@@ -1,6 +1,3 @@
----
-
-```markdown
 # 📚 SaralKakshya – Smart Classroom Management System  
 
 **A BCA Project II Submission** | *Developed for Ratna Rajyalaxmi Campus, Tribhuvan University*  
