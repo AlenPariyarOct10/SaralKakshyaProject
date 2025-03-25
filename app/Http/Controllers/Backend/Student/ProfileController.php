@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -95,6 +96,38 @@ class ProfileController extends Controller
             'status' => 'success',
             'message' => 'Profile picture updated successfully!',
             'image_url' => asset('storage/profile_pictures/' . $fileName)
+        ]);
+    }
+
+    public function update_personal_info(Request $request)
+    {
+        $request->validate([
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:255', 'unique:students'],
+            'address' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:students'],
+            'dob'=>['required','date'],
+            'guardian_name'=>['required','string', 'max:255'],
+            'guardian_phone'=>['required','string', 'max:255'],
+        ]);
+
+        $user = Auth::user();
+
+        $toupdate = Student::findOrFail($user->id);
+        $toupdate->fname = $request->get('fname');
+        $toupdate->lname = $request->get('lname');
+        $toupdate->phone = $request->get('phone');
+        $toupdate->address = $request->get('address');
+        $toupdate->email = $request->get('email');
+        $toupdate->dob = $request->get('dob');
+        $toupdate->guardian_name = $request->get('guardian_name');
+        $toupdate->guardian_phone = $request->get('guardian_phone');
+        $toupdate->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully!',
         ]);
     }
 }

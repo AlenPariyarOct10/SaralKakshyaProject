@@ -80,11 +80,11 @@
         </div>
 
         <nav class="p-4 space-y-1">
-            <a href="{{route('admin.dashboard')}}" class="sidebar-item active">
+            <a href="{{route('admin.dashboard')}}" class="sidebar-item {{ Route::is("admin.dashboard") ? "active" : "" }}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{route('admin.programs.index')}}" class="sidebar-item">
+            <a href="{{route('admin.programs.index')}}" class="sidebar-item {{ Route::is("admin.programs.index") ? "active" : "" }}">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Programs</span>
             </a>

@@ -305,16 +305,16 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="personalInfoForm">
+                <form  id="personalInfoForm">
                     <div class="space-y-4">
                         <div class="flex space-x-4">
                             <div class="flex-1">
                                 <label for="firstNamePersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-                                <input type="text" id="firstNamePersonal" name="firstNamePersonal" value="{{$user->fname}}" class="form-input">
+                                <input type="text" id="firstNamePersonal" name="fname" value="{{$user->fname}}" class="form-input">
                             </div>
                             <div class="flex-1">
                                 <label for="lastNamePersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
-                                <input type="text" id="lastNamePersonal" name="lastNamePersonal" value="{{$user->lname}}" class="form-input">
+                                <input type="text" id="lastNamePersonal" name="lname" value="{{$user->lname}}" class="form-input">
                             </div>
                         </div>
                         <div>
@@ -323,23 +323,23 @@
                         </div>
                         <div>
                             <label for="emailPersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                            <input type="email" id="emailPersonal" name="emailPersonal" value="{{$user->email}}" class="form-input">
+                            <input type="email" id="emailPersonal" name="email" value="{{$user->email}}" class="form-input">
                         </div>
                         <div>
                             <label for="phonePersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                            <input type="tel" id="phonePersonal" name="phonePersonal" value="{{$user->phone}}" class="form-input">
+                            <input type="tel" id="phonePersonal" name="phone" value="{{$user->phone}}" class="form-input">
                         </div>
                         <div>
                             <label for="addressPersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
-                            <textarea id="addressPersonal" name="addressPersonal" rows="2" class="form-input">{{$user->address}}</textarea>
+                            <textarea id="addressPersonal" name="address" rows="2" class="form-input">{{$user->address}}</textarea>
                         </div>
                         <div>
                             <label for="emergencyContactPersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parents Name</label>
-                            <input type="text" id="emergencyContactPersonal" name="emergencyContactPersonal" value="{{$user->guardian_name}}" class="form-input">
+                            <input type="text" id="emergencyContactPersonal" name="guardian_name" value="{{$user->guardian_name}}" class="form-input">
                         </div>
                         <div>
                             <label for="emergencyContactPersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parents Phone</label>
-                            <input type="text" id="emergencyContactPersonal" name="emergencyContactPersonal" value="{{$user->guardian_phone}}" class="form-input">
+                            <input type="text" id="emergencyContactPersonal" name="guardian_phone" value="{{$user->guardian_phone}}" class="form-input">
                         </div>
                     </div>
 
