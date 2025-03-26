@@ -89,14 +89,22 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
-                    <input type="text" id="searchPrograms" placeholder="Search departments..."
-                           class="form-input rounded-lg pl-10 pr-4 py-2 focus:ring-2 ">
+                    <input type="text" id="searchPrograms" placeholder="Search students..." class="form-input pl-12 pr-4 py-2">
                 </div>
-
+                <div>
+                    <select id="departmentFilter" class="form-input py-2">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Business">Business</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
             </div>
 
             <button id="addProgramBtn" class="btn-primary flex items-center justify-center">
-                <i class="fas fa-plus mr-2"></i> Add New Departments
+                <i class="fas fa-plus mr-2"></i> Add New Program
             </button>
         </div>
 
@@ -106,15 +114,21 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th scope="col" class="table-header">Department Name</th>
-                        <th scope="col" class="table-header">Total Programs</th>
+                        <th scope="col" class="table-header">Name</th>
+                        <th scope="col" class="table-header">Department</th>
+                        <th scope="col" class="table-header">Total Batches</th>
+                        <th scope="col" class="table-header">Total Semesters</th>
+                        <th scope="col" class="table-header">Duration (Years)</th>
                         <th scope="col" class="table-header">Status</th>
                         <th scope="col" class="table-header">Actions</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="programsTableBody">
                     <tr>
-                        <td class="table-cell font-medium">BCA</td>
+                        <td class="table-cell font-medium">Bachelor of Computer Science</td>
+                        <td class="table-cell">Computer Science</td>
+                        <td class="table-cell">4</td>
+                        <td class="table-cell">8</td>
                         <td class="table-cell">4</td>
                         <td class="table-cell">
                             <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
@@ -130,9 +144,51 @@
                             </div>
                         </td>
                     </tr>
-
+                    <tr>
+                        <td class="table-cell font-medium">Master of Business Administration</td>
+                        <td class="table-cell">Business</td>
+                        <td class="table-cell">2</td>
+                        <td class="table-cell">4</td>
+                        <td class="table-cell">2</td>
+                        <td class="table-cell">
+                            <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
+                        </td>
+                        <td class="table-cell">
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="2" aria-label="Edit program">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="2" aria-label="Delete program">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-cell font-medium">Bachelor of Mechanical Engineering</td>
+                        <td class="table-cell">Engineering</td>
+                        <td class="table-cell">4</td>
+                        <td class="table-cell">8</td>
+                        <td class="table-cell">4</td>
+                        <td class="table-cell">
+                            <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
+                        </td>
+                        <td class="table-cell">
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="3" aria-label="Edit program">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="3" aria-label="Delete program">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                     <tr>
                         <td class="table-cell font-medium">Bachelor of Fine Arts</td>
+                        <td class="table-cell">Arts</td>
+                        <td class="table-cell">3</td>
+                        <td class="table-cell">6</td>
                         <td class="table-cell">3</td>
                         <td class="table-cell">
                             <span class="badge bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Under Review</span>
@@ -150,7 +206,10 @@
                     </tr>
                     <tr>
                         <td class="table-cell font-medium">PhD in Physics</td>
+                        <td class="table-cell">Science</td>
                         <td class="table-cell">1</td>
+                        <td class="table-cell">6</td>
+                        <td class="table-cell">3</td>
                         <td class="table-cell">
                             <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
                         </td>

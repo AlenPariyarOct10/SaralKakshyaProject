@@ -11,19 +11,21 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    // Show registration form
     public function showRegister()
     {
         $system_info = SystemSetting::first();
         return view('backend.teacher.signup', compact('system_info'));
     }
 
+    // Show login form
     public function showLogin()
     {
         $system_info = SystemSetting::first();
         return view('backend.teacher.login', compact('system_info'));
     }
 
-
+    // Handle login attempt
     public function login(Request $request)
     {
         $request->validate([
@@ -40,6 +42,7 @@ class AuthController extends Controller
         return redirect()->route('teacher.login')->withErrors(['email' => 'Invalid credentials']);
     }
 
+    // Handle registration of a new teacher
     public function register(Request $request)
     {
         $request->validate([
@@ -60,63 +63,10 @@ class AuthController extends Controller
         return redirect()->route('teacher.login')->with('success', 'You have successfully registered.');
     }
 
+    // Handle logout functionality
     public function logout()
     {
-        Auth::guard('teacher')->logout(); // Logout the admin
+        Auth::guard('teacher')->logout(); // Logout the teacher
         return redirect()->route('teacher.login');
-    }/**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

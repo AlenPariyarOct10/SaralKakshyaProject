@@ -11,6 +11,9 @@ use App\Http\Controllers\Backend\Student\ProfileController as StudentProfileCont
 use App\Http\Controllers\Backend\Admin\ProgramController as AdminProgramController;
 use App\Http\Controllers\Backend\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Backend\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Backend\Admin\DepartmentController as AdminDepartmentController;
+use App\Http\Controllers\Backend\Admin\StudentController as AdminStudentController;
+use App\Http\Controllers\Backend\Admin\TeacherController as AdminTeacherController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,9 +29,14 @@ Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['auth:admin'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, "index"])->name('admin.dashboard');
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
+        Route::get('/department', [AdminDepartmentController::class, "index"])->name('admin.department.index');
         Route::get('/attendance-face', [AdminAttendanceController::class, "face_index"])->name('admin.attendance-face.index');
+
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
         Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
+
+        Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
+        Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
 
         Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');

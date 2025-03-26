@@ -77,20 +77,33 @@
                     <i class="fas fa-book"></i>
                     <span>Programs</span>
                 </a>
+                <a href="{{route("admin.department.index")}}" class="sidebar-item  {{Route::is("admin.department.index")? "active":""}}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Departments</span>
+                </a>
                 <a href="{{route("admin.attendance.index")}}" class="sidebar-item {{Route::is("admin.attendance.index")? "active":""}}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
 
-                <a href="{{route("admin.attendance-face.index")}}" class="sidebar-item {{route("admin.attendance-face.index")}}">
+                <a href="{{route("admin.attendance-face.index")}}" class="sidebar-item {{Route::is("admin.attendance-face.index")? "active":""}}">
                     <i class="fas fa-video"></i>
                     <span>Attendance Face Recognition</span>
                 </a>
-                <a href="{{route("admin.announcement.index")}}" class="sidebar-item">
+                <a href="{{route("admin.announcement.index")}}" class="sidebar-item {{Route::is("admin.announcement.index")? "active":""}}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
-
+                <div class="pt-4 mt-4 border-t dark:border-gray-700">
+                    <a href="{{route("admin.student.index")}}" class="sidebar-item {{Route::is("admin.student.index")? "active":""}}">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Students</span>
+                    </a>
+                    <a href="{{route("admin.teacher.index")}}" class="sidebar-item {{Route::is("admin.teacher.index")? "active":""}}">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Teachers</span>
+                    </a>
+                </div>
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
                     <a href="" class="sidebar-item">
                         <i class="fas fa-user"></i>
@@ -100,13 +113,10 @@
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                    <form action="{{ route('admin.logout') }}" method="get" class="sidebar-item text-red-500 dark:text-red-400">
-                        <button type="submit" class="flex items-center">
+                    <a href="{{ route('admin.logout') }}" class="sidebar-item text-red-500 dark:text-red-400">
                             <i class="fas fa-sign-out-alt"></i>
-                            Logout Now
-                        </button>
-                    </form>
-
+                            <span> Logout Now</span>
+                    </a>
                 </div>
             </nav>
         </aside>
