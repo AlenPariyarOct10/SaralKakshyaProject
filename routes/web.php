@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\Student\AuthController as StudentAuthController
 use App\Http\Controllers\Backend\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Backend\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Backend\Admin\ProgramController as AdminProgramController;
+use App\Http\Controllers\Backend\Admin\AttendanceController as AdminAttendanceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +24,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::middleware(['auth:admin'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, "index"])->name('admin.dashboard');
+        Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
+        Route::get('/attendance-face', [AdminAttendanceController::class, "face_index"])->name('admin.attendance-face.index');
 
         Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
