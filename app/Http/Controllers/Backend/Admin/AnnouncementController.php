@@ -6,17 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class DashboardController extends Controller
+class AnnouncementController extends Controller
 {
-
-    protected $page_title = "Dashboard";
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $user = Auth::guard('admin')->user();
-        return view('backend.admin.dashboard', compact('user'));
+        $user = Auth::user();
+        return view('backend.admin.announcement', compact('user'));
+
     }
 
     /**
@@ -24,7 +23,10 @@ class DashboardController extends Controller
      */
     public function create()
     {
-        //
+        $user = Auth::user();
+
+        return view('backend.admin.upload-announcement', compact('user'));
+
     }
 
     /**

@@ -285,11 +285,7 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label for="totalBatches" class="form-label">Total Batches</label>
-                            <input type="number" id="totalBatches" class="form-input" min="1" placeholder="Batches" required>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
                         <div>
                             <label for="totalSemesters" class="form-label">Total Semesters</label>

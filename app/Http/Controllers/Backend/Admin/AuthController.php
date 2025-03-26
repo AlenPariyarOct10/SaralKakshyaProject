@@ -26,14 +26,22 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        $credentials = $request->only('email', 'password'); // Extract email & password
+        $credentials = $request->only('email', 'password');
 
         if (Auth::guard('admin')->attempt($credentials)) {
-            return redirect()->intended(route('admin.dashboard')); // Redirect to dashboard if success
+            $request->session()->regenerate();
+
+            // Debug: Check if authentication is successful
+            if (Auth::guard('admin')->user()) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return back()->withErrors(['email' => 'Authentication failed, please try again']);
         }
 
         return redirect()->route('admin.login')->withErrors(['email' => 'Invalid credentials']);
     }
+
 
     public function logout()
     {

@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 class Teacher extends Authenticatable
 {
     use HasFactory, Notifiable;
+    protected $guard = 'teacher';
+
 
     protected $table = 'teachers'; // Define table name explicitly
 

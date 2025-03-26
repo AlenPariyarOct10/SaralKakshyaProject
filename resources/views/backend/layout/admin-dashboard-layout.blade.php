@@ -86,7 +86,7 @@
                     <i class="fas fa-video"></i>
                     <span>Attendance Face Recognition</span>
                 </a>
-                <a href="announcements.html" class="sidebar-item">
+                <a href="{{route("admin.announcement.index")}}" class="sidebar-item">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
@@ -120,7 +120,7 @@
                         <button id="openSidebar" class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
                     </div>
 
                     <div class="flex items-center space-x-4">
@@ -167,7 +167,7 @@
                             <button id="profileBtn" class="flex items-center space-x-2">
                                 <img src="{{ $user->profile_picture ? asset($user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}"
                                      alt="Profile" class="w-8 h-8 rounded-full">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{$user->fname." ".$user->fname}}</span>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{$user->fname." ".$user->lname}}</span>
                                 <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:block"></i>
                             </button>
 

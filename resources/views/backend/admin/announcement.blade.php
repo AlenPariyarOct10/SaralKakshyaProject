@@ -1,4 +1,6 @@
+
 @extends("backend.layout.admin-dashboard-layout")
+
 
 @section('username')
     {{$user->fname}} {{$user->lname}}
@@ -17,7 +19,7 @@
 @section('content')
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
-<main class="p-4 md:p-6">
+
     <!-- Announcement Filters -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div class="flex flex-col md:flex-row gap-4">
@@ -38,6 +40,9 @@
                     <option value="month">This Month</option>
                 </select>
             </div>
+            <a href="{{route('admin.announcement.create')}}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">
+                Add Announcement
+            </a>
         </div>
 
         <div class="relative">
@@ -214,3 +219,4 @@
         </div>
     </div>
 </main>
+@endsection
