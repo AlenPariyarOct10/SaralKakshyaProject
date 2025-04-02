@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Program;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +17,7 @@ class ProgramController extends Controller
     public function index()
     {
         $allDepartments = Department::all();
-        $programs = Program::all();
+        $programs = Program::with('department')->get();
         $user = Auth::guard('admin')->user();
         return view('backend.admin.program', compact('user', 'allDepartments', 'programs'));
     }
@@ -83,6 +84,18 @@ class ProgramController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $program = Program::find($id);
+
+            if (!$program) {
+                return response()->json(['success' => false, 'message' => 'Program not found'], 404);
+            }
+
+            $program->delete(); // Use Eloquent instead of destroy()
+
+            return response()->json(['success' => true, 'message' => 'Program deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

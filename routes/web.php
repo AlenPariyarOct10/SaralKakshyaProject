@@ -46,6 +46,7 @@ Route::group(['prefix' => 'admin'], function () {
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
         Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
+        Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
 
 
 

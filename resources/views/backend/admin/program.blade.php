@@ -85,6 +85,8 @@
 
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
+        <x-backend.toast-message/>
+
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
@@ -105,10 +107,14 @@
                     </select>
                 </div>
             </div>
-
-            <button id="addProgramBtn" class="btn-primary flex items-center justify-center">
-                <i class="fas fa-plus mr-2"></i> Add New Program
-            </button>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="manageBatchBtn" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
+                    <i class="fas fa-plus mr-2"></i> Manage Batch
+                </button>
+                <button id="addProgramBtn" class="btn-primary flex items-center justify-center">
+                    <i class="fas fa-plus mr-2"></i> Add New Program
+                </button>
+            </div>
         </div>
 
         <!-- Programs Table -->
@@ -130,7 +136,7 @@
                     @forelse($programs as $program)
                         <tr>
                             <td class="table-cell font-medium">{{$program->name}}</td>
-                            <td class="table-cell">{{$program->department_name}}</td>
+                            <td class="table-cell">{{$program->department->name}}</td>
                             <td class="table-cell">4</td>
                             <td class="table-cell">{{$program->total_semesters}}</td>
                             <td class="table-cell">{{$program->duration}}</td>
@@ -146,10 +152,10 @@
                             </td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
-                                    <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="1" aria-label="Edit program">
+                                    <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Edit program">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="1" aria-label="Delete program">
+                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Delete program">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -190,6 +196,71 @@
 @section("modals")
     <!-- Add Program Modal -->
     <div id="programModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="modalTitle" class="text-xl font-semibold text-gray-800 dark:text-white">Add New Program</h3>
+                    <button id="closeModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form action="{{route('admin.programs.store')}}" method="POST">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="programName" class="form-label">Program Name</label>
+                        <input type="text" name="name" id="programName" class="form-input" placeholder="Enter program name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="department" class="form-label">Department</label>
+                        <select id="department" name="department_id" class="form-input" required>
+                            <option value="null">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+                        <div>
+                            <label for="totalSemesters" class="form-label">Total Semesters</label>
+                            <input type="number" name="total_semesters" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
+                        </div>
+
+                        <div>
+                            <label for="durationYears" class="form-label">Duration (Years)</label>
+                            <input type="number" name="duration" id="durationYears" class="form-input" min="1" placeholder="Years" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="programStatus" class="form-label">Status</label>
+                        <select id="programStatus" name="status" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="programDescription" class="form-label">Description (Optional)</label>
+                        <textarea id="programDescription" name="description" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-6">
+                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" id="saveBtn" class="btn-primary">Save Program</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Manage Batch Modal -->
+    <div id="manageBatchModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
         <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
@@ -346,8 +417,6 @@
 
 @section("scripts")
     <script>
-
-
         // Program Modal
         const programModal = document.getElementById('programModal');
         const addProgramBtn = document.getElementById('addProgramBtn');
@@ -357,11 +426,21 @@
         const programForm = document.getElementById('programForm');
         const programId = document.getElementById('programId');
 
+        // Batch Modal
+        const manageBatchModal = document.getElementById('manageBatchModal');
+        const manageBatchBtn = document.getElementById('manageBatchBtn');
+
         // Delete Modal
         const deleteModal = document.getElementById('deleteModal');
         const closeDeleteModal = document.getElementById('closeDeleteModal');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        // Manage Batch Modal
+        manageBatchBtn.addEventListener('click', ()=>{
+            console.log("clicked");
+            manageBatchModal.classList.remove("hidden");
+        })
 
         // Open Add Program Modal
         addProgramBtn.addEventListener('click', () => {
@@ -440,13 +519,35 @@
 
         confirmDeleteBtn.addEventListener('click', () => {
             if (programToDelete) {
-                // In a real application, you would send a delete request to the server
-                // For this demo, we'll just remove the row from the table
+
                 const row = document.querySelector(`.delete-program-btn[data-id="${programToDelete}"]`).closest('tr');
                 row.remove();
 
-                // Show a success message (in a real app, you might use a toast notification)
-                alert('Program deleted successfully');
+                fetch(`/admin/programs/${programToDelete}`, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Program Deleted',
+                            })
+                        } else {
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Failed to delete',
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);  // Log any errors
+                    });
 
                 deleteModal.classList.add('hidden');
                 programToDelete = null;
