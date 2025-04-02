@@ -127,106 +127,41 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="programsTableBody">
-                    <tr>
-                        <td class="table-cell font-medium">Bachelor of Computer Science</td>
-                        <td class="table-cell">Computer Science</td>
-                        <td class="table-cell">4</td>
-                        <td class="table-cell">8</td>
-                        <td class="table-cell">4</td>
-                        <td class="table-cell">
-                            <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="1" aria-label="Edit program">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="1" aria-label="Delete program">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="table-cell font-medium">Master of Business Administration</td>
-                        <td class="table-cell">Business</td>
-                        <td class="table-cell">2</td>
-                        <td class="table-cell">4</td>
-                        <td class="table-cell">2</td>
-                        <td class="table-cell">
-                            <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="2" aria-label="Edit program">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="2" aria-label="Delete program">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="table-cell font-medium">Bachelor of Mechanical Engineering</td>
-                        <td class="table-cell">Engineering</td>
-                        <td class="table-cell">4</td>
-                        <td class="table-cell">8</td>
-                        <td class="table-cell">4</td>
-                        <td class="table-cell">
-                            <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="3" aria-label="Edit program">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="3" aria-label="Delete program">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="table-cell font-medium">Bachelor of Fine Arts</td>
-                        <td class="table-cell">Arts</td>
-                        <td class="table-cell">3</td>
-                        <td class="table-cell">6</td>
-                        <td class="table-cell">3</td>
-                        <td class="table-cell">
-                            <span class="badge bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Under Review</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="4" aria-label="Edit program">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="4" aria-label="Delete program">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="table-cell font-medium">PhD in Physics</td>
-                        <td class="table-cell">Science</td>
-                        <td class="table-cell">1</td>
-                        <td class="table-cell">6</td>
-                        <td class="table-cell">3</td>
-                        <td class="table-cell">
-                            <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="5" aria-label="Edit program">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="5" aria-label="Delete program">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @forelse($programs as $program)
+                        <tr>
+                            <td class="table-cell font-medium">{{$program->name}}</td>
+                            <td class="table-cell">{{$program->department_name}}</td>
+                            <td class="table-cell">4</td>
+                            <td class="table-cell">{{$program->total_semesters}}</td>
+                            <td class="table-cell">{{$program->duration}}</td>
+                            <td class="table-cell">
+                                @if($program->status == "active")
+                                    <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
+                                @endif
+
+                                @if($program->status == "inactive")
+                                    <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
+                                @endif
+
+                            </td>
+                            <td class="table-cell">
+                                <div class="flex items-center space-x-2">
+                                    <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="1" aria-label="Edit program">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="1" aria-label="Delete program">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td class="table-cell font-medium text-center" colspan="7">No Programs Found</td>
+                        </tr>
+                    @endforelse
+
+
                     </tbody>
                 </table>
             </div>
@@ -265,12 +200,11 @@
                     </button>
                 </div>
 
-                <form id="programForm">
-                    <input type="hidden" id="programId" value="">
-
+                <form action="{{route('admin.programs.store')}}" method="POST">
+                    @csrf
                     <div class="mb-4">
                         <label for="programName" class="form-label">Program Name</label>
-                        <input type="text" id="programName" class="form-input" placeholder="Enter program name" required>
+                        <input type="text" name="name" id="programName" class="form-input" placeholder="Enter program name" required>
                     </div>
 
                     <div class="mb-4">
@@ -289,27 +223,26 @@
 
                         <div>
                             <label for="totalSemesters" class="form-label">Total Semesters</label>
-                            <input type="number" name="" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
+                            <input type="number" name="total_semesters" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
                         </div>
 
                         <div>
                             <label for="durationYears" class="form-label">Duration (Years)</label>
-                            <input type="number" id="durationYears" class="form-input" min="1" placeholder="Years" required>
+                            <input type="number" name="duration" id="durationYears" class="form-input" min="1" placeholder="Years" required>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label for="programStatus" class="form-label">Status</label>
-                        <select id="programStatus" class="form-input" required>
+                        <select id="programStatus" name="status" class="form-input" required>
                             <option value="active">Active</option>
-                            <option value="review">Under Review</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
                         <label for="programDescription" class="form-label">Description (Optional)</label>
-                        <textarea id="programDescription" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                        <textarea id="programDescription" name="description" class="form-input" rows="3" placeholder="Enter program description"></textarea>
                     </div>
 
                     <div class="flex justify-end space-x-2 mt-6">
@@ -520,29 +453,6 @@
             }
         });
 
-        // Form Submission
-        programForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // In a real application, you would send the form data to the server
-            // For this demo, we'll just show a success message
-            const isEditing = programId.value !== '';
-            const message = isEditing ? 'Program updated successfully' : 'Program added successfully';
-
-            alert(message);
-
-            // Close the modal
-            programModal.classList.add('hidden');
-
-            // If adding a new program, you would typically refresh the table or add a new row
-            // For this demo, we'll just reload the page after a short delay
-            if (!isEditing) {
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }
-        });
-
         // Search and Filter
         const searchInput = document.getElementById('searchPrograms');
         const departmentFilter = document.getElementById('departmentFilter');
@@ -552,10 +462,13 @@
             const department = departmentFilter.value;
 
             const rows = document.querySelectorAll('#programsTableBody tr');
+            console.log(rows);
 
             rows.forEach(row => {
                 const programName = row.querySelector('td:first-child').textContent.toLowerCase();
                 const programDepartment = row.querySelector('td:nth-child(2)').textContent;
+
+
 
                 const matchesSearch = programName.includes(searchTerm);
                 const matchesDepartment = department === '' || programDepartment === department;

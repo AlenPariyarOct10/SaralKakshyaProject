@@ -42,6 +42,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/department', [AdminDepartmentController::class, "update"])->name('admin.department.update');
         Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
 
+
+//        Programs
+        Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
+        Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
+
+
+
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
         Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');
         Route::delete('/testimonial/{id}', [AdminTestimonialController::class, "destroy"])->name('admin.testimonial.destroy');
@@ -55,7 +62,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
 
         Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-        Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
 
     });
 });
