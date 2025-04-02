@@ -6,6 +6,9 @@
     <title>SaralKakshya - Smart Classroom Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="{{asset('js/swiper.js')}}"></script>
+    <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
+
     <script>
         tailwind.config = {
             theme: {
@@ -54,6 +57,8 @@
             background-color: #f8fafc;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
+
+
     </style>
 </head>
 <body class="font-sans text-gray-800">
@@ -400,7 +405,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-10 lg:mt-0">
                     <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white mx-auto">
                         <i class="fas fa-user-shield"></i>
@@ -444,7 +448,6 @@
         </div>
     </div>
 </div>
-
 <!-- Testimonials Section -->
 <div id="testimonials" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -457,88 +460,35 @@
                 See what teachers, students, and administrators are saying about SaralKakshya.
             </p>
         </div>
-
-        <div class="mt-12">
-            <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-                <!-- Testimonial 1 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-8">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <img class="h-12 w-12 rounded-full" src="/placeholder.svg?height=48&width=48" alt="Teacher avatar">
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Rajesh Sharma</h4>
-                                <p class="text-sm text-gray-500">Science Teacher, Delhi Public School</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <p class="text-gray-600">
-                                "SaralKakshya has transformed how I teach science. The virtual lab simulations and assignment tracking have made my classes more engaging and efficient."
-                            </p>
-                        </div>
-                        <div class="mt-4 flex text-yellow-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 2 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-8">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <img class="h-12 w-12 rounded-full" src="/placeholder.svg?height=48&width=48" alt="Student avatar">
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Priya Patel</h4>
-                                <p class="text-sm text-gray-500">12th Grade Student, Greenwood High</p>
+        <div class="mt-12 ">
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper mb-5">
+                    @forelse($testimonial as $row)
+                        <!-- Each Testimonial is a Slide -->
+                        <div class="swiper-slide flex justify-center">
+                            <div class="bg-white rounded-lg shadow-lg overflow-hidden p-8 w-full max-w-sm min-h-[240px] flex flex-col">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <img class="h-12 w-12 rounded-full" src="{{ asset('storage/'.$row->profile_picture) }}" alt="Teacher avatar">
+                                    </div>
+                                    <div class="ml-4">
+                                        <h4 class="text-lg font-bold text-gray-900">{{ $row->user_name }}</h4>
+                                        <p class="text-sm text-gray-500">{{ $row->designation }}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex-grow">
+                                    <p class="text-gray-600 line-clamp-5">"{{ $row->description }}"</p>
+                                </div>
+                                <div class="mt-4 flex text-yellow-400">
+                                    @for($i = 0; $i < $row->stars ; $i++)
+                                        <i class="fas fa-star"></i>
+                                    @endfor
+                                </div>
                             </div>
                         </div>
-                        <div class="mt-4">
-                            <p class="text-gray-600">
-                                "I love how easy it is to keep track of all my assignments and communicate with teachers. The mobile app lets me study even when I'm on the go."
-                            </p>
-                        </div>
-                        <div class="mt-4 flex text-yellow-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 3 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-8">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <img class="h-12 w-12 rounded-full" src="/placeholder.svg?height=48&width=48" alt="Principal avatar">
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Dr. Anand Kumar</h4>
-                                <p class="text-sm text-gray-500">Principal, Modern Academy</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <p class="text-gray-600">
-                                "Implementing SaralKakshya has increased our school's efficiency by 40%. The comprehensive analytics help us make data-driven decisions for better outcomes."
-                            </p>
-                        </div>
-                        <div class="mt-4 flex text-yellow-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
+                    @empty
+                        <p class="text-center text-gray-500">No testimonials available</p>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -822,8 +772,30 @@
         </div>
     </div>
 </footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1,  // Show 1 slide at a time on small screens
+            spaceBetween: 20,
+            loop: true, // Enable infinite loop
+
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            breakpoints: {
+                640: { slidesPerView: 1 }, // Mobile: 1 slide
+                768: { slidesPerView: 2 }, // Tablet: 2 slides
+                1024: { slidesPerView: 3 } // Desktop: 3 slides
+            }
+        });
+    });
+</script>
+
+
 
 <script>
+
     // Mobile menu toggle
     document.getElementById('mobile-menu-button').addEventListener('click', function() {
         const mobileMenu = document.getElementById('mobile-menu');

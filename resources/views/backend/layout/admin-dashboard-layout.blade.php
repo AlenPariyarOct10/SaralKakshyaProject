@@ -5,11 +5,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @livewireStyles
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Classroom - Dashboard</title>
+    <title>{{\App\Models\SystemSetting::all()->first()->name}} - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
+    <script src="{{asset('js/sweetalert.js')}}"></script>
+    <script src="{{asset('js/swiper.js')}}"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -54,6 +59,39 @@
             }
         }
     </style>
+    <style>
+        .colored-toast.swal2-icon-success {
+            background-color: #a5dc86 !important;
+        }
+
+        .colored-toast.swal2-icon-error {
+            background-color: #f27474 !important;
+        }
+
+        .colored-toast.swal2-icon-warning {
+            background-color: #f8bb86 !important;
+        }
+
+        .colored-toast.swal2-icon-info {
+            background-color: #3fc3ee !important;
+        }
+
+        .colored-toast.swal2-icon-question {
+            background-color: #87adbd !important;
+        }
+
+        .colored-toast .swal2-title {
+            color: white;
+        }
+
+        .colored-toast .swal2-close {
+            color: white;
+        }
+
+        .colored-toast .swal2-html-container {
+            color: white;
+        }
+    </style>
     @stack('styles')
 </head>
 @section("content")
@@ -62,7 +100,7 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
             <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
-                <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">Smart Classroom</h1>
+                <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">{{\App\Models\SystemSetting::all()->first()->name}}</h1>
                 <button id="closeSidebar" class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                     <i class="fas fa-times"></i>
                 </button>
@@ -88,11 +126,15 @@
 
                 <a href="{{route("admin.attendance-face.index")}}" class="sidebar-item {{Route::is("admin.attendance-face.index")? "active":""}}">
                     <i class="fas fa-video"></i>
-                    <span>Attendance Face Recognition</span>
+                    <span>Attendance - Face</span>
                 </a>
                 <a href="{{route("admin.announcement.index")}}" class="sidebar-item {{Route::is("admin.announcement.index")? "active":""}}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
+                </a>
+                <a href="{{route("admin.testimonial.index")}}" class="sidebar-item {{Route::is("admin.testimonial.index")? "active":""}}">
+                    <i class="fa-solid fa-star-half-stroke"></i>
+                    <span>Testimonial</span>
                 </a>
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
                     <a href="{{route("admin.student.index")}}" class="sidebar-item {{Route::is("admin.student.index")? "active":""}}">
@@ -209,11 +251,22 @@
             @yield("content")
         </div>
     </div>
-    @yield("modals")
 
-    @yield("scripts")
+    @yield("modals")
+    @livewireScripts
     <script>
-        @yield("js")
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            iconColor: 'white',
+            customClass: {
+                popup: 'colored-toast',
+            },
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+        });
+
         // Sidebar Toggle
         const sidebar = document.getElementById('sidebar');
         const openSidebar = document.getElementById('openSidebar');
@@ -264,6 +317,10 @@
             notificationDropdown.classList.add('hidden');
             profileDropdown.classList.add('hidden');
         });
+
+        @yield("js")
+
     </script>
+    @yield("scripts")
     </body>
 </html>

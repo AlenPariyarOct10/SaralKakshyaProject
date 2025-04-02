@@ -274,56 +274,7 @@
 @endsection
 @section("scripts")
     <script>
-        // Sidebar Toggle
-        const sidebar = document.getElementById('sidebar');
-        const openSidebar = document.getElementById('openSidebar');
-        const closeSidebar = document.getElementById('closeSidebar');
 
-        openSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-        });
-
-        closeSidebar.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-        });
-
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-
-        // Check for saved theme preference or use the system preference
-        if (localStorage.getItem('darkMode') === 'true' ||
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        });
-
-        // Dropdowns
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        const profileBtn = document.getElementById('profileBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
-
-        notificationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('hidden');
-            profileDropdown.classList.add('hidden');
-        });
-
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-            notificationDropdown.classList.add('hidden');
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', () => {
-            notificationDropdown.classList.add('hidden');
-            profileDropdown.classList.add('hidden');
-        });
 
         // Select All Checkbox
         const selectAll = document.getElementById('selectAll');
@@ -353,8 +304,11 @@
         const saveAttendance = document.getElementById('saveAttendance');
 
         saveAttendance.addEventListener('click', () => {
-            // In a real app, you would save the attendance data to a database
-            alert('Attendance saved successfully!');
+            console.log("helo");
+            Toast.fire({
+                icon: 'success',
+                title: 'Success',
+            });
         });
 
         // Generate Report Button

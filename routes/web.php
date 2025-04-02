@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Backend\Teacher\AuthController as TeacherAuthController;
 use App\Http\Controllers\Backend\Admin\AuthController as AdminAuthController;
+use App\Models\Testimonial;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Backend\Teacher\DashboardController as TeacherDashboardController;
@@ -14,9 +15,12 @@ use App\Http\Controllers\Backend\Admin\AnnouncementController as AdminAnnounceme
 use App\Http\Controllers\Backend\Admin\DepartmentController as AdminDepartmentController;
 use App\Http\Controllers\Backend\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Backend\Admin\TeacherController as AdminTeacherController;
+use App\Http\Controllers\Backend\Admin\TestimonialController as AdminTestimonialController;
 
-Route::get('/', function () {
-    return view('welcome');
+
+Route::get('/', function (){
+    $testimonial = Testimonial::orderBy('rank','asc')->get();
+    return view('welcome', compact('testimonial'));
 });
 
 
@@ -31,6 +35,18 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
         Route::get('/department', [AdminDepartmentController::class, "index"])->name('admin.department.index');
         Route::get('/attendance-face', [AdminAttendanceController::class, "face_index"])->name('admin.attendance-face.index');
+
+//        Department
+        Route::post('/department', [AdminDepartmentController::class, "store"])->name('admin.department.store');
+        Route::delete('/department/{id}', [AdminDepartmentController::class, "destroy"])->name('admin.department.destroy');
+        Route::put('/department', [AdminDepartmentController::class, "update"])->name('admin.department.update');
+        Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
+
+        Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
+        Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');
+        Route::delete('/testimonial/{id}', [AdminTestimonialController::class, "destroy"])->name('admin.testimonial.destroy');
+        Route::put('/testimonial', [AdminTestimonialController::class, "update"])->name('admin.testimonial.update');
+        Route::get('/testimonial/get_testimonial/{id}', [AdminTestimonialController::class, "get_testimonial"])->name('admin.testimonial.get_testimonial');
 
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
         Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
