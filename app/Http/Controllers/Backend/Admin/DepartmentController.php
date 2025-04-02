@@ -39,23 +39,22 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-//       $request = $request->validate([
-//            'name' => 'required|string|max:255',
-//            'status' => 'required|string|max:255',
-//            'description' => 'max:500',
-//        ]);
-//
-//
-//       $status = Department::create($request);
-//       if($status)
-//       {
-//           return redirect()->route('admin.department.index')->with('success', 'Department created successfully');
-//       }else{
-//           return redirect()->route('admin.department.index')->with('error', 'Failed to create department');
-//
-//       }
+       $request = $request->validate([
+            'name' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'description' => 'max:500',
+        ]);
 
-        echo "hello";
+
+       $status = Department::create($request);
+       if($status)
+       {
+           return redirect()->route('admin.department.index')->with('success', 'Department created successfully');
+       }else{
+           return redirect()->route('admin.department.index')->with('error', 'Failed to create department');
+
+       }
+
 
 
     }

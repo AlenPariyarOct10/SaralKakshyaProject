@@ -253,7 +253,7 @@
 @endsection
 
 @section("modals")
-    <!-- Add/Edit Program Modal -->
+    <!-- Add Program Modal -->
     <div id="programModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
         <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -275,13 +275,80 @@
 
                     <div class="mb-4">
                         <label for="department" class="form-label">Department</label>
-                        <select id="department" class="form-input" required>
-                            <option value="">Select Department</option>
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="Business">Business</option>
-                            <option value="Arts">Arts</option>
-                            <option value="Science">Science</option>
+                        <select id="department" name="department_id" class="form-input" required>
+                            <option value="null">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+                        <div>
+                            <label for="totalSemesters" class="form-label">Total Semesters</label>
+                            <input type="number" name="" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
+                        </div>
+
+                        <div>
+                            <label for="durationYears" class="form-label">Duration (Years)</label>
+                            <input type="number" id="durationYears" class="form-input" min="1" placeholder="Years" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="programStatus" class="form-label">Status</label>
+                        <select id="programStatus" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="review">Under Review</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="programDescription" class="form-label">Description (Optional)</label>
+                        <textarea id="programDescription" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-6">
+                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" id="saveBtn" class="btn-primary">Save Program</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Edit Program Modal -->
+    <div id="editProgramModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Add New Program</h3>
+                    <button id="closeEditModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="programForm">
+                    <input type="hidden" id="programId" name="id" value="">
+
+                    <div class="mb-4">
+                        <label for="programName" class="form-label">Program Name</label>
+                        <input type="text" id="editProgramName" name="name" class="form-input" placeholder="Enter program name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="department" class="form-label">Department</label>
+                        <select id="editDepartment" name="department_id" class="form-input" required>
+                            <option value="null">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
                         </select>
                     </div>
 

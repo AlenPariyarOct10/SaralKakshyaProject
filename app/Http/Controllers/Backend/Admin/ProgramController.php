@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,8 +14,9 @@ class ProgramController extends Controller
      */
     public function index()
     {
+        $allDepartments = Department::all();
         $user = Auth::guard('admin')->user();
-        return view('backend.admin.program', compact('user'));
+        return view('backend.admin.program', compact('user', 'allDepartments'));
     }
 
     /**
