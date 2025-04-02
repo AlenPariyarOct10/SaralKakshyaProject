@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Models\Program;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,12 @@ class DepartmentController extends Controller
     {
         $department = Department::findOrFail($id);
         return response()->json($department);
+    }
+
+    public function get_department_programs(Request $request)
+    {
+        $programs = Program::where('department_id', $request->department_id)->get();
+        return response()->json($programs);
     }
 
     /**

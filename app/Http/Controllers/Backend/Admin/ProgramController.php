@@ -79,6 +79,12 @@ class ProgramController extends Controller
         //
     }
 
+    public function get_program_semesters(Request $request)
+    {
+        $semester = Program::findOrFaile($request->id)->semester;
+        return response()->json($semester);
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -98,4 +104,6 @@ class ProgramController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+
 }

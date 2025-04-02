@@ -265,22 +265,16 @@
         <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 id="modalTitle" class="text-xl font-semibold text-gray-800 dark:text-white">Add New Program</h3>
-                    <button id="closeModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Manage Batch</h3>
+                    <button class="closeManageBatchModal p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-                <form action="{{route('admin.programs.store')}}" method="POST">
-                    @csrf
+                <form id="manageBatchForm">
                     <div class="mb-4">
-                        <label for="programName" class="form-label">Program Name</label>
-                        <input type="text" name="name" id="programName" class="form-input" placeholder="Enter program name" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="department" class="form-label">Department</label>
-                        <select id="department" name="department_id" class="form-input" required>
+                        <label for="batchDepartment" class="form-label">Department</label>
+                        <select id="batchDepartment" name="department_id" class="form-input" required>
                             <option value="null">Select Department</option>
                             @forelse($allDepartments as $deprtment)
                                 <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
@@ -289,36 +283,45 @@
                             @endforelse
                         </select>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
-                        <div>
-                            <label for="totalSemesters" class="form-label">Total Semesters</label>
-                            <input type="number" name="total_semesters" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
-                        </div>
-
-                        <div>
-                            <label for="durationYears" class="form-label">Duration (Years)</label>
-                            <input type="number" name="duration" id="durationYears" class="form-input" min="1" placeholder="Years" required>
-                        </div>
-                    </div>
-
                     <div class="mb-4">
-                        <label for="programStatus" class="form-label">Status</label>
-                        <select id="programStatus" name="status" class="form-input" required>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                        <label for="batchProgram" class="form-label">Program</label>
+                        <select id="batchProgram" name="program" class="form-input" required>
+                            <option value="null">Select Program</option>
                         </select>
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="batchSemester" class="form-label">Select Semesters</label>
+                            <select id="batchSemester" name="batchSemester" class="form-input" required>
+                                <option value="null">Select Semester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="programStatus" class="form-label">Status</label>
+                            <select id="programStatus" name="status" class="form-input" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="batchProgram" class="form-label">Enter Batch Title</label>
+                            <input type="text" name="batch" id="batchProgram" class="form-input" placeholder="Batch Title" required="">
+                        </div>
+                        <div>
+                            <label for="batchProgram" class="form-label">Insert Batch</label>
+                            <button type="button" id="addBatchButton" class="btn-primary w-full">Add</button>
+                        </div>
+                    </div>
                     <div class="mb-4">
-                        <label for="programDescription" class="form-label">Description (Optional)</label>
-                        <textarea id="programDescription" name="description" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                        <label for="allBatches" class="form-label">All Batches</label>
+                        <textarea id="allBatches" class="form-input" placeholder="No batches yes" disabled></textarea>
                     </div>
 
                     <div class="flex justify-end space-x-2 mt-6">
-                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" id="saveBtn" class="btn-primary">Save Program</button>
+                        <button type="button" id="cancelBtn" class="closeManageBatchModal btn-danger">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -429,6 +432,7 @@
         // Batch Modal
         const manageBatchModal = document.getElementById('manageBatchModal');
         const manageBatchBtn = document.getElementById('manageBatchBtn');
+        const closeManageBatchModal = document.getElementById('closeManageBatchModal');
 
         // Delete Modal
         const deleteModal = document.getElementById('deleteModal');
@@ -441,6 +445,114 @@
             console.log("clicked");
             manageBatchModal.classList.remove("hidden");
         })
+
+        // Close Manage Batch Model
+        document.querySelectorAll('.closeManageBatchModal').forEach((item) => {
+            item.addEventListener('click', () => {
+                document.getElementById('manageBatchModal').classList.add("hidden");
+            });
+        });
+
+        let selectedDepartment=null;
+
+        $(document).ready(function () {
+            $("#batchDepartment").on("change", function () {
+                let departmentId = $(this).val();
+
+                if (departmentId === "null") {
+                    return; // Do nothing if no department is selected
+                }
+
+                $.ajax({
+                    url: "{{route('admin.department.get_department_programs')}}",  // Replace with your actual route
+                    type: "GET",
+                    data: {
+                        department_id: departmentId,
+                        _token: $('meta[name="csrf-token"]').attr("content") // CSRF Token for Laravel
+                    },
+                    success: function (response) {
+                        console.log("Success:", response);
+                        selectedDepartment = response;
+
+                        // Populate the Program dropdown with the received data
+                        let programDropdown = $("#batchProgram");
+                        console.log(programDropdown);
+                        programDropdown.empty();
+                        programDropdown.append('<option value="null">Select Program</option>');
+
+                        response.forEach((item)=>{
+                            programDropdown.append(`<option value="${item.id}">${item.name}</option>`);
+                        })
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", error);
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+            $("#batchProgram").on("change", function () {
+                let programId = $(this).val();
+
+                if (programId === "null") {
+                    return; // Do nothing if no program is selected
+                }
+
+                console.log("result 1", selectedDepartment);
+                console.log("result 2", programId);
+
+                let totalSemesters = null;
+
+                selectedDepartment.forEach((item) => {
+
+                    if (item.id == programId) {
+                        totalSemesters = item.total_semesters;
+                    }
+                });
+
+                // Ensure totalSemesters is valid
+                if (totalSemesters) {
+                    console.log("total", totalSemesters);
+                    let semesterDropdown = document.getElementById('batchSemester');
+
+                    console.log("sd, ",semesterDropdown);
+
+                    for (let i = 1; i <= totalSemesters; i++) {
+                        semesterDropdown.innerHTML += `<option value="${i}">${i}</option>`;
+                    }
+                }
+            });
+        });
+
+
+        $(document).ready(function () {
+            $("#addBatchButton").click(function () {
+                // Get form data
+                let department = $("#batchDepartment").val();
+                let program = $("#batchProgram").val();
+                let semester = $("#batchSemester").val();
+                let status = $("#programStatus").val();
+                let batchTitle = $("#batchProgram").val();
+
+                // Validate if all required fields are selected/filled
+                if (department === "null" || program === "null" || semester === "null" || batchTitle.trim() === "") {
+                    alert("Please fill in all required fields.");
+                    return;
+                }
+
+                // Append batch details to the textarea
+                let batchInfo = `Department: ${department}, Program: ${program}, Semester: ${semester}, Status: ${status}, Title: ${batchTitle}`;
+                $("#allBatches").val(function (index, currentValue) {
+                    return currentValue ? currentValue + "\n" + batchInfo : batchInfo;
+                });
+
+                // Optionally, reset batch title input after adding
+                $("#batchProgram").val("");
+            });
+        });
+
+
 
         // Open Add Program Modal
         addProgramBtn.addEventListener('click', () => {

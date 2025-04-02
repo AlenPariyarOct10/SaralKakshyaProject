@@ -20,4 +20,9 @@ class Program extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function batch()
+    {
+        return $this->hasMany(Batch::class);
+    }
 }

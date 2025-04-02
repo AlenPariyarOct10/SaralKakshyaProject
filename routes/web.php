@@ -41,12 +41,14 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('/department/{id}', [AdminDepartmentController::class, "destroy"])->name('admin.department.destroy');
         Route::put('/department', [AdminDepartmentController::class, "update"])->name('admin.department.update');
         Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
-
+        Route::get('/department/get_department_programs', [AdminDepartmentController::class, 'get_department_programs'])->name('admin.department.get_department_programs');
 
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
         Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
         Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
+        Route::get('/department/get_program_semesters', [AdminProgramController::class, 'get_program_semesters'])->name('admin.department.get_program_semesters');
+
 
 
 

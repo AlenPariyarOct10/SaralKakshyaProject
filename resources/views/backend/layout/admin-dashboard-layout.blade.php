@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
     <script src="{{asset('js/sweetalert.js')}}"></script>
     <script src="{{asset('js/swiper.js')}}"></script>
+    <script src="{{asset('js/jquery.js')}}"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
