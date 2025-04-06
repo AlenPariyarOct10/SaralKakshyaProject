@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+
+    public function register()
+    {
+        $system_info = SystemSetting::first();
+
+        return view('backend.admin.signup', compact('system_info'));
+    }
+
     public function showLogin()
     {
         if (Auth::check()) {

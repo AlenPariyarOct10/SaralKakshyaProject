@@ -7,7 +7,54 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="{{asset('assets/images/logo.png')}}" type="image/x-icon">
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .bg-primary{
+                @apply bg-primary-500;
+            }
+            .btn-primary {
+                @apply px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors;
+            }
+            .card {
+                @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
+            }
+            .sidebar-item {
+                @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors;
+            }
+            .sidebar-item.active {
+                @apply bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-medium;
+            }
+            /* Add scrollable content styles */
+            .scrollable-content {
+                @apply overflow-y-auto;
+                height: calc(100vh - 64px); /* Adjust based on header height */
+            }
+        }
+    </style>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
@@ -22,7 +69,7 @@
     <!-- Card Container -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary p-6 text-white text-center">
+        <div class="bg-blue-400 p-6 text-white text-center">
             <h1 class="text-2xl font-bold">@yield('logo')</h1>
 
         </div>

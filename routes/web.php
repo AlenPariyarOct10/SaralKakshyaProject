@@ -16,6 +16,7 @@ use App\Http\Controllers\Backend\Admin\DepartmentController as AdminDepartmentCo
 use App\Http\Controllers\Backend\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Backend\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Backend\Admin\TestimonialController as AdminTestimonialController;
+use App\Http\Controllers\Backend\Admin\AcademicInstituteController as AdminAcademicInstituteController;
 
 
 Route::get('/', function (){
@@ -28,6 +29,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
         Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login');
+        Route::get('/register', [AdminAuthController::class, 'register'])->name('admin.register');
+        Route::post('/register', [AdminAuthController::class, 'register'])->name('admin.register');
+        Route::get('/register/institute', [AdminAcademicInstituteController::class, 'create'])->name('admin.register.institute');
+        Route::post('/register/institute', [AdminAcademicInstituteController::class, 'create'])->name('admin.register.institute');
     });
 
     Route::middleware(['auth:admin'])->group(function () {

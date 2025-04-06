@@ -48,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'students',
         ],
+        'super_admin' => [
+            'driver' => 'session',
+            'provider' => 'super_admins',
+        ],
     ],
 
 
@@ -80,6 +84,10 @@ return [
         'students' => [
             'driver' => 'eloquent',
             'model' => App\Models\Student::class,
+        ],
+        'super_admins' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\SuperAdmin::class,
         ],
     ],
 
