@@ -38,6 +38,13 @@ class Admin extends Authenticatable
         'password',
     ];
 
+    public function institute()
+    {
+        return $this->hasOne(Institute::class, 'created_by', 'id');
+    }
+
+
+
     /**
      * Get the attributes that should be cast.
      *

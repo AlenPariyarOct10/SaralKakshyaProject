@@ -21,19 +21,27 @@ return new class extends Migration
             $table->text('profile_picture', 200)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('is_approved')->default(false);
+            $table->foreignId('approved_by')->nullable()->constrained('super_admins')->onDelete('set null');
+            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });
-
     }
-
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::table('admins', function (Blueprint $table) {
+            // Drop the foreign key constraint first
+            $table->dropForeign(['approved_by']);
 
+            // Now drop the columns
+            $table->dropColumn(['is_approved', 'approved_by', 'approved_at']);
+        });
+
+        // Finally, drop the admins table
+        Schema::dropIfExists('admins');
     }
 };

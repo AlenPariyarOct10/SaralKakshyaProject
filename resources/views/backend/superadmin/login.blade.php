@@ -11,12 +11,20 @@
 @section("content")
 <div class="p-6">
     @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+    <div class="bg-green-100 border border-green-500 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
         <strong class="font-bold">Success !</strong>
         <span class="block sm:inline">Account created, Login to continue</span>
     </div>
     @endif
-    <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
+        @if ($errors->any())
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li class="text-red-500">{{ $error }}</li>
+                @endforeach
+            </ul>
+        @endif
+
+        <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
     <p class="text-sm mt-1 mb-6 text-center">Super Admin Login</p>
 
     <form action="{{route('superadmin.login')}}" method="post" id="loginForm">
@@ -66,8 +74,6 @@
             Login
         </button>
     </form>
-
-
 </div>
 
 @endsection

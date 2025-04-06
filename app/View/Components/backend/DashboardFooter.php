@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class toast-message extends Component
+class DashboardFooter extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class toast-message extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.backend.toast-message');
+        return view('components.backend.dashboard-footer');
     }
 }

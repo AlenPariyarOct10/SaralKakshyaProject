@@ -17,4 +17,9 @@ class Department extends Model
     {
         return $this->hasMany(Program::class);
     }
+
+    function institute()
+    {
+        return $this->belongsTo(Institute::class);
+    }
 }

@@ -16,7 +16,7 @@
 
 @section('content')
     <main class="scrollable-content p-4 md:p-6">
-        <!-- Welcome Message -->
+
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome back, {{$user->fname}}!</h1>
             <p class="text-gray-600 dark:text-gray-400">Here's what's happening with your classes today.</p>
@@ -314,5 +314,6 @@
         <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400 pb-6">
             <p>© 2025 Smart Classroom. All rights reserved.</p>
         </footer>
+
     </main>
 @endsection

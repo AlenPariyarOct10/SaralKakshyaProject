@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Backend\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
-use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +29,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::guard('super_admin')->attempt($credentials)) {
-            return redirect()->intended(route('superadmin.dashboard'));
+            return redirect()->intended(route('superadmin.index'));
         }
 
         return redirect()->route('superadmin.login')->withErrors(['email' => 'Invalid credentials']);
