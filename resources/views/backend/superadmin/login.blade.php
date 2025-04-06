@@ -17,9 +17,9 @@
     </div>
     @endif
     <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
-    <p class="text-sm mt-1 mb-6 text-center">Student Account</p>
+    <p class="text-sm mt-1 mb-6 text-center">Super Admin Login</p>
 
-    <form action="{{route('student.login')}}" method="post" id="loginForm">
+    <form action="{{route('superadmin.login')}}" method="post" id="loginForm">
         @csrf
         <!-- Email Input -->
         <div class="mb-4">
@@ -67,16 +67,7 @@
         </button>
     </form>
 
-    <!-- Divider -->
-    <div class="relative flex items-center mt-8 mb-6">
-        <div class="flex-grow border-t border-gray-300"></div>
-    </div>
 
-    <!-- Sign Up Link -->
-    <p class="text-center text-gray-600 text-sm">
-        Don't have an account?
-        <a href="{{route("student.register")}}" class="text-primary hover:text-secondary font-medium">Sign up</a>
-    </p>
 </div>
 
 @endsection
