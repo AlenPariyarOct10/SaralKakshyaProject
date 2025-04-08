@@ -31,18 +31,18 @@
         <!-- Card Container -->
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <!-- Header -->
-
-
             <!-- Form -->
             <div class="p-6">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create Institute Profile</h2>
 
-                <form action="{{route("admin.register.institute")}}" method="post" id="signupForm">
+                <form action="{{route("admin.register.institute.store")}}" method="post" id="signupForm">
 
                     @csrf
                     <!-- Name Inputs -->
                     <div class="grid gap-4 mb-4">
                         <div>
+                            num -> {{$user->id}}
+                            <input type="hidden" name="admin_id" value="{{$user->id}}">
                             <label for="institutionName" class="block text-gray-700 text-sm font-medium mb-2">Institution name</label>
                             <input type="text" id="institutionName" name="name"
                                    class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"

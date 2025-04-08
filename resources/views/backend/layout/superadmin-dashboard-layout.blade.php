@@ -75,6 +75,7 @@
             }
         }
     </style>
+    @stack('styles')
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
 <div class="flex h-screen overflow-hidden">
@@ -87,52 +88,7 @@
             </button>
         </div>
 
-        <nav class="p-4 space-y-1">
-            <a href="dashboard.html" class="sidebar-item active">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="admin-management.html" class="sidebar-item">
-                <i class="fas fa-user-shield"></i>
-                <span>Admin Management</span>
-            </a>
-            <a href="institute-management.html" class="sidebar-item">
-                <i class="fas fa-university"></i>
-                <span>Institute Management</span>
-            </a>
-            <a href="reports.html" class="sidebar-item">
-                <i class="fas fa-chart-bar"></i>
-                <span>Reports & Analytics</span>
-            </a>
-            <a href="roles.html" class="sidebar-item">
-                <i class="fas fa-user-tag"></i>
-                <span>User Roles & Permissions</span>
-            </a>
-            <a href="settings.html" class="sidebar-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-            <a href="notifications.html" class="sidebar-item">
-                <i class="fas fa-bell"></i>
-                <span>Notifications</span>
-                <span class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">8</span>
-            </a>
-            <a href="help.html" class="sidebar-item">
-                <i class="fas fa-question-circle"></i>
-                <span>Help & Support</span>
-            </a>
-
-            <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                <a href="profile.html" class="sidebar-item">
-                    <i class="fas fa-user"></i>
-                    <span>Profile</span>
-                </a>
-                <a href="index.html" class="sidebar-item text-red-500 dark:text-red-400">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </nav>
+        @component('components.backend.super-admin-dashboard-sidebar') @endcomponent
     </aside>
 
     <!-- Main Content -->

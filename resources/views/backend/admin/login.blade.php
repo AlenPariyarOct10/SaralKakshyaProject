@@ -15,7 +15,13 @@
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
                 <strong class="font-bold">Success !</strong>
-                <span class="block sm:inline">Account created, Login to continue</span>
+                <span class="block sm:inline">{{session('success')}}</span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success !</strong>
+                <span class="block sm:inline">{{session('error')}}</span>
             </div>
         @endif
         <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
@@ -35,6 +41,9 @@
                            placeholder="Enter your email" required>
                 </div>
                 <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</p>
+            </div>
+
+            <div class="mb-4"><livewire:login.institute-dropdown />
             </div>
 
             <!-- Password Input -->
@@ -68,9 +77,6 @@
                 Login
             </button>
         </form>
-
-
-
     </div>
 
 @endsection

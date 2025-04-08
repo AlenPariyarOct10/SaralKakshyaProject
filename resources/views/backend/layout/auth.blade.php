@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="{{asset('assets/images/logo.png')}}" type="image/x-icon">
+    @livewireStyles
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,6 +32,7 @@
             }
         }
     </script>
+
     <style type="text/tailwindcss">
         @layer utilities {
             .bg-primary{
@@ -84,9 +86,9 @@
         &copy; {{now()->year}} @yield('name') - @yield("description"). All rights reserved.
     </p>
 </div>
-
+@livewireScripts
 <script>
-    // Toggle password visibility
+    // Toggle password visibility18
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordInput = document.getElementById('password');
         const icon = this.querySelector('i');

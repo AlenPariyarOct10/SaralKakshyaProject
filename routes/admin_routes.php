@@ -21,10 +21,15 @@ Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
         Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login');
-        Route::get('/register', [AdminAuthController::class, 'register'])->name('admin.register');
+        Route::get('/register', [AdminAuthController::class, 'showRegister'])->name('admin.register');
         Route::post('/register', [AdminAuthController::class, 'register'])->name('admin.register');
-        Route::get('/register/institute', [AdminAcademicInstituteController::class, 'create'])->name('admin.register.institute');
-        Route::post('/register/institute', [AdminAcademicInstituteController::class, 'create'])->name('admin.register.institute');
+        Route::get('/register/institute/{token}', [AdminAcademicInstituteController::class, 'create'])
+            ->name('admin.register.institute.create');
+        Route::get('/register/institute', function (){return redirect()->route('admin.register');})->name('abackend.admin.login');
+
+        Route::post('/register/institute', [AdminAcademicInstituteController::class, 'store'])
+            ->name('admin.register.institute.store');
+
     });
 
     Route::middleware(['auth:admin'])->group(function () {

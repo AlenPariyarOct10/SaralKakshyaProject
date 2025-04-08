@@ -32,7 +32,7 @@ class AuthController extends Controller
             return redirect()->intended(route('superadmin.index'));
         }
 
-        return redirect()->route('superadmin.login')->withErrors(['email' => 'Invalid credentials']);
+        return redirect()->route('superadmin.login')->withErrors(['email' => 'User not found. Please try again.']);
     }
 
     public function logout()

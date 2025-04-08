@@ -19,8 +19,9 @@
     </div>
     @endif
     @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative m-3">
-            <ul>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+            <strong class="font-bold">Whoops!</strong>
+            <ul class="mt-2 list-disc list-inside text-sm">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -47,14 +48,18 @@
                         <input type="text" id="firstName" name="fname"
                                class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="First name" required>
-                        <p id="firstNameError" class="text-red-500 text-xs mt-1 hidden">First name is required</p>
+                        <p id="firstNameError" class="text-red-500 text-xs mt-1 {{ $errors->has('fname') ? '' : 'hidden' }}">
+                            {{ $errors->first('fname') }}
+                        </p>
                     </div>
                     <div>
                         <label for="lastName" class="block text-gray-700 text-sm font-medium mb-2">Last Name</label>
                         <input type="text" id="lastName" name="lname"
                                class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="Last name" required>
-                        <p id="lastNameError" class="text-red-500 text-xs mt-1 hidden">Last name is required</p>
+                        <p id="lastNameError" class="text-red-500 text-xs mt-1 {{ $errors->has('lname') ? '' : 'hidden' }}">
+                            {{ $errors->first('lname') }}
+                        </p>
                     </div>
                 </div>
 
@@ -69,7 +74,9 @@
                                class="w-full py-2 pl-10 pr-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="Enter your email" required>
                     </div>
-                    <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</p>
+                    <p id="emailError" class="text-red-500 text-xs mt-1 {{ $errors->has('email') ? '' : 'hidden' }}">
+                        {{ $errors->first('email') }}
+                    </p>
                 </div>
 
                 <!-- Password Input -->
@@ -86,7 +93,9 @@
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
-                    <p id="passwordError" class="text-red-500 text-xs mt-1 hidden">Password must be at least 8 characters with letters and numbers</p>
+                    <p id="passwordError" class="text-red-500 text-xs mt-1 {{ $errors->has('password') ? '' : 'hidden' }}">
+                        {{ $errors->first('password') }}
+                    </p>
                 </div>
 
                 <!-- Confirm Password Input -->
@@ -100,11 +109,10 @@
                                class="w-full py-2 pl-10 pr-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="Confirm your password" required>
                     </div>
-                    <p id="confirmPasswordError" class="text-red-500 text-xs mt-1 hidden">Passwords do not match</p>
+                    <p id="confirmPasswordError" class="text-red-500 text-xs mt-1 {{ $errors->has('password_confirmation') ? '' : 'hidden' }}">
+                        {{ $errors->first('password_confirmation') }}
+                    </p>
                 </div>
-
-
-
                 <!-- Sign Up Button -->
                 <button type="submit" class="w-full bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">
                     Create Account

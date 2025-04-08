@@ -35,9 +35,9 @@
 
         <!-- Form -->
         <div class="p-6">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create Student Account</h2>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create Teacher Account</h2>
 
-            <form action="{{route("student.register")}}" method="post" id="signupForm">
+            <form action="{{route("teacher.register")}}" method="post" id="signupForm">
 
                 @csrf
                 <!-- Name Inputs -->
@@ -102,9 +102,6 @@
                     </div>
                     <p id="confirmPasswordError" class="text-red-500 text-xs mt-1 hidden">Passwords do not match</p>
                 </div>
-
-
-
                 <!-- Sign Up Button -->
                 <button type="submit" class="w-full bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">
                     Create Account
@@ -119,7 +116,7 @@
             <!-- Login Link -->
             <p class="text-center text-gray-600 text-sm">
                 Already have an account?
-                <a href="{{route('student.login')}}" class="text-primary hover:text-secondary font-medium">Login</a>
+                <a href="{{route('teacher.login')}}" class="text-primary hover:text-secondary font-medium">Login</a>
             </p>
         </div>
     </div>
