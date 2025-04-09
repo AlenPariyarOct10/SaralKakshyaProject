@@ -1,3 +1,5 @@
+<img src="https://github.com/user-attachments/assets/ec39543e-bec8-40b9-b7d4-9d49aa0a1363" width="200" alt="logo">
+
 # 📚 SaralKakshya – Smart Classroom Management System  
 
 **A BCA Project II Submission** | *Developed for Ratna Rajyalaxmi Campus, Tribhuvan University*  
