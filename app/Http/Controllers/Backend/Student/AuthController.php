@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute;
 use App\Models\Student;
 use App\Models\SystemSetting;
 use App\Models\Teacher;
@@ -16,7 +17,8 @@ class AuthController extends Controller
     public function showRegister()
     {
         $system_info = SystemSetting::first();
-        return view('backend.student.signup', compact('system_info'));
+        $institutes = Institute::all();
+        return view('backend.student.signup', compact('system_info', 'institutes'));
     }
 
     public function register(Request $request)
@@ -43,9 +45,10 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('student.dashboard');
         }
+        $institutes = Institute::all();
 
         $system_info = SystemSetting::first();
-        return view('backend.student.login', compact('system_info'));
+        return view('backend.student.login', compact('system_info', 'institutes'));
     }
 
     public function login(Request $request)

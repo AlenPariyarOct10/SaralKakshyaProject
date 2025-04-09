@@ -19,7 +19,7 @@ class Institute extends Model
 
     public function students()
     {
-        return $this->hasMany(Student::class, 'institute_id', 'id');
+        return $this->belongsToMany(Student::class, 'institute_student');
     }
 
     public function teachers()

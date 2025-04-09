@@ -3,9 +3,9 @@
 
     <input type="text" wire:model.live="search" placeholder="Search institute..."
            class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-           autocomplete="off">
+           autocomplete="off" aria-errormessage="Please select an Institute" required>
 
-    <input type="hidden" name="institute" value="{{$this->selectedInstitute}}">
+    <input type="hidden" name="institute" value="{{($this->selectedInstitute)?$this->selectedInstitute:null}}">
 
     <!-- Display the list of institutes based on search results -->
     @if (!empty($institutes))

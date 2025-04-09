@@ -54,7 +54,8 @@ class AuthController extends Controller
         }
 
         $system_info = SystemSetting::first();
-        return view('backend.admin.login', compact('system_info'));
+        $institutes = Institute::all();
+        return view('backend.admin.login', compact('system_info', 'institutes'));
     }
 
     public function login(Request $request)

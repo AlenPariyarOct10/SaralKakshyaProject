@@ -33,8 +33,11 @@
 
         <form action="{{route('student.login')}}" method="post" id="loginForm">
             @csrf
+
             <!-- Email Input -->
             @component('components.login.email-input') @endcomponent
+            <!-- Institute Input -->
+            @component('components.login.institute-input', ['institutes' => $institutes]) @endcomponent
 
             <!-- Password Input -->
             @component('components.login.password-input') @endcomponent

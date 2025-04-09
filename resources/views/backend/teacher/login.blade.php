@@ -18,13 +18,20 @@
         <span class="block sm:inline">Account created, Login to continue</span>
     </div>
     @endif
-    <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
+        @component('components.login.validation-summary')
+        @endcomponent
+
+
+
+        <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
     <p class="text-sm mt-1 mb-6 text-center">Teacher Account</p>
 
     <form action="{{route('teacher.login')}}" method="post" id="loginForm">
         @csrf
         <!-- Email Input -->
         @component('components.login.email-input') @endcomponent
+        <!-- Institute Input -->
+        @component('components.login.institute-input', ['institutes' => $institutes]) @endcomponent
         <!-- Password Input -->
         @component('components.login.password-input') @endcomponent
         <!-- Remember Me & Forgot Password -->

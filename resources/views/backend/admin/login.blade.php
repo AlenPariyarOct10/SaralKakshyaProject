@@ -42,9 +42,8 @@
                 </div>
                 <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</p>
             </div>
+            @component('components.login.institute-input', ['institutes' => $institutes]) @endcomponent
 
-            <div class="mb-4"><livewire:login.institute-dropdown />
-            </div>
 
             <!-- Password Input -->
             <div class="mb-6">

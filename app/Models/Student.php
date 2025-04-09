@@ -51,4 +51,10 @@ class Student extends Authenticatable
     {
         return "{$this->fname} {$this->lname}";
     }
+
+    public function institutes()
+    {
+        return $this->belongsToMany(Institute::class, 'institute_student');
+    }
+
 }

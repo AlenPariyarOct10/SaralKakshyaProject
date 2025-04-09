@@ -72,6 +72,9 @@
                     <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</p>
                 </div>
 
+                @component('components.login.institute-input') @endcomponent
+
+
                 <!-- Password Input -->
                 <div class="mb-4">
                     <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
