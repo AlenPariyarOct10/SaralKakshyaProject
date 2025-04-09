@@ -83,7 +83,7 @@
                         <button wire:click="setApproved({{$admin->id}})" class="text-green-600 hover:text-green-900 dark:hover:text-green-400" title="Approve">
                             <i class="fas fa-check"></i>
                         </button>
-                        <button class="text-red-600 hover:text-red-900 dark:hover:text-red-400" title="Reject">
+                        <button wire:click="setDeleted({{$admin->id}})" class="text-red-600 hover:text-red-900 dark:hover:text-red-400" title="Reject">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>

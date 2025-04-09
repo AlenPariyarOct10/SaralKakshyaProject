@@ -32,7 +32,7 @@ Route::group(['prefix' => 'admin'], function () {
 
     });
 
-    Route::middleware(['auth:admin'])->group(function () {
+    Route::middleware(['auth:admin','admin.approved'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, "index"])->name('admin.dashboard');
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
         Route::get('/department', [AdminDepartmentController::class, "index"])->name('admin.department.index');

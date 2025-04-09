@@ -11,6 +11,9 @@
         <li class="mr-2 cursor-pointer">
             <a wire:click="setTab('approved')" class="tab {{($activeTab === 'approved')?'active':''}}" data-tab="approved">Approved</a>
         </li>
+        <li class="mr-2 cursor-pointer">
+            <a wire:click="setTab('trashed')" class="tab {{($activeTab === 'trashed')?'active':''}}" data-tab="trashed">Trashed</a>
+        </li>
     </ul>
 </div>
 
@@ -50,6 +53,12 @@
     <!-- Approved Table -->
     @if($activeTab === 'approved')
         <h2 class="text-lg font-semibold mb-2 text-black dark:text-white">Approved Admins</h2>
+        @component('components.backend.admin-table', ['admins' => $admins]) @endcomponent
+    @endif
+
+    <!-- Approved Table -->
+    @if($activeTab === 'trashed')
+        <h2 class="text-lg font-semibold mb-2 text-black dark:text-white">Trashed Admins</h2>
         @component('components.backend.admin-table', ['admins' => $admins]) @endcomponent
     @endif
 </div>
