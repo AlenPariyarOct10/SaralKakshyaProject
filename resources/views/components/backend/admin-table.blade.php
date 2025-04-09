@@ -1,5 +1,11 @@
 
 <div class="card">
+    @if(session('message'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative"
+             role="alert">
+            <span class="block sm:inline">{{session('message')}}</span>
+        </div>
+    @endif
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -71,10 +77,10 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
-                        <button class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400" title="View">
+                        <button  class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400" title="View">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="text-green-600 hover:text-green-900 dark:hover:text-green-400" title="Approve">
+                        <button wire:click="setApproved({{$admin->id}})" class="text-green-600 hover:text-green-900 dark:hover:text-green-400" title="Approve">
                             <i class="fas fa-check"></i>
                         </button>
                         <button class="text-red-600 hover:text-red-900 dark:hover:text-red-400" title="Reject">

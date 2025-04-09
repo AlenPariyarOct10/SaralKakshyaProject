@@ -96,16 +96,10 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Admin Management</h1>
                 <p class="text-gray-600 dark:text-gray-400">Manage all admin accounts in the system</p>
             </div>
-            <div class="mt-4 md:mt-0">
-                <button id="addAdminBtn" class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i> Add New Admin
-                </button>
-            </div>
+
         </div>
 
         @livewire('super-admin.admin-table')
 
 
-    @component('components.backend.dashboard-footer')
-    @endcomponent
 @endsection

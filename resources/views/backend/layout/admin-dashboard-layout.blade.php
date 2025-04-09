@@ -1,7 +1,4 @@
-@php use Illuminate\Support\Facades\Auth; @endphp
-@php
-    $user = Auth::user()
-@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
