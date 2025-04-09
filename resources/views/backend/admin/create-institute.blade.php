@@ -41,7 +41,6 @@
                     <!-- Name Inputs -->
                     <div class="grid gap-4 mb-4">
                         <div>
-                            num -> {{$user->id}}
                             <input type="hidden" name="admin_id" value="{{$user->id}}">
                             <label for="institutionName" class="block text-gray-700 text-sm font-medium mb-2">Institution name</label>
                             <input type="text" id="institutionName" name="name"

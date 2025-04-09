@@ -40,9 +40,9 @@ class AuthController extends Controller
 
         if ($admin) {
             $token = Crypt::encryptString($admin->id);
-            return redirect()->route('admin.register.institute.create',['token' => $token]);
+            return redirect()->route('admin.register.institute.create',['token' => $token])->withInput();
         } else {
-            return redirect()->back()->withErrors(['error' => 'Registration failed. Please try again.']);
+            return redirect()->back()->withErrors(['error' => 'Registration failed. Please try again.'])->withInput();
         }
     }
 
@@ -67,25 +67,22 @@ class AuthController extends Controller
         ]);
 
         $institute = Institute::find($request->institute);
+        $admin = Admin::withTrashed()->where('email', $request->email)->first(); // Include soft-deleted users
 
-
-
-        $admin = Admin::where('email', $request->email)->first();
+        if ($admin && $admin->trashed()) {
+            return back()->withErrors(['email' => 'Your account has been deleted by super-admin.'])->withInput();
+        }
 
         $credentials = $request->only('email', 'password');
-
         if ($admin && $admin->id == $institute->created_by && Auth::guard('student')->attempt($credentials)) {
-
             Auth::guard('admin')->login($admin);
             $request->session()->regenerate();
-
             return redirect()->route('admin.dashboard');
         }
 
-
-
         return back()->withErrors(['email' => 'Invalid credentials or institute'])->withInput();
     }
+
 
 
 

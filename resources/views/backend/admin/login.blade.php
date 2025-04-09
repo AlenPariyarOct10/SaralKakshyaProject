@@ -40,7 +40,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                 <i class="fas fa-envelope"></i>
                             </span>
-                    <input type="email" id="email" name="email"
+                    <input type="email" id="email" name="email" value="{{old('email')}}"
                            class="w-full py-2 pl-10 pr-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                            placeholder="Enter your email" required>
                 </div>

@@ -46,12 +46,12 @@
                             <label for="firstName" class="block text-gray-700 text-sm font-medium mb-2">First Name</label>
                             <input type="text" id="firstName" name="fname"
                                    class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                   placeholder="First name" required>
+                                   placeholder="First name" value="{{old('fname')}}" required>
                             <p id="firstNameError" class="text-red-500 text-xs mt-1 hidden">First name is required</p>
                         </div>
                         <div>
                             <label for="lastName" class="block text-gray-700 text-sm font-medium mb-2">Last Name</label>
-                            <input type="text" id="lastName" name="lname"
+                            <input type="text" id="lastName" value="{{old('lname')}}" name="lname"
                                    class="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="Last name" required>
                             <p id="lastNameError" class="text-red-500 text-xs mt-1 hidden">Last name is required</p>
@@ -65,7 +65,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                 <i class="fas fa-envelope"></i>
                             </span>
-                            <input type="email" id="email" name="email"
+                            <input type="email" value="{{old('email')}}" id="email" name="email"
                                    class="w-full py-2 pl-10 pr-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="Enter your email" required>
                         </div>

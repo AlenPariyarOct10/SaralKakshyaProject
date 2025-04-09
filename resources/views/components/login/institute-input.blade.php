@@ -4,7 +4,7 @@
         <option value="" disabled {{ old('institute') ? '' : 'selected' }}>Select Institute</option>
         @foreach ($institutes as $institute)
             <option value="{{ $institute->id }}" {{ old('institute') == $institute->id ? 'selected' : '' }}>
-                {{ $institute->name }}
+                {{ $institute->name }}, {{$institute->address}}
             </option>
         @endforeach
     </select>

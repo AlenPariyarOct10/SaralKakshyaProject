@@ -16,12 +16,24 @@ class AdminAllowedMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->is_approved == 0) {
-            Auth::logout();
-            return redirect()->route('admin.login')->withErrors(['Your account is not approved yet.']);
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if ($user->deleted_at !== null) {
+                Auth::logout();
+                return redirect()->route('admin.login')->withErrors(['Your account has been deleted by super-admin.']);
+            }
+
+            if ($user->is_approved == 0) {
+                Auth::logout();
+                return redirect()->route('admin.login')->withErrors(['Your account is not approved yet.']);
+            }
+
+
         }
 
         return $next($request);
     }
+
 
 }

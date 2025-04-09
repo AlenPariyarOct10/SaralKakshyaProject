@@ -48,9 +48,9 @@ class AcademicInstituteController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:institutes,email',
+            'email' => 'required|string|max:255|unique:institutes,email',
             'description' => 'required|string|max:1000',
-            'admin_id' => 'required|exists:admins,id', // ensure it's coming from the hidden input
+            'admin_id' => 'required|exists:admins,id',
         ]);
 
         $validated['created_by'] = $validated['admin_id'];
