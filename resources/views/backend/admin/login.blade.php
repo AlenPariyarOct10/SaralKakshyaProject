@@ -18,12 +18,16 @@
                 <span class="block sm:inline">{{session('success')}}</span>
             </div>
         @endif
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
-                <strong class="font-bold">Success !</strong>
-                <span class="block sm:inline">{{session('error')}}</span>
-            </div>
-        @endif
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                    <strong class="font-bold">Whoops!</strong>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         <h2 class="text-2xl font-semibold text-gray-800 text-center">Login to Your Account</h2>
         <p class="text-sm mt-1 mb-6 text-center">Admin Account</p>
 
@@ -75,6 +79,18 @@
             <button type="submit" class="w-full bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">
                 Login
             </button>
+
+
+            <!-- Divider -->
+            <div class="relative flex items-center mt-8 mb-6">
+                <div class="flex-grow border-t border-gray-300"></div>
+
+            </div>
+            <!-- Login Link -->
+            <p class="text-center text-gray-600 text-sm">
+                Create an account?
+                <a href="{{route('admin.register')}}" class="text-primary hover:text-secondary font-medium">Register</a>
+            </p>
         </form>
     </div>
 

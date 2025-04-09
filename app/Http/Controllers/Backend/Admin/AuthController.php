@@ -68,17 +68,21 @@ class AuthController extends Controller
 
         $institute = Institute::find($request->institute);
 
+
+
         $admin = Admin::where('email', $request->email)->first();
 
+        $credentials = $request->only('email', 'password');
 
-
-        if ($admin && $admin->id == $institute->created_by && Hash::check($request->password, $admin->password)) {
+        if ($admin && $admin->id == $institute->created_by && Auth::guard('student')->attempt($credentials)) {
 
             Auth::guard('admin')->login($admin);
             $request->session()->regenerate();
 
             return redirect()->route('admin.dashboard');
         }
+
+
 
         return back()->withErrors(['email' => 'Invalid credentials or institute'])->withInput();
     }

@@ -3,6 +3,10 @@
         <i class="fas fa-tachometer-alt"></i>
         <span>Dashboard</span>
     </a>
+    <a href="{{route("superadmin.testimonial.index")}}" class="sidebar-item {{Route::is("admin.testimonial.index")? "active":""}}">
+        <i class="fa-solid fa-star-half-stroke"></i>
+        <span>Testimonial</span>
+    </a>
     <a href="{{route("superadmin.admin-management")}}" class="sidebar-item {{(Route::is('superadmin.admin-management')?'active':'')}}">
         <i class="fas fa-user-shield"></i>
         <span>Admin Management</span>

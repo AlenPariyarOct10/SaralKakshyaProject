@@ -127,6 +127,7 @@
                                     <p class="text-sm font-medium text-gray-800 dark:text-white">New admin registration</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 minutes ago</p>
                                 </a>
+
                                 <a href="#" class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <p class="text-sm font-medium text-gray-800 dark:text-white">Institute approval request</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 hour ago</p>
@@ -195,6 +196,7 @@
 
     </div>
 </div>
+@yield("scripts")
 <script>
     // Logout Modal Functionality
     const logoutLinks = document.querySelectorAll('a[href="index.html"]');

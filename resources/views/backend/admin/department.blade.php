@@ -85,7 +85,7 @@
 
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
-        <x-backend.toast-message/>
+
 
 
         <!-- Action Bar -->

@@ -1,4 +1,4 @@
-@extends("backend.layout.admin-dashboard-layout")
+@extends('backend.layout.superadmin-dashboard-layout')
 
 @section('username')
     {{$user->fname}} {{$user->lname}}
@@ -84,7 +84,7 @@
 @section('content')
 
     <!-- Main Content Area -->
-
+    <main class="scrollable-content p-4 md:p-6">
 
 
         <!-- Attendance Management -->
@@ -369,8 +369,12 @@
 @endsection
 
 @section("scripts")
+
     <script>
+        console.log("ready");
         document.addEventListener('DOMContentLoaded', function() {
+
+
             // DOM Elements - Add Modal
             const addTestimonialModal = document.getElementById('addTestimonialModal');
             const addTestimonialBtn = document.getElementById('addTestimonialBtn');
@@ -456,7 +460,7 @@
                     console.log(`Editing testimonial with ID: ${testimonialId}`);
 
 
-                    fetch(`/admin/testimonial/get_testimonial/${testimonialId}`, {
+                    fetch(`/superadmin/testimonial/get_testimonial/${testimonialId}`, {
                         method: "GET",
                         headers: {
                             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
@@ -550,7 +554,7 @@
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.addEventListener("click", () => {
                     if (testimonialToDelete) {
-                        fetch(`/admin/testimonial/${testimonialToDelete}`, {
+                        fetch(`/superadmin/testimonial/${testimonialToDelete}`, {
                             method: "DELETE",
                             headers: {
                                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,

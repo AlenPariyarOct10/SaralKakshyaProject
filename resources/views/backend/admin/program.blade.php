@@ -85,7 +85,6 @@
 
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
-        <x-backend.toast-message/>
 
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
