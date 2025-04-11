@@ -20,7 +20,9 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Admins</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">42</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+                            {{ $admins->count() }}
+                        </h3>
                     </div>
                     <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
                         <i class="fas fa-user-shield text-blue-500 dark:text-blue-300"></i>
@@ -29,12 +31,12 @@
                 <div class="mt-4 flex items-center justify-between">
                     <div>
                                 <span class="text-sm text-green-500">
-                                    <i class="fas fa-check-circle mr-1"></i> 38 Approved
+                                    <i class="fas fa-check-circle mr-1"></i> {{$admins->where('is_approved',1)->count()}} Approved
                                 </span>
                     </div>
                     <div>
                                 <span class="text-sm text-yellow-500">
-                                    <i class="fas fa-clock mr-1"></i> 4 Pending
+                                    <i class="fas fa-clock mr-1"></i> {{$admins->where('is_approved',0)->count()}} Pending
                                 </span>
                     </div>
                 </div>
@@ -45,7 +47,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Institutes</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">156</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{$institutes->count()}}</h3>
                     </div>
                     <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
                         <i class="fas fa-university text-green-500 dark:text-green-300"></i>

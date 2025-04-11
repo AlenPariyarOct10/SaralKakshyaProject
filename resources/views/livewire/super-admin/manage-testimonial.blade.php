@@ -15,7 +15,7 @@
 
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="relative">
-                    <button data-mode="new" id="addTestimonialBtn"
+                    <button data-mode="new" id="addTestimonialBtn" wire:click="toggleAddNewModal()"
                             class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">
                         Add New
                     </button>
@@ -88,21 +88,22 @@
                 </tbody>
             </table>
         </div>
+        @if($addNewIsVisible)
         <!-- Add Testimonial Modal -->
-        <div id="addTestimonialModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div id="addTestimonialModal" class="fixed inset-0 z-50 flex items-center justify-center" >
             <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" id="addModalOverlay"></div>
             <div
                 class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Add Testimonial</h3>
-                        <button id="closeAddModal"
+                        <button id="closeAddModal" wire:click="toggleAddNewModal()"
                                 class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                                 aria-label="Close modal">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <form action="{{route("admin.testimonial.store")}}" method="post" id="addTestimonialForm"
+                    <form action="{{route("superadmin.testimonial.store")}}" method="post" id="addTestimonialForm"
                           enctype="multipart/form-data">
                         @csrf
                         <!-- Profile Picture Upload -->
@@ -169,13 +170,14 @@
                         </div>
 
                         <div class="flex justify-end space-x-3 mt-6">
-                            <button type="button" id="addCancelBtn" class="btn-secondary">Cancel</button>
-                            <button type="submit" id="addSaveBtn" class="btn-primary">Save Testimonial</button>
+                            <button type="button" wire:click="toggleAddNewModal()" id="addCancelBtn" class="btn-secondary">Cancel</button>
+                            <button type="submit" wire:click="toggleAddNewModal()" id="addSaveBtn" class="btn-primary">Save Testimonial</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+        @endif
     </div>
     @if($editIsVisible)
         <!-- Edit Testimonial Modal -->
@@ -309,3 +311,5 @@
         </div>
     @endif
 </main>
+
+

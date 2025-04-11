@@ -2,12 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Admin\AuthController as AdminAuthController;
-use App\Models\Testimonial;
 use App\Http\Controllers\Backend\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Backend\Teacher\DashboardController as TeacherDashboardController;
-use App\Http\Controllers\Backend\Student\AuthController as StudentAuthController;
-use App\Http\Controllers\Backend\Student\DashboardController as StudentDashboardController;
-use App\Http\Controllers\Backend\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Backend\Admin\ProgramController as AdminProgramController;
 use App\Http\Controllers\Backend\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Backend\Admin\AnnouncementController as AdminAnnouncementController;

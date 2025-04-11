@@ -57,8 +57,6 @@
             background-color: #f8fafc;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-
-
     </style>
 </head>
 <body class="font-sans text-gray-800">
@@ -86,14 +84,44 @@
                     </a>
                 </div>
             </div>
-            <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-                <a href="{{route('student.login')}}" class="inline-flex items-center px-4 py-2 border border-primary-500 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <i class="fas fa-user-graduate mr-2"></i> Student Login
-                </a>
-                <a href="{{route('teacher.login')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <i class="fas fa-chalkboard-teacher mr-2"></i> Teacher Login
-                </a>
-            </div>
+            @if(!Auth::user())
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="{{route('student.login')}}" class="inline-flex items-center px-4 py-2 border border-primary-500 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <i class="fas fa-user-graduate mr-2"></i> Student Login
+                    </a>
+                    <a href="{{route('teacher.login')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <i class="fas fa-chalkboard-teacher mr-2"></i> Teacher Login
+                    </a>
+                </div>
+            @endif
+
+            @if (Auth::guard('admin')->check())
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="{{route('admin.logout')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fa fa-sign-out mr-2" aria-hidden="true"></i>Admin Logout
+                    </a>
+                </div>
+            @elseif (Auth::guard('teacher')->check())
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="{{route('teacher.logout')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fa fa-sign-out mr-2" aria-hidden="true"></i>Teacher Logout
+                    </a>
+                </div>
+            @elseif (Auth::guard('student')->check())
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="{{route('student.logout')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fa fa-sign-out mr-2" aria-hidden="true"></i>Student Logout
+                    </a>
+                </div>
+            @elseif (Auth::guard('super_admin')->check())
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="{{route('superadmin.logout')}}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fa fa-sign-out mr-2" aria-hidden="true"></i>SuperAdmin Logout
+                    </a>
+                </div>
+            @endif
+
+
             <div class="-mr-2 flex items-center sm:hidden">
                 <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
                     <span class="sr-only">Open main menu</span>
@@ -625,7 +653,7 @@
                     <span class="font-bold text-xl text-white">SaralKakshya</span>
                 </div>
                 <p class="text-gray-300 text-base">
-                    Making classroom management simple and effective for schools across India.
+                    Making classroom management simple and effective for schools across Nepal.
                 </p>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-400 hover:text-white">

@@ -85,5 +85,40 @@
     @livewire('super-admin.manage-testimonial')
 @endsection
 
+@section('scripts')
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const addNewBtn = document.getElementById('addTestimonialBtn');
+            addNewBtn.addEventListener('click', ()=>{
+                const fileInput = document.getElementById('addProfilePicture');
+                const previewImage = document.getElementById('addImagePreview');
+                const previewPlaceholder = document.getElementById('addPreviewPlaceholder');
+
+                console.log(fileInput);
+
+                fileInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            previewImage.src = event.target.result;
+                            previewImage.classList.remove('hidden');
+                            previewPlaceholder.classList.add('hidden');
+                        };
+
+                        reader.readAsDataURL(file);
+                    } else {
+                        previewImage.src = '';
+                        previewImage.classList.add('hidden');
+                        previewPlaceholder.classList.remove('hidden');
+                    }
+                });
+            })
+        });
+    </script>
+
+@endsection
 
 

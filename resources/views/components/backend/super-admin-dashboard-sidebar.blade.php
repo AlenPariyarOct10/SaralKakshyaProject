@@ -3,7 +3,7 @@
         <i class="fas fa-tachometer-alt"></i>
         <span>Dashboard</span>
     </a>
-    <a href="{{route("superadmin.testimonial.index")}}" class="sidebar-item {{Route::is("admin.testimonial.index")? "active":""}}">
+    <a href="{{route("superadmin.testimonial.index")}}" class="sidebar-item {{Route::is("superadmin.testimonial.index")? "active":""}}">
         <i class="fa-solid fa-star-half-stroke"></i>
         <span>Testimonial</span>
     </a>

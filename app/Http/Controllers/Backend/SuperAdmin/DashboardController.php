@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\Institute;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,7 +14,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('backend.superadmin.dashboard');
+        $admins = Admin::all();
+        $institutes = Institute::all();
+        return view('backend.superadmin.dashboard', compact('admins', 'institutes'));
     }
 
     /**

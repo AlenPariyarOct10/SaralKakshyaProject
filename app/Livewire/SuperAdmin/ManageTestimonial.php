@@ -14,6 +14,7 @@ class ManageTestimonial extends Component
 
     public $deleteIsVisible=false;
     public $editIsVisible=false;
+    public $addNewIsVisible=false;
 
     public function setDeleteId($id)
     {
@@ -28,6 +29,13 @@ class ManageTestimonial extends Component
 
         $this->editingTestimonial = Testimonial::where('id', $id)->first();
 
+
+
+    }
+
+    public function toggleAddNewModal()
+    {
+        $this->addNewIsVisible=!$this->addNewIsVisible;
     }
 
     public function toggleDeleteModal()
