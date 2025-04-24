@@ -17,11 +17,6 @@ class AttendanceController extends Controller
         return view('backend.admin.attendance', compact('user'));
     }
 
-    public function face_index()
-    {
-        $user = Auth::guard('admin')->user();
-        return view('backend.admin.attendance-face', compact('user'));
-    }
 
     /**
      * Show the form for creating a new resource.

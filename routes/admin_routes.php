@@ -31,7 +31,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/dashboard', [AdminDashboardController::class, "index"])->name('admin.dashboard');
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
         Route::get('/department', [AdminDepartmentController::class, "index"])->name('admin.department.index');
-        Route::get('/attendance-face', [AdminAttendanceController::class, "face_index"])->name('admin.attendance-face.index');
 
 //        Department
         Route::post('/department', [AdminDepartmentController::class, "store"])->name('admin.department.store');

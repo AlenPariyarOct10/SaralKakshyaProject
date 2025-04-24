@@ -123,10 +123,6 @@
                     <span>Attendance</span>
                 </a>
 
-                <a href="{{route("admin.attendance-face.index")}}" class="sidebar-item {{Route::is("admin.attendance-face.index")? "active":""}}">
-                    <i class="fas fa-video"></i>
-                    <span>Attendance - Face</span>
-                </a>
                 <a href="{{route("admin.announcement.index")}}" class="sidebar-item {{Route::is("admin.announcement.index")? "active":""}}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>

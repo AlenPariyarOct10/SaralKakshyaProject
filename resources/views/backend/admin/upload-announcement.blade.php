@@ -50,185 +50,182 @@
     </style>
 @endpush
 
+@section("scripts")
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileUpload = document.getElementById('file-upload');
+            const fileList = document.getElementById('file-list');
+            const dropZone = fileUpload.closest('.border-dashed');
+
+            // Handle file selection via input
+            fileUpload.addEventListener('change', handleFiles);
+
+            // Handle drag and drop
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-primary-500');
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-primary-500');
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-primary-500');
+
+                if (e.dataTransfer.files.length) {
+                    handleFileUpload(e.dataTransfer.files);
+                }
+            });
+
+            function handleFiles(e) {
+                const files = e.target.files;
+                handleFileUpload(files);
+            }
+
+            function handleFileUpload(files) {
+                for (let i = 0; i < files.length; i++) {
+                    uploadFile(files[i]);
+                }
+            }
+
+            function uploadFile(file) {
+                // Create file item element
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md';
+
+                // File info
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'flex items-center space-x-2';
+
+                // File icon based on type
+                const fileIcon = document.createElement('i');
+                if (file.type.includes('pdf')) {
+                    fileIcon.className = 'fas fa-file-pdf text-red-500';
+                } else if (file.type.includes('doc')) {
+                    fileIcon.className = 'fas fa-file-word text-blue-500';
+                } else if (file.type.includes('image')) {
+                    fileIcon.className = 'fas fa-file-image text-green-500';
+                } else {
+                    fileIcon.className = 'fas fa-file text-gray-500';
+                }
+
+                // File name and size
+                const fileDetails = document.createElement('div');
+                fileDetails.innerHTML = `
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">${file.name}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">${formatFileSize(file.size)}</p>
+        `;
+
+                // Status container
+                const statusContainer = document.createElement('div');
+                statusContainer.className = 'flex items-center space-x-2';
+
+                // Progress container
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'w-24 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700';
+
+                // Progress bar
+                const progressBar = document.createElement('div');
+                progressBar.className = 'bg-primary-600 h-2.5 rounded-full';
+                progressBar.style.width = '0%';
+
+                // Status text
+                const statusText = document.createElement('span');
+                statusText.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
+                statusText.textContent = 'Preparing...';
+
+                // Append elements
+                progressContainer.appendChild(progressBar);
+                statusContainer.appendChild(progressContainer);
+                statusContainer.appendChild(statusText);
+
+                fileInfo.appendChild(fileIcon);
+                fileInfo.appendChild(fileDetails);
+
+                fileItem.appendChild(fileInfo);
+                fileItem.appendChild(statusContainer);
+
+                fileList.appendChild(fileItem);
+
+                // Simulate file upload with progress
+                simulateFileUpload(progressBar, statusText, fileItem);
+            }
+
+            function simulateFileUpload(progressBar, statusText, fileItem) {
+                let progress = 0;
+                statusText.textContent = 'Uploading...';
+
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+
+                        // Upload complete
+                        setTimeout(() => {
+                            statusText.textContent = 'Uploaded';
+                            statusText.className = 'text-xs font-medium text-green-500';
+
+                            // Replace progress bar with success icon
+                            const progressContainer = progressBar.parentElement;
+                            progressContainer.innerHTML = '';
+
+                            const successIcon = document.createElement('i');
+                            successIcon.className = 'fas fa-check-circle text-green-500 text-lg';
+                            progressContainer.appendChild(successIcon);
+
+                            // Add remove button
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'ml-2 text-gray-400 hover:text-red-500 focus:outline-none';
+                            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                            removeBtn.addEventListener('click', function() {
+                                fileItem.remove();
+                            });
+
+                            progressContainer.appendChild(removeBtn);
+                        }, 500);
+                    }
+
+                    progressBar.style.width = `${progress}%`;
+                }, 200);
+
+                // In a real implementation, you would use FormData and fetch/axios to upload the file
+                // const formData = new FormData();
+                // formData.append('file', file);
+                //
+                // fetch('/upload-endpoint', {
+                //     method: 'POST',
+                //     body: formData
+                // })
+                // .then(response => response.json())
+                // .then(data => {
+                //     // Handle successful upload
+                // })
+                // .catch(error => {
+                //     // Handle error
+                // });
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
+@endsection
+
 @section('content')
     <!-- Main Content Area -->
-    <main class="scrollable-content p-4 md:p-6">
-        <div class="max-w-3xl mx-auto">
-            <!-- Breadcrumbs -->
-            <nav class="flex mb-6" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 text-sm mx-1"></i>
-                            <a href="{{route('admin.announcement.index')}}" class="ml-1 text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white">
-                                Announcements
-                            </a>
-                        </div>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 text-sm mx-1"></i>
-                            <span class="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Upload Announcement
-                                    </span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-
-            <!-- Upload Announcement Form -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-6">Create New Announcement</h3>
-
-                <form id="announcementForm">
-                    <div class="space-y-6">
-                        <!-- Title -->
-                        <div>
-                            <label for="title" class="form-label">Announcement Title <span class="text-red-500">*</span></label>
-                            <input type="text" id="title" name="title" class="form-input" placeholder="Enter announcement title" required>
-                        </div>
-
-                        <!-- Course/Department -->
-                        <div>
-                            <label for="course" class="form-label">Course/Department <span class="text-red-500">*</span></label>
-                            <select id="course" name="course" class="form-select" required>
-                                <option value="">Select Course/Department</option>
-                                <option value="all">All Courses</option>
-                                <option value="math">Mathematics</option>
-                                <option value="physics">Physics</option>
-                                <option value="cs">Computer Science</option>
-                                <option value="eng">Engineering</option>
-                                <option value="bio">Biology</option>
-                                <option value="chem">Chemistry</option>
-                                <option value="arts">Arts & Humanities</option>
-                            </select>
-                        </div>
-
-                        <!-- Announcement Type -->
-                        <div>
-                            <label for="type" class="form-label">Announcement Type <span class="text-red-500">*</span></label>
-                            <select id="type" name="type" class="form-select" required>
-                                <option value="regular">Regular</option>
-                                <option value="important">Important</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
-                        </div>
-
-                        <!-- Content -->
-                        <div>
-                            <label for="content" class="form-label">Announcement Content <span class="text-red-500">*</span></label>
-                            <textarea id="content" name="content" rows="6" class="form-input" placeholder="Enter announcement content" required></textarea>
-                        </div>
-
-                        <!-- Attachments -->
-                        <div>
-                            <label for="attachments" class="form-label">Attachments</label>
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
-                                <div class="space-y-1 text-center">
-                                    <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
-                                    <div class="flex text-sm text-gray-600 dark:text-gray-400">
-                                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                                            <span class="px-2">Upload files</span>
-                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
-                                        </label>
-                                        <p class="pl-1">or drag and drop</p>
-                                    </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        PDF, DOC, DOCX, PNG, JPG, JPEG up to 10MB
-                                    </p>
-                                </div>
-                            </div>
-                            <div id="file-list" class="mt-2 space-y-2"></div>
-                        </div>
-
-                        <!-- Options -->
-                        <div class="space-y-3">
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="pin" name="pin" type="checkbox" class="form-checkbox">
-                                </div>
-                                <div class="ml-3 text-sm">
-                                    <label for="pin" class="font-medium text-gray-700 dark:text-gray-300">Pin to top</label>
-                                    <p class="text-gray-500 dark:text-gray-400">This announcement will be pinned to the top of the announcements page.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="notify" name="notify" type="checkbox" class="form-checkbox" checked>
-                                </div>
-                                <div class="ml-3 text-sm">
-                                    <label for="notify" class="font-medium text-gray-700 dark:text-gray-300">Send notification</label>
-                                    <p class="text-gray-500 dark:text-gray-400">Users will receive a notification about this announcement.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="email" name="email" type="checkbox" class="form-checkbox">
-                                </div>
-                                <div class="ml-3 text-sm">
-                                    <label for="email" class="font-medium text-gray-700 dark:text-gray-300">Send email</label>
-                                    <p class="text-gray-500 dark:text-gray-400">Users will receive an email about this announcement.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Schedule -->
-                        <div>
-                            <div class="flex items-start mb-2">
-                                <div class="flex items-center h-5">
-                                    <input id="schedule" name="schedule" type="checkbox" class="form-checkbox">
-                                </div>
-                                <div class="ml-3 text-sm">
-                                    <label for="schedule" class="font-medium text-gray-700 dark:text-gray-300">Schedule announcement</label>
-                                    <p class="text-gray-500 dark:text-gray-400">Set a specific date and time for this announcement to be published.</p>
-                                </div>
-                            </div>
-
-                            <div id="schedule-options" class="pl-8 mt-3 hidden">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="schedule-date" class="form-label">Date</label>
-                                        <input type="date" id="schedule-date" name="schedule-date" class="form-input">
-                                    </div>
-                                    <div>
-                                        <label for="schedule-time" class="form-label">Time</label>
-                                        <input type="time" id="schedule-time" name="schedule-time" class="form-input">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Expiration -->
-                        <div>
-                            <div class="flex items-start mb-2">
-                                <div class="flex items-center h-5">
-                                    <input id="expiration" name="expiration" type="checkbox" class="form-checkbox">
-                                </div>
-                                <div class="ml-3 text-sm">
-                                    <label for="expiration" class="font-medium text-gray-700 dark:text-gray-300">Set expiration date</label>
-                                    <p class="text-gray-500 dark:text-gray-400">The announcement will be automatically archived after this date.</p>
-                                </div>
-                            </div>
-
-                            <div id="expiration-options" class="pl-8 mt-3 hidden">
-                                <div>
-                                    <label for="expiration-date" class="form-label">Expiration Date</label>
-                                    <input type="date" id="expiration-date" name="expiration-date" class="form-input">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit Buttons -->
-                        <div class="flex justify-end space-x-3 pt-4">
-                            <a href="announcements.html" class="btn-secondary">Cancel</a>
-                            <button type="submit" class="btn-primary">Publish Announcement</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
+    @livewire('admin.upload-announcement')
 @endsection
