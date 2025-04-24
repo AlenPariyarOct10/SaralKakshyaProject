@@ -9,5 +9,5 @@ class SystemSetting extends Model
 {
     use HasFactory;
     protected $table = 'system_settings';
-    protected $fillable = ['name', 'description', 'logo', 'favicon'];
+    protected $fillable = ['name','favicon', 'long_description' ,'description', 'logo', 'favicon'];
 }

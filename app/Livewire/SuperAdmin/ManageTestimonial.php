@@ -28,9 +28,6 @@ class ManageTestimonial extends Component
         $this->toggleEditModal();
 
         $this->editingTestimonial = Testimonial::where('id', $id)->first();
-
-
-
     }
 
     public function toggleAddNewModal()

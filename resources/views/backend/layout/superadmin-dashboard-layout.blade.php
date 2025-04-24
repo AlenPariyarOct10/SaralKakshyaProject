@@ -110,39 +110,6 @@
                         <i class="fas fa-sun hidden dark:block"></i>
                     </button>
 
-                    <!-- Notifications -->
-                    <div class="relative">
-                        <button id="notificationBtn" class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-bell"></i>
-                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
-
-                        <!-- Notification Dropdown (Hidden by default) -->
-                        <div id="notificationDropdown" class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
-                            <div class="p-4 border-b dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
-                            </div>
-                            <div class="max-h-96 overflow-y-auto">
-                                <a href="#" class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">New admin registration</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 minutes ago</p>
-                                </a>
-
-                                <a href="#" class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">Institute approval request</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 hour ago</p>
-                                </a>
-                                <a href="#" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">System update available</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yesterday</p>
-                                </a>
-                            </div>
-                            <div class="p-2 text-center border-t dark:border-gray-700">
-                                <a href="notifications.html" class="text-sm text-primary-600 hover:underline">View all notifications</a>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Profile Dropdown -->
                     <div class="relative">
                         <button id="profileBtn" class="flex items-center space-x-2">
@@ -154,10 +121,10 @@
                         <!-- Profile Dropdown (Hidden by default) -->
                         <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
                             <div class="py-1">
-                                <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <a href="{{route('superadmin.profile.index')}}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-user mr-2"></i> Profile
                                 </a>
-                                <a href="settings.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <a href="{{route('superadmin.setting.index')}}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-cog mr-2"></i> Settings
                                 </a>
                                 <div class="border-t dark:border-gray-700"></div>
@@ -260,28 +227,17 @@
     });
 
     // Dropdowns
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationDropdown = document.getElementById('notificationDropdown');
+
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
-
-    notificationBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notificationDropdown.classList.toggle('hidden');
-        profileDropdown.classList.add('hidden');
-    });
 
     profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         profileDropdown.classList.toggle('hidden');
-        notificationDropdown.classList.add('hidden');
+
     });
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', () => {
-        notificationDropdown.classList.add('hidden');
-        profileDropdown.classList.add('hidden');
-    });
+
 </script>
 </body>
 </html>

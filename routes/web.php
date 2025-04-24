@@ -2,10 +2,12 @@
 
 use App\Models\Testimonial;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Event\Telemetry\System;
 
 Route::get('/', function (){
     $testimonial = Testimonial::orderBy('rank','asc')->get();
-    return view('welcome', compact('testimonial'));
+    $system = \App\Models\SystemSetting::first();
+    return view('welcome', compact('testimonial', 'system'));
 });
 
 require __DIR__ . '/admin_routes.php';

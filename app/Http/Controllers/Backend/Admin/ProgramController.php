@@ -17,7 +17,7 @@ class ProgramController extends Controller
     public function index()
     {
         $allDepartments = Department::all();
-        $programs = Program::with('department')->get();
+        $programs = Program::with('department')->where('created_by', Auth::guard('admin')->id())->get();
         $user = Auth::guard('admin')->user();
         return view('backend.admin.program', compact('user', 'allDepartments', 'programs'));
     }
@@ -44,6 +44,7 @@ class ProgramController extends Controller
             'description' => 'required|string|max:500',
         ]);
 
+        $validated['created_by'] = Auth::guard('admin')->id();
         $status = Program::create($validated);
 
         if ($status)
@@ -68,16 +69,42 @@ class ProgramController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $program = Program::with('department')->find($id); // Using `find()` simplifies the query
+
+        // Check if the program was found
+        if (!$program) {
+            return response()->json(['message' => 'Program not found'], 404);
+        }
+
+        return response()->json($program);
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'department_id' => 'required|integer|exists:departments,id',
+            'total_semesters' => 'required|integer|max:15',
+            'duration' => 'required|integer|max:15',
+            'status' => 'required|string',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $program = Program::findOrFail($id);
+
+        $status = $program->update($validated);
+
+        if ($status) {
+            return response()->json(['success' => 'Program updated successfully']);
+        } else {
+            return response()->json(['error' => 'Failed to update program']);
+        }
     }
+
 
     public function get_program_semesters(Request $request)
     {

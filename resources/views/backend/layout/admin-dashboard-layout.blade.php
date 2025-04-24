@@ -131,10 +131,6 @@
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
-                <a href="{{route("admin.testimonial.index")}}" class="sidebar-item {{Route::is("admin.testimonial.index")? "active":""}}">
-                    <i class="fa-solid fa-star-half-stroke"></i>
-                    <span>Testimonial</span>
-                </a>
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
                     <a href="{{route("admin.student.index")}}" class="sidebar-item {{Route::is("admin.student.index")? "active":""}}">
                         <i class="fa-solid fa-graduation-cap"></i>

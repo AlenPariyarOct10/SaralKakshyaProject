@@ -11,6 +11,7 @@ class Department extends Model
         'name',
         'status',
         'description',
+        'institute_id',
     ];
 
     public function program()

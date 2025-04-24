@@ -56,12 +56,12 @@
                 <div class="mt-4 flex items-center justify-between">
                     <div>
                                 <span class="text-sm text-green-500">
-                                    <i class="fas fa-check-circle mr-1"></i> 142 Approved
+                                    <i class="fas fa-check-circle mr-1"></i> {{$institutes->where('deleted_at', null)->count()}} Active
                                 </span>
                     </div>
                     <div>
-                                <span class="text-sm text-yellow-500">
-                                    <i class="fas fa-clock mr-1"></i> 14 Pending
+                                <span class="text-sm text-red-500">
+                                    <i class="fas fa-clock mr-1"></i> {{$institutes->whereNotNull('deleted_at')->count()}} Deleted
                                 </span>
                     </div>
                 </div>
@@ -72,18 +72,27 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Teachers</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">1,248</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{$teachers->count()}}</h3>
                     </div>
                     <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
                         <i class="fas fa-chalkboard-teacher text-purple-500 dark:text-purple-300"></i>
                     </div>
                 </div>
-                <div class="mt-4">
+                @if($teachers->growth>0)
+                    <div class="mt-4">
                             <span class="text-sm text-green-500">
-                                <i class="fas fa-arrow-up mr-1"></i> 8%
+                                <i class="fas fa-arrow-up mr-1"></i> {{$students->growth}}%
                             </span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
-                </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
+                    </div>
+                @elseif($teachers->growth<=0)
+                    <div class="mt-4">
+                            <span class="text-sm text-red-500">
+                                <i class="fas fa-arrow-down mr-1"></i> {{$teachers->growth}}%
+                            </span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
+                    </div>
+                @endif
             </div>
 
             <!-- Students Stats Card -->
@@ -91,86 +100,33 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Students</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">24,853</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{$students->count()}}</h3>
                     </div>
                     <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
                         <i class="fas fa-user-graduate text-yellow-500 dark:text-yellow-300"></i>
                     </div>
                 </div>
+                @if($students->growth>0)
                 <div class="mt-4">
                             <span class="text-sm text-green-500">
-                                <i class="fas fa-arrow-up mr-1"></i> 12%
+                                <i class="fas fa-arrow-up mr-1"></i> {{$students->growth}}%
                             </span>
                     <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
                 </div>
+                @elseif($students->growth<=0)
+                <div class="mt-4">
+                            <span class="text-sm text-red-500">
+                                <i class="fas fa-arrow-down mr-1"></i> {{$students->growth}}%
+                            </span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
+                </div>
+                @endif
             </div>
         </div>
 
         <!-- Pending Approvals & System Alerts -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Pending Approvals -->
-            <div class="card">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Approvals</h3>
-                    <a href="notifications.html" class="text-sm text-primary-600 hover:underline">View all</a>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex items-start p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        <div class="p-2 bg-yellow-100 dark:bg-yellow-800 rounded-md mr-3">
-                            <i class="fas fa-user-shield text-yellow-500 dark:text-yellow-300"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-800 dark:text-white">New Admin Registration</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">John Smith - john.smith@example.com</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="px-2 py-1 text-xs bg-green-500 text-white rounded-md hover:bg-green-600">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        <div class="p-2 bg-yellow-100 dark:bg-yellow-800 rounded-md mr-3">
-                            <i class="fas fa-university text-yellow-500 dark:text-yellow-300"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-800 dark:text-white">Institute Approval Request</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tech University - Added by admin@tech.edu</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="px-2 py-1 text-xs bg-green-500 text-white rounded-md hover:bg-green-600">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        <div class="p-2 bg-yellow-100 dark:bg-yellow-800 rounded-md mr-3">
-                            <i class="fas fa-university text-yellow-500 dark:text-yellow-300"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-800 dark:text-white">Institute Approval Request</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Global College - Added by admin@global.edu</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="px-2 py-1 text-xs bg-green-500 text-white rounded-md hover:bg-green-600">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @livewire('super-admin.dashboard-pending-approvals')
 
             <!-- System Alerts -->
             <div class="card">

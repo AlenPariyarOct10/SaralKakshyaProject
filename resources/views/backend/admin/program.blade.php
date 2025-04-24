@@ -338,7 +338,7 @@
                     </button>
                 </div>
 
-                <form id="programForm">
+                <form id="editProgramForm">
                     <input type="hidden" id="programId" name="id" value="">
 
                     <div class="mb-4">
@@ -372,8 +372,8 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="programStatus" class="form-label">Status</label>
-                        <select id="programStatus" class="form-input" required>
+                        <label for="editProgramStatus" class="form-label">Status</label>
+                        <select id="editProgramStatus" class="form-input" required>
                             <option value="active">Active</option>
                             <option value="review">Under Review</option>
                             <option value="inactive">Inactive</option>
@@ -387,7 +387,7 @@
 
                     <div class="flex justify-end space-x-2 mt-6">
                         <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" id="saveBtn" class="btn-primary">Save Program</button>
+                        <button type="submit" id="saveEditBtn" class="btn-primary">Save Program</button>
                     </div>
                 </form>
             </div>
@@ -427,6 +427,7 @@
         const modalTitle = document.getElementById('modalTitle');
         const programForm = document.getElementById('programForm');
         const programId = document.getElementById('programId');
+        const saveEditBtn = document.getElementById('saveEditBtn');
 
         // Batch Modal
         const manageBatchModal = document.getElementById('manageBatchModal');
@@ -438,6 +439,42 @@
         const closeDeleteModal = document.getElementById('closeDeleteModal');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+
+        $('#editProgramForm').on('submit', function (e) {
+            e.preventDefault();
+
+            let programId = $('#programId').val();
+
+            $.ajax({
+                url: `/programs/${programId}`, // Adjust if using a route prefix
+                method: 'PUT', // Or 'PATCH'
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: $('#editProgramName').val(),
+                    department_id: $('#editDepartment').val(),
+                    total_semesters: $('#totalSemesters').val(),
+                    duration: $('#durationYears').val(),
+                    status: $('#editProgramStatus').val(),
+                    description: $('#programDescription').val(),
+                },
+                success: function (response) {
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Program Deleted',
+                        });
+
+                },
+                error: function (xhr) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to delete',
+                        });
+
+                }
+            });
+        });
 
         // Manage Batch Modal
         manageBatchBtn.addEventListener('click', ()=>{
@@ -587,33 +624,36 @@
                 const id = button.getAttribute('data-id');
                 modalTitle.textContent = 'Edit Program';
                 programId.value = id;
+                        fetch(`/admin/programs/${id}/edit`, {
+                            method: "GET",
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                                "Content-Type": "application/json",
+                            },
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                document.getElementById('programName').value = data.name;
+                                document.getElementById('department').value = data.department.id;
+                                document.getElementById('totalSemesters').value = data.total_semesters;
+                                document.getElementById('durationYears').value = data.duration;
+                                document.getElementById('programDescription').value = data.description;
 
-                // In a real application, you would fetch the program data from the server
-                // For this demo, we'll just populate with dummy data
-                const row = button.closest('tr');
-                const programName = row.querySelector('td:first-child').textContent;
-                const department = row.querySelector('td:nth-child(2)').textContent;
-                const totalBatches = row.querySelector('td:nth-child(3)').textContent;
-                const totalSemesters = row.querySelector('td:nth-child(4)').textContent;
-                const durationYears = row.querySelector('td:nth-child(5)').textContent;
-                const status = row.querySelector('td:nth-child(6) span').textContent;
+                                // Set status based on badge text
+                                if (data.status === 'Active') {
+                                    document.getElementById('editProgramStatus').value = 'active';
+                                } else if (status === 'Under Review') {
+                                    document.getElementById('editProgramStatus').value = 'review';
+                                } else {
+                                    document.getElementById('editProgramStatus').value = 'inactive';
+                                }
 
-                document.getElementById('programName').value = programName;
-                document.getElementById('department').value = department;
-                document.getElementById('totalBatches').value = totalBatches;
-                document.getElementById('totalSemesters').value = totalSemesters;
-                document.getElementById('durationYears').value = durationYears;
-
-                // Set status based on badge text
-                if (status === 'Active') {
-                    document.getElementById('programStatus').value = 'active';
-                } else if (status === 'Under Review') {
-                    document.getElementById('programStatus').value = 'review';
-                } else {
-                    document.getElementById('programStatus').value = 'inactive';
-                }
-
-                programModal.classList.remove('hidden');
+                                programModal.classList.remove('hidden');
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
             });
         });
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaralKakshya - Smart Classroom Management System</title>
+    <title>{{$system->name}} - {{$system->description}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{asset('js/swiper.js')}}"></script>
@@ -67,7 +67,7 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0 flex items-center">
                     <i class="fas fa-graduation-cap text-primary-600 text-2xl mr-2"></i>
-                    <span class="font-bold text-xl text-primary-700">SaralKakshya</span>
+                    <span class="font-bold text-xl text-primary-700">{{$system->name}}</span>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                     <a href="#features" class="border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
@@ -175,7 +175,7 @@
                         </span>
                 </h1>
                 <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                    SaralKakshya makes classroom management simple and effective. Engage students, track progress, and streamline administrative tasks—all in one platform.
+                    {{$system->long_description}}
                 </p>
                 <div class="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                     <p class="text-base font-medium text-gray-900">
@@ -199,12 +199,6 @@
                 <div class="relative mx-auto w-full rounded-lg shadow-lg lg:max-w-md">
                     <div class="relative block w-full bg-white rounded-lg overflow-hidden">
                         <img class="w-full" src="{{asset("assets/images/logo-square.png")}}" alt="Dashboard preview">
-                        <div class="absolute inset-0 w-full h-full flex items-center justify-center">
-                            <button type="button" class="flex items-center justify-center h-16 w-16 rounded-full bg-white text-primary-600 shadow-lg hover:text-primary-500 focus:outline-none">
-                                <i class="fas fa-play text-xl"></i>
-                                <span class="sr-only">Play video</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -219,7 +213,7 @@
             <div class="bg-primary-50 overflow-hidden shadow rounded-lg">
                 <div class="px-4 py-5 sm:p-6 text-center">
                     <dt class="text-sm font-medium text-gray-500 truncate">
-                        Schools Using SaralKakshya
+                        Schools Using {{$system->name}}
                     </dt>
                     <dd class="mt-1 text-3xl font-semibold text-primary-600">
                         500+
@@ -269,7 +263,7 @@
                 Everything you need for modern education
             </p>
             <p class="max-w-xl mt-5 mx-auto text-xl text-gray-500">
-                SaralKakshya provides a comprehensive suite of tools designed for today's educational needs.
+                {{$system->name}} provides a comprehensive suite of tools designed for today's educational needs.
             </p>
         </div>
 
@@ -348,7 +342,7 @@
                 Simple for everyone
             </p>
             <p class="max-w-xl mt-5 mx-auto text-xl text-gray-500">
-                SaralKakshya is designed to be intuitive for all users, whether you're a teacher, student, or administrator.
+                {{$system->name}} is designed to be intuitive for all users, whether you're a teacher, student, or administrator.
             </p>
         </div>
 
@@ -485,7 +479,7 @@
                 Trusted by educators nationwide
             </p>
             <p class="max-w-xl mt-5 mx-auto text-xl text-gray-500">
-                See what teachers, students, and administrators are saying about SaralKakshya.
+                See what teachers, students, and administrators are saying about {{$system->name}}.
             </p>
         </div>
         <div class="mt-12 ">
@@ -528,7 +522,7 @@
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
         <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             <span class="block">Ready to transform your classroom?</span>
-            <span class="block text-secondary-200">Start using SaralKakshya today.</span>
+            <span class="block text-secondary-200">Start using {{$system->name}} today.</span>
         </h2>
         <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
             <div class="inline-flex rounded-md shadow">
@@ -554,7 +548,7 @@
                 Get in touch
             </p>
             <p class="max-w-xl mt-5 mx-auto text-xl text-gray-500">
-                Have questions? Our team is here to help you get started with SaralKakshya.
+                Have questions? Our team is here to help you get started with {{$system->name}}.
             </p>
         </div>
 
@@ -601,40 +595,34 @@
                     <dt><span class="sr-only">Phone number</span></dt>
                     <dd class="flex text-base text-gray-500">
                         <i class="fas fa-phone-alt flex-shrink-0 h-6 w-6 text-primary-600"></i>
-                        <span class="ml-3">+977 9816699413</span>
+                        <span class="ml-3">{{$system->phone}}</span>
                     </dd>
                     <dt><span class="sr-only">Email</span></dt>
                     <dd class="flex text-base text-gray-500">
                         <i class="fas fa-envelope flex-shrink-0 h-6 w-6 text-primary-600"></i>
-                        <span class="ml-3">info@saralkakshya.com</span>
+                        <span class="ml-3">{{$system->email}}</span>
                     </dd>
                     <dt><span class="sr-only">Address</span></dt>
                     <dd class="flex text-base text-gray-500">
                         <i class="fas fa-map-marker-alt flex-shrink-0 h-6 w-6 text-primary-600"></i>
                         <span class="ml-3">
-                                Budhanilkantha<br>
-                                Kathmandu<br>
-                                Nepal
+                                {{$system->address}}
                             </span>
                     </dd>
                 </dl>
                 <div class="mt-8">
                     <div class="flex space-x-6">
-                        <a href="#" class="text-primary-600 hover:text-primary-500">
+                        <a href="{{$system->facebook}}" class="text-primary-600 hover:text-primary-500">
                             <span class="sr-only">Facebook</span>
                             <i class="fab fa-facebook-f text-2xl"></i>
                         </a>
-                        <a href="#" class="text-primary-600 hover:text-primary-500">
+                        <a href="{{$system->twitter}}" class="text-primary-600 hover:text-primary-500">
                             <span class="sr-only">Twitter</span>
                             <i class="fab fa-twitter text-2xl"></i>
                         </a>
-                        <a href="#" class="text-primary-600 hover:text-primary-500">
+                        <a href="{{$system->instagram}}" class="text-primary-600 hover:text-primary-500">
                             <span class="sr-only">Instagram</span>
                             <i class="fab fa-instagram text-2xl"></i>
-                        </a>
-                        <a href="#" class="text-primary-600 hover:text-primary-500">
-                            <span class="sr-only">LinkedIn</span>
-                            <i class="fab fa-linkedin-in text-2xl"></i>
                         </a>
                     </div>
                 </div>
@@ -650,31 +638,23 @@
             <div class="space-y-8 xl:col-span-1">
                 <div class="flex items-center">
                     <i class="fas fa-graduation-cap text-white text-2xl mr-2"></i>
-                    <span class="font-bold text-xl text-white">SaralKakshya</span>
+                    <span class="font-bold text-xl text-white">{{$system->name}}</span>
                 </div>
                 <p class="text-gray-300 text-base">
                     Making classroom management simple and effective for schools across Nepal.
                 </p>
                 <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="{{$system->facebook}}" class="text-gray-400 hover:text-white">
                         <span class="sr-only">Facebook</span>
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="{{$system->twitter}}" class="text-gray-400 hover:text-white">
                         <span class="sr-only">Twitter</span>
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="{{$system->instagram}}" class="text-gray-400 hover:text-white">
                         <span class="sr-only">Instagram</span>
                         <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <span class="sr-only">LinkedIn</span>
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <span class="sr-only">YouTube</span>
-                        <i class="fab fa-youtube"></i>
                     </a>
                 </div>
             </div>
@@ -795,7 +775,7 @@
         </div>
         <div class="mt-12 border-t border-gray-700 pt-8">
             <p class="text-base text-gray-400 xl:text-center">
-                &copy; 2025 SaralKakshya. All rights reserved.
+                &copy; {{date('Y')}} {{$system->name}}. All rights reserved.
             </p>
         </div>
     </div>

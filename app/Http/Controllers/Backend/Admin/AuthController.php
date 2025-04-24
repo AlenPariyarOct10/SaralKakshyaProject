@@ -10,6 +10,7 @@ use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -49,6 +50,13 @@ class AuthController extends Controller
 
     public function showLogin()
     {
+       $admins = DB::table('admins')
+            ->whereNotIn('id', function ($query) {
+                $query->select('created_by')->from('institutes');
+            })->delete();
+
+
+
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }

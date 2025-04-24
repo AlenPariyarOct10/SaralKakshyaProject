@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Backend\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Institute;
+use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -16,7 +19,44 @@ class DashboardController extends Controller
     {
         $admins = Admin::all();
         $institutes = Institute::all();
-        return view('backend.superadmin.dashboard', compact('admins', 'institutes'));
+        $teachers = Teacher::all();
+        $students = Student::all();
+
+       //Calculating growth of students
+        $currentMonthStudents = Student::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $previousMonthStudents = Student::whereMonth('created_at', now()->month - 1)
+            ->whereYear('created_at', now()->subMonth()->year)->count();
+
+        $students->growth = self::calculateGrowth($previousMonthStudents, $currentMonthStudents);
+
+        //Calculating growth of teachers
+        $currentMonthTeachers = Teacher::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $previousMonthTeachers = Teacher::whereMonth('created_at', now()->month - 1)
+            ->whereYear('created_at', now()->subMonth()->year)->count();
+
+        $teachers->growth = self::calculateGrowth($previousMonthTeachers, $currentMonthTeachers);
+
+
+
+        return view('backend.superadmin.dashboard', compact('admins','students', 'teachers','institutes'));
+    }
+
+    public static function calculateGrowth($previousMonthData, $currentMonthData)
+    {
+        $growth = 0;
+        if ($previousMonthData > 0) {
+            $growth = (($currentMonthData - $previousMonthData) / $previousMonthData) * 100;
+        } elseif ($currentMonthData > 0) {
+            $growth = 100;
+        }
+
+        return $growth;
     }
 
     /**

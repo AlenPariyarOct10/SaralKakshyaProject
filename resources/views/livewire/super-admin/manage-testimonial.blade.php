@@ -8,7 +8,19 @@
         </div>
     @endif
 
-    <!-- Attendance Management -->
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative"
+             role="alert">
+            <span class="block sm:inline">{{session('success')}}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative"
+             role="alert">
+            <span class="block sm:inline">{{session('error')}}</span>
+        </div>
+    @endif
+
     <div class="card mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 md:mb-0">Testimonial</h3>
@@ -195,7 +207,7 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <form action="{{route('admin.testimonial.update')}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('superadmin.testimonial.update')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <input type="hidden" id="editTestimonialId" name="testimonialId" value="{{$editingTestimonial->id}}">

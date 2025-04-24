@@ -11,7 +11,7 @@
         <i class="fas fa-user-shield"></i>
         <span>Admin Management</span>
     </a>
-    <a href="institute-management.html" class="sidebar-item">
+    <a href="{{route("superadmin.institute.index")}}" class="sidebar-item {{(Route::is('superadmin.institute.index')?'active':'')}}">
         <i class="fas fa-university"></i>
         <span>Institute Management</span>
     </a>
@@ -20,18 +20,12 @@
         <span>Reports & Analytics</span>
     </a>
 
-    <a href="settings.html" class="sidebar-item">
+    <a href="{{route("superadmin.setting.index")}}" class="sidebar-item {{(Route::is('superadmin.setting.index')?'active':'')}}">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
     </a>
-    <a href="notifications.html" class="sidebar-item">
-        <i class="fas fa-bell"></i>
-        <span>Notifications</span>
-        <span class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">8</span>
-    </a>
-
     <div class="pt-4 mt-4 border-t dark:border-gray-700">
-        <a href="profile.html" class="sidebar-item">
+        <a href="{{route("superadmin.profile.index")}}" class="sidebar-item {{(Route::is('superadmin.profile.index')?'active':'')}}">
             <i class="fas fa-user"></i>
             <span>Profile</span>
         </a>

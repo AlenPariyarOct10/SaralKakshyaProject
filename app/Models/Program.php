@@ -15,6 +15,7 @@ class Program extends Model
         'duration',
         'status',
         'description',
+        'created_by',
     ];
     public function department()
     {
@@ -24,5 +25,9 @@ class Program extends Model
     public function batch()
     {
         return $this->hasMany(Batch::class);
+    }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

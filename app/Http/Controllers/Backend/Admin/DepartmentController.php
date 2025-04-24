@@ -52,6 +52,7 @@ class DepartmentController extends Controller
             'description' => 'max:500',
         ]);
 
+       $request['institute_id'] =Auth::guard('admin')->user()->institute->id;
 
        $status = Department::create($request);
        if($status)

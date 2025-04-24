@@ -42,6 +42,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
+        Route::get('/programs/{id}/edit', [AdminProgramController::class, 'edit'])->name('admin.programs.edit');
+        Route::put('/programs/{id}', [AdminProgramController::class, 'update'])->name('admin.programs.update');
         Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
         Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
         Route::get('/department/get_program_semesters', [AdminProgramController::class, 'get_program_semesters'])->name('admin.department.get_program_semesters');
@@ -52,7 +54,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
         Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');
         Route::delete('/testimonial/{id}', [AdminTestimonialController::class, "destroy"])->name('admin.testimonial.destroy');
-        Route::put('/testimonial', [AdminTestimonialController::class, "update"])->name('admin.testimonial.update');
+        Route::put('/testimonial/{id}', [AdminTestimonialController::class, "update"])->name('admin.testimonial.update');
         Route::get('/testimonial/get_testimonial/{id}', [AdminTestimonialController::class, "get_testimonial"])->name('admin.testimonial.get_testimonial');
 
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
