@@ -48,6 +48,7 @@
             }
         }
     </style>
+
 @endpush
 
 @section("scripts")
@@ -57,10 +58,18 @@
             const fileList = document.getElementById('file-list');
             const dropZone = fileUpload.closest('.border-dashed');
 
-            // Handle file selection via input
+            // Constants
+            const MAX_FILE_SIZE = 50 * 1024 * 1024;
+            const ALLOWED_TYPES = [
+                'image/png', 'image/jpeg', 'image/gif', 'image/webp',
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'text/plain'
+            ];
+
             fileUpload.addEventListener('change', handleFiles);
 
-            // Handle drag and drop
             dropZone.addEventListener('dragover', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -79,68 +88,73 @@
                 dropZone.classList.remove('border-primary-500');
 
                 if (e.dataTransfer.files.length) {
-                    handleFileUpload(e.dataTransfer.files);
+                    handleFileUpload(e.dataTransfer.files[0]); // Only first file
                 }
             });
 
             function handleFiles(e) {
-                const files = e.target.files;
-                handleFileUpload(files);
-            }
-
-            function handleFileUpload(files) {
-                for (let i = 0; i < files.length; i++) {
-                    uploadFile(files[i]);
+                const file = e.target.files[0];
+                if (file) {
+                    handleFileUpload(file);
                 }
             }
 
+            function handleFileUpload(file) {
+                fileList.innerHTML = ''; // Remove previous files
+
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    alert('Invalid file type. Only images, PDF, Word, and TXT files are allowed.');
+                    return;
+                }
+
+                if (file.size > MAX_FILE_SIZE) {
+                    alert('File size exceeds the 10MB limit.');
+                    return;
+                }
+
+                uploadFile(file);
+            }
+
             function uploadFile(file) {
-                // Create file item element
                 const fileItem = document.createElement('div');
                 fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md';
 
-                // File info
                 const fileInfo = document.createElement('div');
                 fileInfo.className = 'flex items-center space-x-2';
 
-                // File icon based on type
                 const fileIcon = document.createElement('i');
                 if (file.type.includes('pdf')) {
                     fileIcon.className = 'fas fa-file-pdf text-red-500';
-                } else if (file.type.includes('doc')) {
+                } else if (file.type.includes('word') || file.name.match(/\.(doc|docx)$/)) {
                     fileIcon.className = 'fas fa-file-word text-blue-500';
                 } else if (file.type.includes('image')) {
                     fileIcon.className = 'fas fa-file-image text-green-500';
+                } else if (file.type === 'text/plain') {
+                    fileIcon.className = 'fas fa-file-alt text-gray-500';
                 } else {
                     fileIcon.className = 'fas fa-file text-gray-500';
                 }
 
-                // File name and size
                 const fileDetails = document.createElement('div');
                 fileDetails.innerHTML = `
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">${file.name}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">${formatFileSize(file.size)}</p>
-        `;
+                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">${file.name}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">${formatFileSize(file.size)}</p>
+            `;
 
-                // Status container
                 const statusContainer = document.createElement('div');
                 statusContainer.className = 'flex items-center space-x-2';
 
-                // Progress container
                 const progressContainer = document.createElement('div');
                 progressContainer.className = 'w-24 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700';
 
-                // Progress bar
                 const progressBar = document.createElement('div');
                 progressBar.className = 'bg-primary-600 h-2.5 rounded-full';
                 progressBar.style.width = '0%';
 
-                // Status text
                 const statusText = document.createElement('span');
                 statusText.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
                 statusText.textContent = 'Preparing...';
 
-                // Append elements
                 progressContainer.appendChild(progressBar);
                 statusContainer.appendChild(progressContainer);
                 statusContainer.appendChild(statusText);
@@ -153,7 +167,6 @@
 
                 fileList.appendChild(fileItem);
 
-                // Simulate file upload with progress
                 simulateFileUpload(progressBar, statusText, fileItem);
             }
 
@@ -167,12 +180,10 @@
                         progress = 100;
                         clearInterval(interval);
 
-                        // Upload complete
                         setTimeout(() => {
                             statusText.textContent = 'Uploaded';
                             statusText.className = 'text-xs font-medium text-green-500';
 
-                            // Replace progress bar with success icon
                             const progressContainer = progressBar.parentElement;
                             progressContainer.innerHTML = '';
 
@@ -180,7 +191,6 @@
                             successIcon.className = 'fas fa-check-circle text-green-500 text-lg';
                             progressContainer.appendChild(successIcon);
 
-                            // Add remove button
                             const removeBtn = document.createElement('button');
                             removeBtn.className = 'ml-2 text-gray-400 hover:text-red-500 focus:outline-none';
                             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
@@ -194,38 +204,24 @@
 
                     progressBar.style.width = `${progress}%`;
                 }, 200);
-
-                // In a real implementation, you would use FormData and fetch/axios to upload the file
-                // const formData = new FormData();
-                // formData.append('file', file);
-                //
-                // fetch('/upload-endpoint', {
-                //     method: 'POST',
-                //     body: formData
-                // })
-                // .then(response => response.json())
-                // .then(data => {
-                //     // Handle successful upload
-                // })
-                // .catch(error => {
-                //     // Handle error
-                // });
             }
 
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
-
                 const k = 1024;
                 const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
         });
     </script>
+
 @endsection
 
 @section('content')
+    @if(session('errors'))
+        {{session('errors')}}
+    @endif
     <!-- Main Content Area -->
     @livewire('admin.upload-announcement')
 @endsection

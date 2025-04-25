@@ -47,17 +47,18 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
         Route::get('/department/get_program_semesters', [AdminProgramController::class, 'get_program_semesters'])->name('admin.department.get_program_semesters');
 
-
-
-
+        //Testimonial
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
         Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');
         Route::delete('/testimonial/{id}', [AdminTestimonialController::class, "destroy"])->name('admin.testimonial.destroy');
         Route::put('/testimonial/{id}', [AdminTestimonialController::class, "update"])->name('admin.testimonial.update');
         Route::get('/testimonial/get_testimonial/{id}', [AdminTestimonialController::class, "get_testimonial"])->name('admin.testimonial.get_testimonial');
 
+        //Announcement
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
         Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
+        Route::post('/announcement/store', [AdminAnnouncementController::class, "store"])->name('admin.announcement.store');
+
 
         Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');

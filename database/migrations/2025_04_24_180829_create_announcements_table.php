@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->foreignId('department_id')->nullable()->constrained('departments', 'id')->nullOnDelete();
             $table->foreignId('program_id')->nullable()->constrained('programs', 'id')->nullOnDelete();
-            $table->string('type')->nullable(); // e.g., 'event', 'notice', etc.
+            $table->string('type')->nullable();
             $table->longText('content')->nullable();
             $table->foreignId('attachment_id')->nullable()->constrained('attachments', 'id')->nullOnDelete();
             $table->boolean('pinned')->default(false);
             $table->boolean('notification')->default(false);
-            $table->string('creator_type')->nullable(); // e.g., 'admin', 'teacher'
+            $table->string('creator_type')->nullable();
             $table->unsignedBigInteger('creator_id')->nullable();
             $table->timestamps();
         });

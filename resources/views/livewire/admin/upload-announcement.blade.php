@@ -3,7 +3,6 @@
         <!-- Breadcrumbs -->
         <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
-
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 text-sm mx-1"></i>
@@ -27,20 +26,21 @@
         <div class="card">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-6">Create New Announcement</h3>
 
-            <form id="announcementForm">
+            <form id="announcementForm" action="{{route("admin.announcement.store")}}" method="POST" enctype="multipart/form-data">
+                @csrf
                 <div class="space-y-6">
                     <!-- Title -->
                     <div>
                         <label for="title" class="form-label">Announcement Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="title" name="title" class="form-input" placeholder="Enter announcement title" required>
+                        <input type="text" id="title" name="title" value="{{old('title')}}" class="form-input" placeholder="Enter announcement title" required>
                     </div>
 
                     <!-- Department -->
                     <div>
                         <label for="department" class="form-label">Department <span class="text-red-500">*</span></label>
                         <div>
-                            <select id="department" name="department" class="form-select" wire:change="updateDepartment($event.target.value)" required>
-                                <option value="all">All Departments</option>
+                            <select id="department" name="department_id" class="form-select" wire:change="updateDepartment($event.target.value)">
+                                <option value="">All Departments</option>
                                 @foreach($departments as $department)
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                                 @endforeach
@@ -51,8 +51,8 @@
                     <!-- Programs -->
                     <div>
                         <label for="course" class="form-label">Programs <span class="text-red-500">*</span></label>
-                        <select id="course" name="course" class="form-select" required>
-                            <option value="all">All Courses</option>
+                        <select id="course" name="program_id" class="form-select">
+                            <option value="">All Programs</option>
                             @foreach($programs as $program)
                                 <option value="{{$program->id}}">{{$program->name}}</option>
                             @endforeach
@@ -72,7 +72,7 @@
                     <!-- Content -->
                     <div>
                         <label for="content" class="form-label">Announcement Content <span class="text-red-500">*</span></label>
-                        <textarea id="content" name="content" rows="6" class="form-input" placeholder="Enter announcement content" required></textarea>
+                        <textarea id="content" name="content" rows="6" class="form-input" placeholder="Enter announcement content" required>{{old('content')}}</textarea>
                     </div>
 
                     <!-- Attachments -->
@@ -83,8 +83,8 @@
                                 <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
                                 <div class="flex text-sm text-gray-600 dark:text-gray-400">
                                     <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                                        <span class="px-2">Upload files</span>
-                                        <input type="file" id="file-upload" name="files[]" multiple>
+                                        <label for="file-upload" class="px-2">Upload files</label>
+                                        <input class="hidden" type="file" id="file-upload" name="file">
                                     </label>
                                     <p class="pl-1">or drag and drop</p>
                                 </div>
@@ -100,7 +100,7 @@
                     <div class="space-y-3">
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input id="pin" name="pin" type="checkbox" class="form-checkbox">
+                                <input id="pin" name="pinned" type="checkbox" class="form-checkbox">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="pin" class="font-medium text-gray-700 dark:text-gray-300">Pin to top</label>
@@ -109,7 +109,7 @@
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input id="notify" name="notify" type="checkbox" class="form-checkbox" checked>
+                                <input id="notify" name="notification" type="checkbox" class="form-checkbox" checked>
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="notify" class="font-medium text-gray-700 dark:text-gray-300">Send notification</label>
