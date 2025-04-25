@@ -8,7 +8,7 @@ class Subject extends Model
 {
     protected $table = "subjects";
     protected $fillable =
-        ['name', 'code', 'description', 'program_id', 'batch_id', 'status', 'created_by', 'standard_publisher'];
+        ['name', 'code', 'description','credit', 'program_id', 'batch_id', 'status', 'created_by', 'standard_publisher'];
 
     public function subject_evaluations()
     {

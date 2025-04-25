@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('subject_evaluation_formats', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('subject_id')->references('id')->on('subjects')->onDelete('cascade');
+            $table->string('criteria', 255);
+            $table->double('full_marks', 1000);
+            $table->double('pass_marks', 1000);
             $table->timestamps();
         });
     }
