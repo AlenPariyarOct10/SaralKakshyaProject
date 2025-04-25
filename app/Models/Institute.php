@@ -14,7 +14,7 @@ class Institute extends Model
 
     public function departments()
     {
-        $this->hasMany(Department::class, 'institute_id', 'id');
+        return $this->hasMany(Department::class, 'institute_id', 'id');
     }
 
     public function students()
@@ -30,6 +30,11 @@ class Institute extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'created_by', 'id');
+    }
+
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class);
     }
 
 }

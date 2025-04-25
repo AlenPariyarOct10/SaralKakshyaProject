@@ -26,6 +26,8 @@ class AnnouncementController extends Controller
     {
         $user = Auth::user();
 
+
+
         return view('backend.admin.upload-announcement', compact('user'));
 
     }
@@ -44,36 +46,20 @@ class AnnouncementController extends Controller
             'program_id' => 'nullable',
             'type' => 'required|string',
             'content' => 'required|string|max:500',
-            'file' => 'required|file|mimes:jpeg,jpg,png,pdf,docx,doc|max:20480',
-
+            'file' => 'nullable|file|mimes:jpeg,jpg,png,pdf,docx,doc|max:20480',
         ]);
 
-
-        // Create the Announcement
-        $announcement = Announcement::create([
-            'title' => $validated['title'],
-            'department_id' => $validated['department_id'],
-            'program_id' => $validated['program_id'],
-            'type' => $validated['type'],
-            'content' => $validated['content'],
-            'pinned' => $pinned,
-            'notification' => $notification,
-            'creator_type' => 'admin',
-            'creator_id' => auth()->id(),
-        ]);
-
-
-
-// Save announcement
+        // Create the announcement once
         $announcement = Announcement::create([
             ...$validated,
             'pinned' => $pinned,
             'notification' => $notification,
             'creator_type' => 'admin',
             'creator_id' => auth()->id(),
+            'institute_id' => Auth::user()->institute?->id,
         ]);
 
-// Handle file upload
+        // Handle file upload if present
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -86,8 +72,7 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Announcement created with attachment.');
-
+        return redirect()->back()->with('success', 'Announcement created successfully.');
     }
 
     /**

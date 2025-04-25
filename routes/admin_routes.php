@@ -11,6 +11,7 @@ use App\Http\Controllers\Backend\Admin\StudentController as AdminStudentControll
 use App\Http\Controllers\Backend\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Backend\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Backend\Admin\AcademicInstituteController as AdminAcademicInstituteController;
+use App\Http\Controllers\Backend\Admin\SubjectController as AdminSubjectController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -38,6 +39,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/department', [AdminDepartmentController::class, "update"])->name('admin.department.update');
         Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
         Route::get('/department/get_department_programs', [AdminDepartmentController::class, 'get_department_programs'])->name('admin.department.get_department_programs');
+
+        //Subjects
+        Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
 
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');

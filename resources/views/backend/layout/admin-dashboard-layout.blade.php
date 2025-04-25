@@ -118,6 +118,10 @@
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>
                 </a>
+                <a href="{{route("admin.subjects.index")}}" class="sidebar-item  {{Route::is("admin.subjects.index")? "active":""}}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Subjects</span>
+                </a>
                 <a href="{{route("admin.attendance.index")}}" class="sidebar-item {{Route::is("admin.attendance.index")? "active":""}}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>

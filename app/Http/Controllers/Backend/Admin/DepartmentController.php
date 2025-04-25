@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Models\Institute;
 use App\Models\Program;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
@@ -16,8 +17,10 @@ class DepartmentController extends Controller
      */
     public function index()
     {
+        $institute = Institute::where('created_by', Auth::id())->first();
+
         $user = Auth::guard('admin')->user();
-        $allDepartments = Department::all();
+        $allDepartments = Department::where('institute_id', $institute->id)->get();
         return view('backend.admin.department', compact('user', 'allDepartments'));
     }
 

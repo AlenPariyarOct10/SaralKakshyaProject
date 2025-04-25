@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Models\Institute;
 use App\Models\Program;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
@@ -16,7 +17,9 @@ class ProgramController extends Controller
      */
     public function index()
     {
-        $allDepartments = Department::all();
+        $institute = Institute::where('created_by', Auth::id())->first();
+
+        $allDepartments = Department::where('institute_id', $institute->id)->get();
         $programs = Program::with('department')->where('created_by', Auth::guard('admin')->id())->get();
         $user = Auth::guard('admin')->user();
         return view('backend.admin.program', compact('user', 'allDepartments', 'programs'));
