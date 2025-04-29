@@ -8,14 +8,14 @@ class Subject extends Model
 {
     protected $table = "subjects";
     protected $fillable =
-        ['name', 'code', 'description','credit', 'program_id', 'batch_id', 'status', 'created_by', 'standard_publisher'];
+        ['name', 'code', 'description','credit', 'program_id', 'semester', 'max_external_marks', 'max_internal_marks','batch_id', 'status', 'created_by', 'updated_by'];
 
     public function subject_evaluations()
     {
         $this->hasOne(SubjectEvaluationFormat::class, 'subject_id', 'id');
     }
-    public function subject()
+    public function program()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Program::class, 'program_id', 'id');
     }
 }

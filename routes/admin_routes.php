@@ -42,6 +42,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Subjects
         Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
+        Route::get('/subject/create', [AdminSubjectController::class, 'create'])->name('admin.subjects.create');
+        Route::post('/subject', [AdminSubjectController::class, 'store'])->name('admin.subjects.store');
+        Route::get('/subject/{id}/edit', [AdminSubjectController::class, 'edit'])->name('admin.subjects.edit');
 
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');

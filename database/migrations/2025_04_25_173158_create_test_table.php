@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subject_evaluation_formats', function (Blueprint $table) {
+        Schema::create('test', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('subject_id')->references('id')->on('subjects')->onDelete('cascade');
-            $table->string('criteria', 255);
-            $table->double('full_marks', 10);
-            $table->double('pass_marks', 10);
             $table->timestamps();
         });
     }
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subject_evaluation_formats');
+        Schema::dropIfExists('test');
     }
 };

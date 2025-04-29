@@ -112,9 +112,12 @@ $user = Auth::user();
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
-                <a href="{{route('admin.subjects.create')}}" class="btn-primary flex items-center justify-center">
-                    <i class="fas fa-plus mr-2"></i> Add New Subject
-                </a>
+                <button id="manageBatchBtn" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
+                    <i class="fas fa-plus mr-2"></i> Manage Batch
+                </button>
+                <button id="addProgramBtn" class="btn-primary flex items-center justify-center">
+                    <i class="fas fa-plus mr-2"></i> Add New Program
+                </button>
             </div>
         </div>
 
@@ -127,44 +130,36 @@ $user = Auth::user();
                         <th scope="col" class="table-header">Subject Name</th>
                         <th scope="col" class="table-header">Code</th>
                         <th scope="col" class="table-header">Credit</th>
-                        <th scope="col" class="table-header">Description</th>
-                        <th scope="col" class="table-header">Program</th>
-                        <th scope="col" class="table-header">Semester</th>
+                        <th scope="col" class="table-header">Total Semesters</th>
+                        <th scope="col" class="table-header">Duration (Years)</th>
                         <th scope="col" class="table-header">Status</th>
-                        <th scope="col" class="table-header">Created By</th>
-                        <th scope="col" class="table-header">Action</th>
+                        <th scope="col" class="table-header">Actions</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="programsTableBody">
                     @forelse($allSubjects as $subject)
                         <tr>
-                            <td class="table-cell font-medium">{{$subject->name}}</td>
-                            <td class="table-cell font-medium">{{$subject->code}}</td>
-                            <td class="table-cell font-medium">{{$subject->credit}}</td>
-                            <td class="table-cell font-medium w-64">
-                                <div class="max-h-24 overflow-y-auto break-words whitespace-pre-line">
-                                    {{$subject->description}}
-                                </div>
-                            </td>
-                            <td class="table-cell font-medium">{{$subject->program->name}}</td>
-                            <td class="table-cell font-medium">{{$subject?->semester}}</td>
+                            <td class="table-cell font-medium">{{$program->name}}</td>
+                            <td class="table-cell">{{$program->department->name}}</td>
+                            <td class="table-cell">4</td>
+                            <td class="table-cell">{{$program->total_semesters}}</td>
+                            <td class="table-cell">{{$program->duration}}</td>
                             <td class="table-cell">
-                                @if($subject->status == 1)
+                                @if($program->status == "active")
                                     <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
                                 @endif
 
-                                @if($subject->status == 0)
+                                @if($program->status == "inactive")
                                     <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
                                 @endif
 
                             </td>
-                            <td class="table-cell font-medium">{{$subject->created_by}}</td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
-                                    <a href="{{route('admin.subjects.edit', $subject->id)}}" class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{$subject->id}}" aria-label="Edit program">
+                                    <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Edit program">
                                         <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{$subject->id}}" aria-label="Delete program">
+                                    </button>
+                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Delete program">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -172,7 +167,7 @@ $user = Auth::user();
                         </tr>
                     @empty
                         <tr>
-                            <td class="table-cell font-medium text-center" colspan="7">No Subjects Found</td>
+                            <td class="table-cell font-medium text-center" colspan="7">No Programs Found</td>
                         </tr>
                     @endforelse
 
@@ -226,7 +221,11 @@ $user = Auth::user();
                         <label for="department" class="form-label">Department</label>
                         <select id="department" name="department_id" class="form-input" required>
                             <option value="null">Select Department</option>
-
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
                         </select>
                     </div>
 
@@ -264,6 +263,142 @@ $user = Auth::user();
             </div>
         </div>
     </div>
+    <!-- Manage Batch Modal -->
+    <div id="manageBatchModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Manage Batch</h3>
+                    <button class="closeManageBatchModal p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="manageBatchForm">
+                    <div class="mb-4">
+                        <label for="batchDepartment" class="form-label">Department</label>
+                        <select id="batchDepartment" name="department_id" class="form-input" required>
+                            <option value="null">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="batchProgram" class="form-label">Program</label>
+                        <select id="batchProgram" name="program" class="form-input" required>
+                            <option value="null">Select Program</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="batchSemester" class="form-label">Select Semesters</label>
+                            <select id="batchSemester" name="batchSemester" class="form-input" required>
+                                <option value="null">Select Semester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="programStatus" class="form-label">Status</label>
+                            <select id="programStatus" name="status" class="form-input" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="batchProgram" class="form-label">Enter Batch Title</label>
+                            <input type="text" name="batch" id="batchProgram" class="form-input" placeholder="Batch Title" required="">
+                        </div>
+                        <div>
+                            <label for="batchProgram" class="form-label">Insert Batch</label>
+                            <button type="button" id="addBatchButton" class="btn-primary w-full">Add</button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="allBatches" class="form-label">All Batches</label>
+                        <textarea id="allBatches" class="form-input" placeholder="No batches yes" disabled></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-6">
+                        <button type="button" id="cancelBtn" class="closeManageBatchModal btn-danger">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Edit Program Modal -->
+    <div id="editProgramModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Add New Program</h3>
+                    <button id="closeEditModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="editProgramForm">
+                    <input type="hidden" id="programId" name="id" value="">
+
+                    <div class="mb-4">
+                        <label for="programName" class="form-label">Program Name</label>
+                        <input type="text" id="editProgramName" name="name" class="form-input" placeholder="Enter program name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="department" class="form-label">Department</label>
+                        <select id="editDepartment" name="department_id" class="form-input" required>
+                            <option value="null">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="null">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+                        <div>
+                            <label for="totalSemesters" class="form-label">Total Semesters</label>
+                            <input type="number" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
+                        </div>
+
+                        <div>
+                            <label for="durationYears" class="form-label">Duration (Years)</label>
+                            <input type="number" id="durationYears" class="form-input" min="1" placeholder="Years" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="editProgramStatus" class="form-label">Status</label>
+                        <select id="editProgramStatus" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="review">Under Review</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="programDescription" class="form-label">Description (Optional)</label>
+                        <textarea id="programDescription" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-6">
+                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" id="saveEditBtn" class="btn-primary">Save Program</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
