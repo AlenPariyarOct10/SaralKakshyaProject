@@ -44,6 +44,13 @@ class DepartmentController extends Controller
         return response()->json($programs);
     }
 
+    public function getAllDepartments()
+    {
+        $institutes = Institute::where('created_by', Auth::id())->first();
+        $departments = Department::where('institute_id', $institutes->id)->get();
+        return response()->json($departments?$departments:[]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

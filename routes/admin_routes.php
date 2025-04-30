@@ -33,18 +33,22 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
         Route::get('/department', [AdminDepartmentController::class, "index"])->name('admin.department.index');
 
-//        Department
+        //Department
         Route::post('/department', [AdminDepartmentController::class, "store"])->name('admin.department.store');
         Route::delete('/department/{id}', [AdminDepartmentController::class, "destroy"])->name('admin.department.destroy');
         Route::put('/department', [AdminDepartmentController::class, "update"])->name('admin.department.update');
         Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
         Route::get('/department/get_department_programs', [AdminDepartmentController::class, 'get_department_programs'])->name('admin.department.get_department_programs');
+        Route::get('/department/getAllDepartments', [AdminDepartmentController::class, 'getAllDepartments']);
 
         //Subjects
         Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
         Route::get('/subject/create', [AdminSubjectController::class, 'create'])->name('admin.subjects.create');
         Route::post('/subject', [AdminSubjectController::class, 'store'])->name('admin.subjects.store');
         Route::get('/subject/{id}/edit', [AdminSubjectController::class, 'edit'])->name('admin.subjects.edit');
+        Route::get('/subject/{id}/evaluations', [AdminSubjectController::class, 'getEvaluationFormats']);
+        Route::put('/subject/{id}/edit', [AdminSubjectController::class, 'update'])->name('admin.subjects.update');
+        Route::delete('/subject/{id}', [AdminSubjectController::class, 'destroy'])->name('admin.subjects.destroy');
 
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
@@ -53,7 +57,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
         Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
         Route::get('/department/get_program_semesters', [AdminProgramController::class, 'get_program_semesters'])->name('admin.department.get_program_semesters');
-
+        Route::get('/programs/{id}/semesters', [AdminProgramController::class, 'getSemesters']);
+        Route::get('/programs/{id}/subjects', [AdminProgramController::class, 'getSubjects']);
         //Testimonial
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
         Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');

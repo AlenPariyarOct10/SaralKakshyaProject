@@ -19,16 +19,13 @@ class CreateSubjectForm extends Component
 
     public function updateSelectedProgram($programId)
     {
-        if (empty($programId)) {
-            $this->selectedProgram = null;
-            $this->totalSemesters = null;
-            $this->selectedSemester = null;
-        } else {
-            $this->selectedProgram = $programId;
-            $program = Program::find($programId);
-            $this->totalSemesters = $program?->total_semesters ?? null;
-            $this->selectedSemester = null;
-        }
+        $this->selectedProgram = $programId;
+        $this->totalSemesters = $programId ? Program::find($programId)->total_semesters : null;
+        $this->selectedSemester = null;
     }
 
+    public function render()
+    {
+        return view('livewire.admin.create-subject-form');
+    }
 }

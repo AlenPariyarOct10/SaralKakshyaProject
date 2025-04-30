@@ -58,6 +58,52 @@
             const fileList = document.getElementById('file-list');
             const dropZone = fileUpload.closest('.border-dashed');
 
+            $("#department").change(function() {
+                const selectedValue = $(this).val(); // Use 'this' correctly inside the function
+                $.ajax({
+                    url: `/admin/department/get_department_programs`, // Ensure the URL is correct
+                    method: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}', // CSRF token for security
+                        department_id: selectedValue,
+                    },
+                    success: function(response) {
+                        let courseList = document.getElementById("course");
+                        courseList.innerHTML = `<option value="">All Programs</option>`;
+                        response.forEach((course) => {
+                            courseList.innerHTML += `<option value="${course.id}">${course.name}</option>`;
+                        });
+                    },
+                    error: function(xhr) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to load programs',
+                        });
+                    }
+                });
+            });
+
+            $.ajax({
+                url: `/admin/department/getAllDepartments`, // Adjust if using a route prefix
+                method: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function (response) {
+                    let departmentList = document.getElementById("department");
+                    departmentList.innerHTML = `<option value="">All Departments</option>`;
+                    response.forEach((department)=>{
+                        departmentList.innerHTML += `<option value="${department.id}">${department.name}</option>`;
+                    })
+                },
+                error: function (xhr) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Failed to delete',
+                    });
+
+                }
+            });
             // Constants
             const MAX_FILE_SIZE = 50 * 1024 * 1024;
             const ALLOWED_TYPES = [

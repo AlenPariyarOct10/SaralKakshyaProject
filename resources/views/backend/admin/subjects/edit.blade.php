@@ -116,9 +116,14 @@
 @section("scripts")
     <script>
         $(document).ready(function() {
+            let evaluationFormatItems = document.getElementById("evaluation-formats");
 
-            // Add more evaluation format fields
-            let evaluationCount = 1;
+            console.log("all", evaluationFormatItems.childElementCount);
+                let evaluationCount = 1;
+            if(evaluationFormatItems.childElementCount>0)
+            {
+                evaluationCount = evaluationFormatItems.childElementCount-1;
+            }
             let max_internal_marks = 0;
             let total = 0;
 

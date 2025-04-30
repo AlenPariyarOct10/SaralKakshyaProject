@@ -82,6 +82,18 @@ class ProgramController extends Controller
         return response()->json($program);
     }
 
+    public function getSemesters($id)
+    {
+        $program = Program::find($id);
+        return response()->json($program ? $program->total_semesters : 0);
+    }
+
+    public function getSubjects($id)
+    {
+        $program = Program::find($id);
+        return response()->json($program ? $program->subjects : 0);
+    }
+
 
     /**
      * Update the specified resource in storage.

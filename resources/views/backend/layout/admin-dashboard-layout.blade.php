@@ -14,6 +14,9 @@
     <script src="{{asset('js/sweetalert.js')}}"></script>
     <script src="{{asset('js/swiper.js')}}"></script>
     <script src="{{asset('js/jquery.js')}}"></script>
+    <script src="{{asset('js/alpine.js')}}"></script>
+    <script src="{{asset('js/toastify.js')}}"></script>
+    <script src="{{asset('css/toastify.css')}}"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',

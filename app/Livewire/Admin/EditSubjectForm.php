@@ -11,11 +11,15 @@ class EditSubjectForm extends Component
     public $selectedProgram = null;
     public $selectedSemester = null;
     public $totalSemesters = null;
+    public $currentSubject;
 
 
 
-    public function mount()
+    public function mount($currentSubject)
     {
+        $this->currentSubject = $currentSubject;
+        $this->selectedSemester = $currentSubject->semester;
+        $this->totalSemesters = $currentSubject->program->total_semesters ?? null;
         $this->programs = Program::select('id', 'name', 'total_semesters')->get();
     }
 

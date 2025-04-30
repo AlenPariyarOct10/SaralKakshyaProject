@@ -58,7 +58,7 @@
                                    {{$pinned->content}}
                                 </p>
                                 <div class="flex items-center justify-between mt-2">
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Posted by Admin • May 10, 2023</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Posted by {{ ucfirst($pinned->creator_type)}} •   {{$pinned->created_at->diffForHumans()}}</span>
                                     <button class="text-primary-600 hover:text-primary-800 text-sm">
                                         <i class="fas fa-thumbtack"></i>
                                     </button>

@@ -12,8 +12,9 @@ class Subject extends Model
 
     public function subject_evaluations()
     {
-        $this->hasOne(SubjectEvaluationFormat::class, 'subject_id', 'id');
+        return $this->hasMany(SubjectEvaluationFormat::class, 'subject_id', 'id');
     }
+
     public function program()
     {
         return $this->belongsTo(Program::class, 'program_id', 'id');

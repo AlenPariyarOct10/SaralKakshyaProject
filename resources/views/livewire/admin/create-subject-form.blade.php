@@ -19,7 +19,6 @@
     <div class="p-6">
         <form action="{{ route('admin.subjects.store') }}" method="POST">
             @csrf
-
             <!-- Basic Information -->
             <div class="mb-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Basic Information</h2>
@@ -82,7 +81,7 @@
                     <!-- Program Dropdown -->
                     <div>
                         <label for="program" class="form-label">Program <span class="text-red-500">*</span></label>
-                        <select wire:change="updateSelectedProgram($event.target.value)" id="program" name="program_id" class="form-input" required>
+                        <select id="program" name="program_id" class="form-input" required>
                             <option value="">Select Program</option>
                             @foreach($programs as $program)
                                 <option value="{{ $program->id }}" @if($selectedProgram == $program->id) selected @endif>
@@ -94,26 +93,17 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
                     <!-- Semester Dropdown -->
                     <div>
                         <label for="semester" class="form-label">Semester <span class="text-red-500">*</span></label>
-                        <select wire:model="selectedSemester" id="semester" name="semester" class="form-input" required>
+                        <select id="semester" name="semester" class="form-input" required>
                             <option value="">Select Semester</option>
-                            @if($totalSemesters)
-                                @for($i = $totalSemesters; $i >= 1; $i--)
-                                    <option value="{{ $i }}">{{ $i }} Semester</option>
-                                @endfor
-                            @endif
                         </select>
                         @error('selectedSemester')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                        @if($selectedSemester)
-                            <p class="mt-2 text-green-600">You selected: {{ $selectedSemester }} Semester</p>
-                        @endif
                     </div>
-
-
 
 
                 </div>
@@ -133,7 +123,16 @@
             <!-- Evaluation Formats -->
             <div class="mb-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">Evaluation Formats  [<span id="total-weight" class="text-sm font-medium text-gray-900 dark:text-white mb-3">Evaluation Formats</span>]</h2>
+                <div class="mb-3">
+                    <label for="reuse_format" class="form-label">Use existing format </label>
+                    <select id="reuse_format" class="form-input">
+                        <option value="">Select Subject to duplicate format</option>
 
+                    </select>
+                    @error('selectedProgram')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 <div id="evaluation-formats" class="space-y-4">
                     <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
@@ -154,7 +153,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3">
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-4 gap-4">
                     <button type="button" id="add-evaluation-format" class="btn-secondary flex items-center">
                         <i class="fas fa-plus mr-2"></i> Add Another Evaluation Format
                     </button>
@@ -169,4 +168,6 @@
             </div>
         </form>
     </div>
+
+
 </div>

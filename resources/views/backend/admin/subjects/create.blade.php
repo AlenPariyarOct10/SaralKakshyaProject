@@ -49,36 +49,47 @@
             .btn-primary {
                 @apply px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200 font-medium text-sm;
             }
+
             .btn-secondary {
                 @apply px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:ring-offset-2 transition-colors duration-200 font-medium text-sm;
             }
+
             .btn-danger {
                 @apply px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 font-medium text-sm;
             }
+
             .card {
                 @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden;
             }
+
             .sidebar-item {
                 @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors duration-200;
             }
+
             .sidebar-item.active {
                 @apply bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-medium;
             }
+
             .form-input {
                 @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm;
             }
+
             .form-label {
                 @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
             }
+
             .table-header {
                 @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
             }
+
             .table-cell {
                 @apply px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200;
             }
+
             .badge {
                 @apply px-2.5 py-1 text-xs font-medium rounded-full;
             }
+
             .dropdown-item {
                 @apply block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150;
             }
@@ -93,7 +104,8 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add New Subject</h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a new subject for your academic program</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a new subject for your academic
+                    program</p>
             </div>
             <div class="mt-4 md:mt-0">
                 <a href="{{ route('admin.subjects.index') }}" class="btn-secondary flex items-center justify-center">
@@ -104,7 +116,8 @@
 
 
         <!-- error message -->
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative error-message hidden" role="alert">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative error-message hidden"
+             role="alert">
             <strong class="font-bold">Whoops!</strong>
             <ul class="mt-2 list-disc list-inside text-sm" id="error-list">
             </ul>
@@ -115,14 +128,14 @@
 
 @section("scripts")
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             // Add more evaluation format fields
             let evaluationCount = 1;
             let max_internal_marks = 0;
             let total = 0;
 
-            $('#add-evaluation-format').on('click', function() {
+            $('#add-evaluation-format').on('click', function () {
                 evaluationCount++;
 
                 const newEvaluationFormat = `
@@ -155,7 +168,7 @@
                 $('#evaluation-formats').append(newEvaluationFormat);
 
                 // Add event listener to the newly added remove button
-                $('.remove-evaluation').last().on('click', function() {
+                $('.remove-evaluation').last().on('click', function () {
                     $(this).closest('.evaluation-format').remove();
                 });
 
@@ -185,14 +198,13 @@
                 calculateTotalWeight();
 
                 $(document).on('input', '#max_internal_marks', function () {
-                    if(max_internal_marks<total)
-                    {
+                    if (max_internal_marks < total) {
                         alert("hello");
                     }
                 });
             });
 
-            $('form').on('submit', function(e) {
+            $('form').on('submit', function (e) {
                 let isValid = true;
                 let error = [];
 
@@ -206,8 +218,7 @@
                     isValid = false;
                 }
 
-                if(max_internal_marks<total)
-                {
+                if (max_internal_marks < total) {
                     error.push("Marks weight cannot exceed max internal marks");
                     isValid = false;
                 }
@@ -215,14 +226,155 @@
                 if (!isValid) {
                     $('.error-message').classList.remove("hidden")
 
-                    error.forEach((item)=>{
+                    error.forEach((item) => {
                         $('#error-list').innerHTML += `<li>${item}</li>`;
                     });
                     e.preventDefault();
-                }else{
+                } else {
                     $('.error-message').classList.add("hidden");
                 }
             });
+
+
+            document.getElementById('program').addEventListener('change', function () {
+                const programId = this.value;
+                const url = `/admin/programs/${programId}/semesters`;
+                const fetchSubjects = `/admin/programs/${programId}/subjects`;
+                console.log('Fetching:', url);
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const semesterSelect = document.getElementById('semester');
+                        semesterSelect.innerHTML = '<option value="">Select Semester</option>';
+                        for (let i = data; i >= 1; i--) {
+                            semesterSelect.innerHTML += `<option value="${i}">${i} Semester</option>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+
+                fetch(fetchSubjects)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const subjectSelect = document.getElementById('reuse_format');
+                        subjectSelect.innerHTML = ' <option value="">Select one</option>';
+
+                        data.forEach((item) => {
+                            subjectSelect.innerHTML += `<option value="${item.id}">Same as ${item.name}</option>`;
+                        })
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+
+            document.getElementById('reuse_format').addEventListener('change', function () {
+                const subjectId = this.value;
+
+                // Check if the value is not selected
+                if (subjectId === "") {
+                    // Clear all existing evaluation formats
+                    $('#evaluation-formats').html(""); // Clear existing formats
+                    evaluationCount = 1; // Reset evaluation count
+
+                    const newEvaluationFormat = `
+            <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                    <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
+                </div>
+                <div>
+                    <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                    <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
+                </div>
+                <div class="relative">
+                    <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                    <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
+                </div>
+                <div>
+                    <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                    <div class="flex">
+                        <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
+                        <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+                    $('#evaluation-formats').append(newEvaluationFormat);
+                    calculateTotalWeight(); // Recalculate total weight
+                } else {
+                    // Fetch and populate evaluation formats as per selected subject
+                    const url = `/admin/subject/${subjectId}/evaluations`;
+                    console.log('Fetching:', url);
+
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok ' + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            $('#evaluation-formats').html(""); // Clear existing formats
+                            data.forEach((item) => {
+                                const newEvaluationFormat = `
+                        <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                                <input type="text" value="${item.criteria}" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
+                            </div>
+                            <div>
+                                <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                                <input type="number" value="${item.full_marks}" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
+                            </div>
+                            <div class="relative">
+                                <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                                <input type="number" value="${item.pass_marks}" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
+                            </div>
+                            <div>
+                                <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                                <div class="flex">
+                                    <input type="number" value="${item.marks_weight}" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
+                                    <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                                evaluationCount++; // Increment the evaluation count for each added format
+                                $('#evaluation-formats').append(newEvaluationFormat);
+                            });
+
+                            // Attach the click event listener for remove buttons
+                            $('#evaluation-formats').off('click').on('click', '.remove-evaluation', function () {
+                                console.log("clicked");
+                                $(this).closest('.evaluation-format').remove();
+                                evaluationCount--; // Decrease the evaluation count when removing a format
+                                calculateTotalWeight(); // Recalculate total weight after removal
+                            });
+                        })
+                        .catch(error => {
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                }
+            });
+
         });
     </script>
 @endsection

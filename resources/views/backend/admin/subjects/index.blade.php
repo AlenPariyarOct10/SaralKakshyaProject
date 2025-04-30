@@ -87,32 +87,38 @@ $user = Auth::user();
 @endpush
 
 @section('content')
-
-    <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
 
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div class="flex flex-col sm:flex-row gap-3">
-                <div class="relative">
-                    <input type="text" id="searchPrograms" placeholder="Search programs..." class="form-input pl-12 pr-4 py-2">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+            <!-- Search & Filter -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <!-- Search -->
+                <div class="relative w-full max-w-md">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
+                    <input
+                        type="text"
+                        placeholder="Search programs..."
+                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
                 </div>
-                <div>
-                    <select id="departmentFilter" class="form-input py-2">
-                        <option value="">All Departments</option>
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Business">Business</option>
-                        <option value="Arts">Arts</option>
-                        <option value="Science">Science</option>
+
+                <!-- Department Filter -->
+                <div class="relative w-full max-w-md">
+                    <select
+                        id="departmentFilter"
+                        class="w-full pl-4 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-gray-700"
+                    >
                     </select>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <a href="{{route('admin.subjects.create')}}" class="btn-primary flex items-center justify-center">
+
+            <!-- Add Subject Button -->
+            <div class="flex justify-end">
+                <a href="{{ route('admin.subjects.create') }}"
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
                     <i class="fas fa-plus mr-2"></i> Add New Subject
                 </a>
             </div>
@@ -131,13 +137,12 @@ $user = Auth::user();
                         <th scope="col" class="table-header">Program</th>
                         <th scope="col" class="table-header">Semester</th>
                         <th scope="col" class="table-header">Status</th>
-                        <th scope="col" class="table-header">Created By</th>
                         <th scope="col" class="table-header">Action</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="programsTableBody">
                     @forelse($allSubjects as $subject)
-                        <tr>
+                        <tr id="subject-row-{{$subject->id}}">
                             <td class="table-cell font-medium">{{$subject->name}}</td>
                             <td class="table-cell font-medium">{{$subject->code}}</td>
                             <td class="table-cell font-medium">{{$subject->credit}}</td>
@@ -158,13 +163,12 @@ $user = Auth::user();
                                 @endif
 
                             </td>
-                            <td class="table-cell font-medium">{{$subject->created_by}}</td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
                                     <a href="{{route('admin.subjects.edit', $subject->id)}}" class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{$subject->id}}" aria-label="Edit program">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{$subject->id}}" aria-label="Delete program">
+                                    <button class="p-1.5 text-red-600 hover:text-red-800" onclick="confirmDelete({{ $subject->id }}, '{{ $subject->name }}')">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -199,411 +203,89 @@ $user = Auth::user();
                 </div>
             </div>
         </div>
+            <div class="fixed inset-0 z-50 flex items-center justify-center hidden">
+                <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+                <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Confirm Deletion</h3>
+                            <button wire:click="cancelDeleteSubject" class="p-1 text-gray-500 hover:bg-gray-100 rounded">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">
+                            Are you sure you want to delete this subject? This action cannot be undone.
+                        </p>
+                        <div class="flex justify-end gap-2">
+                            <button wire:click="cancelDeleteSubject" class="btn-secondary">Cancel</button>
+                            <button wire:click="cancelDeleteSubject" class="btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     </main>
+
 @endsection
 
-@section("modals")
-    <!-- Add Program Modal -->
-    <div id="programModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 id="modalTitle" class="text-xl font-semibold text-gray-800 dark:text-white">Add New Program</h3>
-                    <button id="closeModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
 
-                <form action="{{route('admin.programs.store')}}" method="POST">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="programName" class="form-label">Program Name</label>
-                        <input type="text" name="name" id="programName" class="form-input" placeholder="Enter program name" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="department" class="form-label">Department</label>
-                        <select id="department" name="department_id" class="form-input" required>
-                            <option value="null">Select Department</option>
-
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
-                        <div>
-                            <label for="totalSemesters" class="form-label">Total Semesters</label>
-                            <input type="number" name="total_semesters" id="totalSemesters" class="form-input" min="1" placeholder="Semesters" required>
-                        </div>
-
-                        <div>
-                            <label for="durationYears" class="form-label">Duration (Years)</label>
-                            <input type="number" name="duration" id="durationYears" class="form-input" min="1" placeholder="Years" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="programStatus" class="form-label">Status</label>
-                        <select id="programStatus" name="status" class="form-input" required>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="programDescription" class="form-label">Description (Optional)</label>
-                        <textarea id="programDescription" name="description" class="form-input" rows="3" placeholder="Enter program description"></textarea>
-                    </div>
-
-                    <div class="flex justify-end space-x-2 mt-6">
-                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" id="saveBtn" class="btn-primary">Save Program</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Confirm Deletion</h3>
-                    <button id="closeDeleteModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <p class="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to delete this program? This action cannot be undone.</p>
-
-                <div class="flex justify-end space-x-2">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
 
 @section("scripts")
+
     <script>
-        // Program Modal
-        const programModal = document.getElementById('programModal');
-        const addProgramBtn = document.getElementById('addProgramBtn');
-        const closeModal = document.getElementById('closeModal');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const modalTitle = document.getElementById('modalTitle');
-        const programForm = document.getElementById('programForm');
-        const programId = document.getElementById('programId');
-        const saveEditBtn = document.getElementById('saveEditBtn');
-
-        // Batch Modal
-        const manageBatchModal = document.getElementById('manageBatchModal');
-        const manageBatchBtn = document.getElementById('manageBatchBtn');
-        const closeManageBatchModal = document.getElementById('closeManageBatchModal');
-
-        // Delete Modal
-        const deleteModal = document.getElementById('deleteModal');
-        const closeDeleteModal = document.getElementById('closeDeleteModal');
-        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
 
-        $('#editProgramForm').on('submit', function (e) {
-            e.preventDefault();
 
-            let programId = $('#programId').val();
+        $(document).ready( function () {
 
-            $.ajax({
-                url: `/programs/${programId}`, // Adjust if using a route prefix
-                method: 'PUT', // Or 'PATCH'
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: $('#editProgramName').val(),
-                    department_id: $('#editDepartment').val(),
-                    total_semesters: $('#totalSemesters').val(),
-                    duration: $('#durationYears').val(),
-                    status: $('#editProgramStatus').val(),
-                    description: $('#programDescription').val(),
-                },
-                success: function (response) {
 
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Program Deleted',
-                    });
+            fetch(`/admin/department/getAllDepartments`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("departmentFilter").innerHTML = "";
+                    if (data) {
+                        document.getElementById("departmentFilter").innerHTML += `<option value="">All Departments</option>`;
+                        data.forEach((item) => {
+                            document.getElementById("departmentFilter").innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                        });
 
-                },
-                error: function (xhr) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Failed to delete',
-                    });
-
-                }
-            });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         });
 
-        // Manage Batch Modal
-        manageBatchBtn.addEventListener('click', ()=>{
-            console.log("clicked");
-            manageBatchModal.classList.remove("hidden");
-        })
-
-        // Close Manage Batch Model
-        document.querySelectorAll('.closeManageBatchModal').forEach((item) => {
-            item.addEventListener('click', () => {
-                document.getElementById('manageBatchModal').classList.add("hidden");
-            });
-        });
-
-        let selectedDepartment=null;
-
-        $(document).ready(function () {
-            $("#batchDepartment").on("change", function () {
-                let departmentId = $(this).val();
-
-                if (departmentId === "null") {
-                    return; // Do nothing if no department is selected
-                }
-
-                $.ajax({
-                    url: "{{route('admin.department.get_department_programs')}}",  // Replace with your actual route
-                    type: "GET",
-                    data: {
-                        department_id: departmentId,
-                        _token: $('meta[name="csrf-token"]').attr("content") // CSRF Token for Laravel
-                    },
-                    success: function (response) {
-                        console.log("Success:", response);
-                        selectedDepartment = response;
-
-                        // Populate the Program dropdown with the received data
-                        let programDropdown = $("#batchProgram");
-                        console.log(programDropdown);
-                        programDropdown.empty();
-                        programDropdown.append('<option value="null">Select Program</option>');
-
-                        response.forEach((item)=>{
-                            programDropdown.append(`<option value="${item.id}">${item.name}</option>`);
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Delete "${name}"? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/subject/${id}`, { method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{csrf_token()}}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(async data => {
+                            if (data.status == "success") {
+                                $(`#subject-row-${id}`).remove();
+                                await Toast.fire({
+                                    icon: 'success',
+                                    title: 'Subject deleted',
+                                })
+                            }
                         })
-
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error:", error);
-                    }
-                });
-            });
-        });
-        $(document).ready(function () {
-            $("#batchProgram").on("change", function () {
-                let programId = $(this).val();
-
-                if (programId === "null") {
-                    return; // Do nothing if no program is selected
-                }
-
-                console.log("result 1", selectedDepartment);
-                console.log("result 2", programId);
-
-                let totalSemesters = null;
-
-                selectedDepartment.forEach((item) => {
-
-                    if (item.id == programId) {
-                        totalSemesters = item.total_semesters;
-                    }
-                });
-
-                // Ensure totalSemesters is valid
-                if (totalSemesters) {
-                    console.log("total", totalSemesters);
-                    let semesterDropdown = document.getElementById('batchSemester');
-
-                    console.log("sd, ",semesterDropdown);
-
-                    for (let i = 1; i <= totalSemesters; i++) {
-                        semesterDropdown.innerHTML += `<option value="${i}">${i}</option>`;
-                    }
-                }
-            });
-        });
-
-
-        $(document).ready(function () {
-            $("#addBatchButton").click(function () {
-                // Get form data
-                let department = $("#batchDepartment").val();
-                let program = $("#batchProgram").val();
-                let semester = $("#batchSemester").val();
-                let status = $("#programStatus").val();
-                let batchTitle = $("#batchProgram").val();
-
-                // Validate if all required fields are selected/filled
-                if (department === "null" || program === "null" || semester === "null" || batchTitle.trim() === "") {
-                    alert("Please fill in all required fields.");
-                    return;
-                }
-
-                // Append batch details to the textarea
-                let batchInfo = `Department: ${department}, Program: ${program}, Semester: ${semester}, Status: ${status}, Title: ${batchTitle}`;
-                $("#allBatches").val(function (index, currentValue) {
-                    return currentValue ? currentValue + "\n" + batchInfo : batchInfo;
-                });
-
-                // Optionally, reset batch title input after adding
-                $("#batchProgram").val("");
-            });
-        });
-
-
-
-        // Open Add Program Modal
-        addProgramBtn.addEventListener('click', () => {
-            modalTitle.textContent = 'Add New Program';
-            programId.value = '';
-            programForm.reset();
-            programModal.classList.remove('hidden');
-        });
-
-        // Close Program Modal
-        closeModal.addEventListener('click', () => {
-            programModal.classList.add('hidden');
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            programModal.classList.add('hidden');
-        });
-
-        // Close Delete Modal
-        closeDeleteModal.addEventListener('click', () => {
-            deleteModal.classList.add('hidden');
-        });
-
-        cancelDeleteBtn.addEventListener('click', () => {
-            deleteModal.classList.add('hidden');
-        });
-
-        // Edit Program
-        const editButtons = document.querySelectorAll('.edit-program-btn');
-
-        editButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.getAttribute('data-id');
-                modalTitle.textContent = 'Edit Program';
-                programId.value = id;
-                fetch(`/admin/programs/${id}/edit`, {
-                    method: "GET",
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        document.getElementById('programName').value = data.name;
-                        document.getElementById('department').value = data.department.id;
-                        document.getElementById('totalSemesters').value = data.total_semesters;
-                        document.getElementById('durationYears').value = data.duration;
-                        document.getElementById('programDescription').value = data.description;
-
-                        // Set status based on badge text
-                        if (data.status === 'Active') {
-                            document.getElementById('editProgramStatus').value = 'active';
-                        } else if (status === 'Under Review') {
-                            document.getElementById('editProgramStatus').value = 'review';
-                        } else {
-                            document.getElementById('editProgramStatus').value = 'inactive';
-                        }
-
-                        programModal.classList.remove('hidden');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
-        });
-
-        // Delete Program
-        const deleteButtons = document.querySelectorAll('.delete-program-btn');
-        let programToDelete = null;
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                programToDelete = button.getAttribute('data-id');
-                deleteModal.classList.remove('hidden');
-            });
-        });
-
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (programToDelete) {
-
-                const row = document.querySelector(`.delete-program-btn[data-id="${programToDelete}"]`).closest('tr');
-                row.remove();
-
-                fetch(`/admin/programs/${programToDelete}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Program Deleted',
-                            })
-                        } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: 'Failed to delete',
-                            })
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);  // Log any errors
-                    });
-
-                deleteModal.classList.add('hidden');
-                programToDelete = null;
-            }
-        });
-
-        // Search and Filter
-        const searchInput = document.getElementById('searchPrograms');
-        const departmentFilter = document.getElementById('departmentFilter');
-
-        function filterPrograms() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const department = departmentFilter.value;
-
-            const rows = document.querySelectorAll('#programsTableBody tr');
-            console.log(rows);
-
-            rows.forEach(row => {
-                const programName = row.querySelector('td:first-child').textContent.toLowerCase();
-                const programDepartment = row.querySelector('td:nth-child(2)').textContent;
-
-
-
-                const matchesSearch = programName.includes(searchTerm);
-                const matchesDepartment = department === '' || programDepartment === department;
-
-                if (matchesSearch && matchesDepartment) {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
+                        .catch(error => console.error('Error:', error));
                 }
             });
         }
 
-        searchInput.addEventListener('input', filterPrograms);
-        departmentFilter.addEventListener('change', filterPrograms);
     </script>
 @endsection
