@@ -25,9 +25,6 @@ class AnnouncementController extends Controller
     public function create()
     {
         $user = Auth::user();
-
-
-
         return view('backend.admin.upload-announcement', compact('user'));
 
     }
@@ -80,7 +77,8 @@ class AnnouncementController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $announcement = Announcement::findOrFail($id);
+        return view('backend.admin.announcement.single', compact('announcement'));
     }
 
     /**

@@ -68,6 +68,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Announcement
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
+        Route::get('/announcement/{id}', [AdminAnnouncementController::class, "show"])->name('admin.announcement.show');
+        Route::delete('/announcement/{id}', [AdminAnnouncementController::class, "destroy"])->name('admin.announcement.destroy');
+        Route::put('/announcement/pin/{id}/', [AdminAnnouncementController::class, "setPin"])->name('admin.announcement.pin');
+        Route::get('/announcement/{id}/edit', [AdminAnnouncementController::class, "edit"])->name('admin.announcement.edit');
         Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
         Route::post('/announcement/store', [AdminAnnouncementController::class, "store"])->name('admin.announcement.store');
 

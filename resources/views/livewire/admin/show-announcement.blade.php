@@ -46,7 +46,7 @@
             @foreach($pinnedAnnouncements as $pinned)
                 @if($pinned->type=="regular")
                     <div class="p-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                        <div class="flex items-start">
+                        <a href="{{route("admin.announcement.show", $pinned->id)}}" class="flex items-start">
                             <div class="flex-shrink-0 mr-3">
                                     <span class="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-800">
                                         <i class="fas fa-exclamation-circle text-blue-600 dark:text-blue-300"></i>
@@ -64,11 +64,11 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @elseif($pinned->type=="important")
                     <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                        <div class="flex items-start">
+                        <a href="{{route("admin.announcement.show", $pinned->id)}}" class="flex items-start">
                             <div class="flex-shrink-0 mr-3">
                                     <span class="flex items-center justify-center h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-800">
                                         <i class="fas fa-clock text-yellow-600 dark:text-yellow-300"></i>
@@ -86,11 +86,11 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @else
                     <div class="p-4 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
-                        <div class="flex items-start">
+                        <a href="{{route("admin.announcement.show", $pinned->id)}}" class="flex items-start">
                             <div class="flex-shrink-0 mr-3">
                                     <span class="flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-800">
                                         <i class="fas fa-exclamation-circle text-red-600 dark:text-red-300"></i>
@@ -108,7 +108,7 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @endif
             @endforeach
@@ -124,7 +124,7 @@
         <div class="space-y-4">
             @foreach($allAnnouncements as $announcement)
                 <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-md">
-                    <div class="flex items-start">
+                    <a href="{{route("admin.announcement.show", $pinned->id)}}" class="flex items-start">
                         <div class="flex-shrink-0 mr-3">
                                     <span class="flex items-center justify-center h-10 w-10 rounded-full bg-green-100 dark:bg-green-800">
                                         <i class="fa fa-bullhorn text-gray-500 dark:text-gray-400" aria-hidden="true"></i>
@@ -142,7 +142,7 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             @endforeach
         </div>
