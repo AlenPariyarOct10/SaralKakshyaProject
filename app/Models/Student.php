@@ -57,4 +57,11 @@ class Student extends Authenticatable
         return $this->belongsToMany(Institute::class, 'institute_student');
     }
 
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'user_id', 'id')
+            ->where('user_type', 'student');
+    }
+
+
 }

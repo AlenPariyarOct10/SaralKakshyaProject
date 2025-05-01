@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\TestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Backend\Admin\DashboardController as AdminDashboardController;
@@ -75,11 +76,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
         Route::post('/announcement/store', [AdminAnnouncementController::class, "store"])->name('admin.announcement.store');
 
-
+        Route::get("/test-email", [AdminAnnouncementController::class, "email"]);
         Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
 
         Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
+        Route::get('/trigger', function () {
+            broadcast(new \App\Events\TestEvent);
+            return 'Event has been broadcast!';
+        });
     });
 });

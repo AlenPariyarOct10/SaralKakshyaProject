@@ -15,6 +15,12 @@ class AttendanceController extends Controller
         return view('backend.teacher.attendance');
     }
 
+    public function pusherView()
+    {
+        return view('pusher-view.test');
+    }
+
+
     /**
      * Show the form for creating a new resource.
      */

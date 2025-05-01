@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AnnouncementController extends Controller
 {
@@ -27,6 +28,19 @@ class AnnouncementController extends Controller
         $user = Auth::user();
         return view('backend.admin.upload-announcement', compact('user'));
 
+    }
+
+    public function email()
+    {
+        $data = ['message' => 'This is a test email from Laravel!'];
+
+        // Send the email using a simple view
+        Mail::send('emails.test', $data, function ($message) {
+            $message->to('oct10.alenpariyar@gmail.com') // Change this to the recipient's email address
+            ->subject('Test Email from Laravel');
+        });
+
+        return 'Test email sent!';
     }
 
     /**

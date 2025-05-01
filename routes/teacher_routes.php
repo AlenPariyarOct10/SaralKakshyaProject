@@ -1,5 +1,7 @@
 <?php
 
+use App\Events\Admin\NewAnnouncement;
+use App\Events\TestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Teacher\AuthController as TeacherAuthController;
 use App\Http\Controllers\Backend\Teacher\DashboardController as TeacherDashboardController;
@@ -8,6 +10,7 @@ use App\Http\Controllers\Backend\Teacher\AssignmentController as TeacherAssignme
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::middleware('guest:teacher')->group(function () {
+
         Route::get('/login', [TeacherAuthController::class, 'showLogin'])->name('teacher.login');
         Route::post('/login', [TeacherAuthController::class, 'login'])->name('teacher.login');
         Route::get('/register', [TeacherAuthController::class, 'showRegister'])->name('teacher.register');

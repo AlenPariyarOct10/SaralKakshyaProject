@@ -52,5 +52,10 @@ class Teacher extends Authenticatable
         return $this->belongsToMany(Institute::class, 'institute_teacher')->withTimestamps();;
     }
 
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'user_id', 'id')
+            ->where('user_type', 'teacher');
+    }
 
 }

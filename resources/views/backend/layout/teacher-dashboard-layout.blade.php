@@ -7,6 +7,8 @@
     <title>Smart Classroom - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/js/app.js'])
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -224,6 +226,21 @@
     </div>
 
     <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.Echo) {
+                Echo.channel('notifications.teachers')
+                    .listen('.new.announcement', (e) => {
+                        console.log('Teacher-specific:', e.message);
+                    });
+
+                Echo.channel('notifications.all')
+                    .listen('.new.announcement', (e) => {
+                        console.log('Global announcement:', e.message);
+                    });
+            } else {
+                console.error('Echo is not loaded yet');
+            }
+        });
         // Sidebar Toggle
         const sidebar = document.getElementById('sidebar');
         const openSidebar = document.getElementById('openSidebar');

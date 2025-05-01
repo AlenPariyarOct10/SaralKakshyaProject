@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class StudentController extends Controller
 {
@@ -14,7 +15,7 @@ class StudentController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('backend.admin.student', compact('user'));
+        return view('backend.admin.students.index', compact('user'));
     }
 
     /**
@@ -64,4 +65,6 @@ class StudentController extends Controller
     {
         //
     }
+
+
 }
