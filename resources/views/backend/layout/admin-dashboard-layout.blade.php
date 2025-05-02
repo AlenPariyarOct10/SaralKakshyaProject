@@ -146,7 +146,7 @@
                     </a>
                 </div>
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                    <a href="" class="sidebar-item">
+                    <a href="{{route("admin.profile.index")}}" class="sidebar-item">
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>

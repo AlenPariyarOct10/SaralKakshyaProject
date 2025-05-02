@@ -257,152 +257,48 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="studentsTableBody">
-                    <!-- Sample data rows - In a real application, these would be populated from database -->
+                    <!--All Students-->
+                    @foreach($students as $student)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
                         <td class="table-cell">
                             <div class="flex items-center">
                                 <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student">
                                 <div>
-                                    <div class="font-medium text-gray-800 dark:text-white">John Smith</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">Male</div>
+                                    <div class="font-medium text-gray-800 dark:text-white">{{$student->fname." ".$student->lname}}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ucfirst($student->gender)}}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="table-cell">CS2023-001</td>
-                        <td class="table-cell">john.smith@example.com</td>
-                        <td class="table-cell">2023</td>
-                        <td class="table-cell">A</td>
-                        <td class="table-cell">Aug 15, 2023</td>
+                        <td class="table-cell">{{$student->roll_number}}</td>
+                        <td class="table-cell">{{$student->email}}</td>
+                        <td class="table-cell">{{$student->batch}}</td>
+                        <td class="table-cell">{{$student->section}}</td>
+                        <td class="table-cell">{{$student->admission_date->format("d M, Y")}}</td>
                         <td class="table-cell">
-                            <span class="badge status-active">Active</span>
+                            @if($student->status)
+                                <span class="badge status-active">Active</span>
+                            @else
+                                <span class="badge status-pending">Pending</span>
+                            @endif
                         </td>
                         <td class="table-cell">
                             <div class="flex items-center space-x-2">
                                 <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="1" aria-label="View profile">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="block-student-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="1" aria-label="Block student">
-                                    <i class="fas fa-ban"></i>
-                                </button>
+                                @if($student->status)
+                                    <button class="block-student-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="1" aria-label="Block student">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                @else
+                                    <button class="approve-student-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full" data-id="5" aria-label="Approve student">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                        <td class="table-cell">
-                            <div class="flex items-center">
-                                <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Student">
-                                <div>
-                                    <div class="font-medium text-gray-800 dark:text-white">Emma Johnson</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">Female</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="table-cell">CS2023-002</td>
-                        <td class="table-cell">emma.johnson@example.com</td>
-                        <td class="table-cell">2023</td>
-                        <td class="table-cell">A</td>
-                        <td class="table-cell">Aug 16, 2023</td>
-                        <td class="table-cell">
-                            <span class="badge status-active">Active</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="2" aria-label="View profile">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="block-student-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="2" aria-label="Block student">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                        <td class="table-cell">
-                            <div class="flex items-center">
-                                <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/men/76.jpg" alt="Student">
-                                <div>
-                                    <div class="font-medium text-gray-800 dark:text-white">Michael Chen</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">Male</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="table-cell">CS2022-015</td>
-                        <td class="table-cell">michael.chen@example.com</td>
-                        <td class="table-cell">2022</td>
-                        <td class="table-cell">B</td>
-                        <td class="table-cell">Sep 05, 2022</td>
-                        <td class="table-cell">
-                            <span class="badge status-blocked">Blocked</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="3" aria-label="View profile">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="unblock-student-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full" data-id="3" aria-label="Unblock student">
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                        <td class="table-cell">
-                            <div class="flex items-center">
-                                <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Student">
-                                <div>
-                                    <div class="font-medium text-gray-800 dark:text-white">Sophia Martinez</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">Female</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="table-cell">CS2022-022</td>
-                        <td class="table-cell">sophia.martinez@example.com</td>
-                        <td class="table-cell">2022</td>
-                        <td class="table-cell">C</td>
-                        <td class="table-cell">Sep 10, 2022</td>
-                        <td class="table-cell">
-                            <span class="badge status-active">Active</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="4" aria-label="View profile">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="block-student-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="4" aria-label="Block student">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
-                        <td class="table-cell">
-                            <div class="flex items-center">
-                                <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/men/42.jpg" alt="Student">
-                                <div>
-                                    <div class="font-medium text-gray-800 dark:text-white">David Wilson</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">Male</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="table-cell">CS2021-008</td>
-                        <td class="table-cell">david.wilson@example.com</td>
-                        <td class="table-cell">2021</td>
-                        <td class="table-cell">A</td>
-                        <td class="table-cell">Aug 12, 2021</td>
-                        <td class="table-cell">
-                            <span class="badge status-pending">Pending</span>
-                        </td>
-                        <td class="table-cell">
-                            <div class="flex items-center space-x-2">
-                                <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="5" aria-label="View profile">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="approve-student-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full" data-id="5" aria-label="Approve student">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>

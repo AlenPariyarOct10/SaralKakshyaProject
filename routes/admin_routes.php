@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\Admin\TeacherController as AdminTeacherControll
 use App\Http\Controllers\Backend\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Backend\Admin\AcademicInstituteController as AdminAcademicInstituteController;
 use App\Http\Controllers\Backend\Admin\SubjectController as AdminSubjectController;
+use App\Http\Controllers\Backend\Admin\ProfileController as AdminProfileController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -79,6 +80,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get("/test-email", [AdminAnnouncementController::class, "email"]);
         Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
+
+        Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
+        Route::get('/setting', [AdminProfileController::class, "index"])->name("admin.settings");
+        Route::get('/notifications', [AdminProfileController::class, "index"])->name("admin.notifications");
 
         Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 

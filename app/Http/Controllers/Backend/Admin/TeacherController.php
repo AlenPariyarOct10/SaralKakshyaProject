@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +15,8 @@ class TeacherController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('backend.admin.teacher', compact('user'));
+        $teachers = Teacher::all();
+        return view('backend.admin.teachers.index', compact('user','teachers'));
     }
 
     /**

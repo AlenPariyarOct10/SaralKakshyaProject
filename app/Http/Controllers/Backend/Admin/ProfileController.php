@@ -3,26 +3,18 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
-class StudentController extends Controller
+class ProfileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $user = Auth::user(); // assuming Admin is logged in
-
-        $instituteId = Admin::find($user->id)->institute->id;
-
-        $students = Student::where('institute_id', $instituteId)->get();
-
-        return view('backend.admin.students.index', compact('user', 'students'));
+        $user = Auth::user();
+        return view("backend.admin.profile.index", compact("user"));
     }
 
     /**
@@ -72,6 +64,4 @@ class StudentController extends Controller
     {
         //
     }
-
-
 }

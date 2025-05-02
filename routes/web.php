@@ -11,7 +11,24 @@ Route::get('/', function (){
     $testimonial = Testimonial::orderBy('rank','asc')->get();
     $system = \App\Models\SystemSetting::first();
     return view('welcome', compact('testimonial', 'system'));
-});
+})->name('welcome');
+
+Route::get('login/{role?}', function ($role = null) {
+    // Default to 'guest' or another role if none is passed in the URL
+    $role = $role ?? 'guest';
+
+    // Redirect to specific login page based on role
+    switch ($role) {
+        case 'teacher':
+            return redirect()->route('teacher.login');
+        case 'admin':
+            return redirect()->route('admin.login');
+        case 'student':
+            return redirect()->route('student.login');
+        default:
+            return redirect()->route('welcome');
+    }
+})->name('login');
 
 // Reverb test routes
 Route::get('/fire-test', [EventCheck::class, 'fireTest']);

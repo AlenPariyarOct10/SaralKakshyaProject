@@ -158,7 +158,6 @@
                     </div>
                 @endif
             </div>
-            @dd($announcement->attachments)
             <!-- Attachments Section -->
             @if($announcement->attachments && count($announcement->attachments) > 0)
                 <div class="mt-6">
