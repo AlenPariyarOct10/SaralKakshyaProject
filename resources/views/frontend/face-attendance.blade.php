@@ -81,33 +81,101 @@
             }
         }
     </style>
+    <style>
+        .pulse {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .face-box {
+            border: 3px solid #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .scanning-line {
+            height: 2px;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 1) 50%, rgba(16, 185, 129, 0) 100%);
+            animation: scan 2s linear infinite;
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+            100% {
+                top: 100%;
+            }
+        }
+
+        .dropdown-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-4">
     <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-center mb-6">
+    <div class="mb-4">
+        <div class="flex justify-between items-center mb-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">Face Recognition</h1>
-                <p class="text-gray-600 mt-1">Automated attendance system</p>
+                <h1 class="text-2xl font-bold text-gray-800">Face Recognition</h1>
+                <p class="text-gray-600 text-sm">Automated attendance system</p>
             </div>
 
             <!-- Institute Selector -->
             <div class="relative w-64">
-                <select id="instituteSelector" class="dropdown-select appearance-none block w-full px-4 py-3 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition duration-200 pr-10">
+                <select id="instituteSelector" class="dropdown-select appearance-none block w-full px-3 py-2 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition duration-200 pr-10 text-sm">
                     <option value="" disabled selected>Select Institute</option>
-                    <option value="1">Main Campus</option>
-                    <option value="2">Engineering Department</option>
-                    <option value="3">Business School</option>
-                    <option value="4">Medical College</option>
-                    <option value="5">Arts & Sciences</option>
+                    @foreach($institutes as $institute)
+                        <option value="{{ $institute->id }}">{{ $institute->name }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
 
         <!-- Status Pills -->
-        <div class="flex flex-wrap gap-3 mb-4">
-            <div id="cameraStatus" class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+        <div class="flex flex-wrap gap-2 mb-3">
+            <div id="cameraStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 <div class="relative">
                     <i class="fas fa-video"></i>
                     <div id="cameraStatusBadge" class="badge bg-yellow-400"></div>
@@ -115,7 +183,7 @@
                 <span>Camera</span>
             </div>
 
-            <div id="faceStatus" class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+            <div id="faceStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 <div class="relative">
                     <i class="fas fa-user"></i>
                     <div id="faceStatusBadge" class="badge bg-gray-400"></div>
@@ -123,7 +191,7 @@
                 <span>Face Detection</span>
             </div>
 
-            <div id="recognitionStatus" class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+            <div id="recognitionStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 <div class="relative">
                     <i class="fas fa-fingerprint"></i>
                     <div id="recognitionStatusBadge" class="badge bg-gray-400"></div>
@@ -134,18 +202,18 @@
     </div>
 
     <!-- Main Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Camera Feed -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="relative">
                     <!-- Camera Header -->
-                    <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div id="recordingIndicator" class="w-3 h-3 rounded-full bg-red-500 hidden"></div>
+                    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center">
+                        <div class="flex items-center gap-2 text-sm">
+                            <div id="recordingIndicator" class="w-2 h-2 rounded-full bg-red-500 hidden"></div>
                             <span id="cameraTitle">Camera Feed</span>
                         </div>
-                        <div id="timeDisplay" class="text-gray-300 text-sm font-mono"></div>
+                        <div id="timeDisplay" class="text-gray-300 text-xs font-mono"></div>
                     </div>
 
                     <!-- Video Container -->
@@ -154,47 +222,47 @@
                         <canvas id="canvas" class="hidden absolute top-0 left-0 w-full h-full"></canvas>
                         <canvas id="overlayCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
 
-                        <!-- Face Detection Overlay (will be controlled by JS) -->
+                        <!-- Face Detection Overlay -->
                         <div id="faceDetectionOverlay" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
 
-                        <!-- Scanning Effect (visible during recognition) -->
+                        <!-- Scanning Effect -->
                         <div id="scanningEffect" class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-0 transition-opacity duration-300">
                             <div class="scanning-line"></div>
                         </div>
 
                         <!-- Status Overlay -->
-                        <div id="statusOverlay" class="absolute bottom-4 left-4 right-4 bg-gray-900 bg-opacity-80 text-white px-4 py-3 rounded-lg opacity-0 transition-opacity duration-300 flex items-center gap-3">
-                            <div id="statusIcon" class="text-xl">
+                        <div id="statusOverlay" class="absolute bottom-3 left-3 right-3 bg-gray-900 bg-opacity-80 text-white px-3 py-2 rounded-lg opacity-0 transition-opacity duration-300 flex items-center gap-2 text-sm">
+                            <div id="statusIcon" class="text-base">
                                 <i class="fas fa-circle-notch fa-spin"></i>
                             </div>
                             <div>
                                 <div id="statusTitle" class="font-medium">Initializing</div>
-                                <div id="statusText" class="text-sm text-gray-300">Please wait...</div>
+                                <div id="statusText" class="text-xs text-gray-300">Please wait...</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Camera Controls -->
-                <div class="p-5 border-t border-gray-100">
-                    <div class="flex flex-wrap gap-3 justify-between">
-                        <button id="startBtn" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-5 rounded-lg transition duration-200">
+                <div class="p-3 border-t border-gray-100">
+                    <div class="flex flex-wrap gap-2 justify-between">
+                        <button id="startBtn" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
                             <i class="fas fa-play"></i>
                             <span>Start Recognition</span>
                         </button>
 
-                        <button id="stopBtn" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-5 rounded-lg transition duration-200 hidden">
+                        <button id="stopBtn" class="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm hidden">
                             <i class="fas fa-stop"></i>
                             <span>Stop Recognition</span>
                         </button>
 
-                        <div class="flex gap-3">
-                            <button id="captureBtn" class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition duration-200">
+                        <div class="flex gap-2">
+                            <button id="captureBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
                                 <i class="fas fa-camera"></i>
                                 <span>Capture</span>
                             </button>
 
-                            <button id="switchCameraBtn" class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition duration-200">
+                            <button id="switchCameraBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
                                 <i class="fas fa-sync-alt"></i>
                                 <span>Switch Camera</span>
                             </button>
@@ -206,92 +274,92 @@
 
         <!-- Recognition Results Panel -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full flex flex-col">
-                <div class="bg-gray-800 text-white px-6 py-4">
-                    <h2 class="font-semibold">Recognition Results</h2>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
+                <div class="bg-gray-800 text-white px-4 py-2">
+                    <h2 class="font-medium text-sm">Recognition Results</h2>
                 </div>
 
-                <div id="emptyState" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
-                        <i class="fas fa-user-circle text-4xl"></i>
+                <div id="emptyState" class="flex-1 flex flex-col items-center justify-center p-4 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-3">
+                        <i class="fas fa-user-circle text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">No Recognition Yet</h3>
-                    <p class="text-gray-500 mb-6">Start the recognition process to identify attendees</p>
+                    <h3 class="text-base font-medium text-gray-800 mb-1">No Recognition Yet</h3>
+                    <p class="text-gray-500 text-sm mb-4">Start recognition to identify attendees</p>
                 </div>
 
-                <div id="recognitionResult" class="flex-1 p-6 hidden">
-                    <div class="text-center mb-6">
-                        <div class="w-24 h-24 rounded-full bg-emerald-50 border-4 border-emerald-500 mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                            <img id="personImage" src="/placeholder.svg" alt="Person" class="w-full h-full object-cover hidden">
-                            <i id="personIcon" class="fas fa-user-circle text-emerald-300 text-5xl"></i>
+                <div id="recognitionResult" class="flex-1 p-4 hidden">
+                    <div class="text-center mb-4">
+                        <div class="w-20 h-20 rounded-full bg-emerald-50 border-4 border-emerald-500 mx-auto mb-3 flex items-center justify-center overflow-hidden">
+                            <img id="personImage" src="{{ asset('images/placeholder.svg') }}" alt="Person" class="w-full h-full object-cover hidden">
+                            <i id="personIcon" class="fas fa-user-circle text-emerald-300 text-4xl"></i>
                         </div>
-                        <h3 id="recognizedName" class="text-xl font-semibold text-gray-800"></h3>
-                        <p id="recognizedId" class="text-gray-500"></p>
+                        <h3 id="recognizedName" class="text-lg font-semibold text-gray-800"></h3>
+                        <p id="recognizedId" class="text-gray-500 text-sm"></p>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="text-sm text-gray-500 mb-1">Recognition Confidence</div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex-1 bg-gray-200 rounded-full h-2.5">
-                                    <div id="confidenceBar" class="bg-emerald-500 h-2.5 rounded-full" style="width: 0%"></div>
+                    <div class="space-y-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">Recognition Confidence</div>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div id="confidenceBar" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
                                 </div>
-                                <div id="confidenceValue" class="text-sm font-medium">0%</div>
+                                <div id="confidenceValue" class="text-xs font-medium">0%</div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="text-sm text-gray-500 mb-1">Date</div>
-                                <div id="currentDate" class="font-medium"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-xs text-gray-500 mb-1">Date</div>
+                                <div id="currentDate" class="font-medium text-sm"></div>
                             </div>
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="text-sm text-gray-500 mb-1">Time</div>
-                                <div id="currentTime" class="font-medium"></div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-xs text-gray-500 mb-1">Time</div>
+                                <div id="currentTime" class="font-medium text-sm"></div>
                             </div>
                         </div>
 
-                        <div class="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                            <div class="flex items-start gap-3">
+                        <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                            <div class="flex items-start gap-2">
                                 <div class="text-emerald-500 mt-0.5">
                                     <i class="fas fa-check-circle"></i>
                                 </div>
                                 <div>
-                                    <div class="font-medium text-emerald-800">Attendance Recorded</div>
-                                    <div class="text-sm text-emerald-600" id="attendanceTimestamp"></div>
+                                    <div class="font-medium text-sm text-emerald-800">Attendance Recorded</div>
+                                    <div class="text-xs text-emerald-600" id="attendanceTimestamp"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="loadingState" class="flex-1 flex flex-col items-center justify-center p-8 text-center hidden">
-                    <div class="w-16 h-16 mb-4">
-                        <div class="w-full h-full rounded-full border-4 border-gray-200 border-t-emerald-500 animate-spin"></div>
+                <div id="loadingState" class="flex-1 flex flex-col items-center justify-center p-4 text-center hidden">
+                    <div class="w-12 h-12 mb-3">
+                        <div class="w-full h-full rounded-full border-3 border-gray-200 border-t-emerald-500 animate-spin"></div>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">Processing</h3>
-                    <p class="text-gray-500">Analyzing facial features...</p>
+                    <h3 class="text-base font-medium text-gray-800 mb-1">Processing</h3>
+                    <p class="text-gray-500 text-sm">Analyzing facial features...</p>
                 </div>
 
-                <div id="errorState" class="flex-1 flex flex-col items-center justify-center p-8 text-center hidden">
-                    <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-4">
-                        <i class="fas fa-exclamation-triangle text-3xl"></i>
+                <div id="errorState" class="flex-1 flex flex-col items-center justify-center p-4 text-center hidden">
+                    <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-3">
+                        <i class="fas fa-exclamation-triangle text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">Recognition Failed</h3>
-                    <p id="errorMessage" class="text-gray-500 mb-6">Unable to detect a face in the frame</p>
-                    <button id="retryBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-200">
+                    <h3 class="text-base font-medium text-gray-800 mb-1">Recognition Failed</h3>
+                    <p id="errorMessage" class="text-gray-500 text-sm mb-4">Unable to detect a face in the frame</p>
+                    <button id="retryBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
                         Try Again
                     </button>
                 </div>
 
                 <!-- Bottom Actions -->
-                <div class="p-5 border-t border-gray-100">
-                    <div class="grid grid-cols-2 gap-4">
-                        <a href="{{ route('welcome') }}" class="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition duration-200 text-center">
+                <div class="p-3 border-t border-gray-100">
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="{{ route('welcome') }}" class="flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-center text-sm">
                             <i class="fas fa-arrow-left"></i>
                             <span>Dashboard</span>
                         </a>
-                        <a href="{{ route('welcome') }}" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg transition duration-200 text-center">
+                        <a href="{{ route('welcome') }}" class="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-center text-sm">
                             <i class="fas fa-edit"></i>
                             <span>Manual</span>
                         </a>
@@ -364,9 +432,8 @@
 
             if (currentDate.textContent === '') {
                 currentDate.textContent = now.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
+                    weekday: 'short',
+                    month: 'short',
                     day: 'numeric'
                 });
             }
@@ -374,8 +441,7 @@
             if (currentTime.textContent === '') {
                 currentTime.textContent = now.toLocaleTimeString('en-US', {
                     hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
+                    minute: '2-digit'
                 });
             }
         }
@@ -751,8 +817,7 @@
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
+                minute: '2-digit'
             });
 
             // Log attendance (API placeholder)
@@ -782,29 +847,25 @@
         function logAttendance(personId) {
             console.log(`Logging attendance for person ID: ${personId} at institute ID: ${instituteId}`);
 
-            // Example API call structure (commented out)
-            /*
-            fetch('/api/attendance/log', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    personId: personId,
-                    instituteId: instituteId,
-                    timestamp: new Date().toISOString(),
-                    method: 'face_recognition'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Attendance logged:', data);
-            })
-            .catch(error => {
-                console.error('Error logging attendance:', error);
-            });
-            */
+            // Example API call structure (using Laravel API routes)
+            {{--$.ajax({--}}
+            {{--    url: "{{ route('api.attendance.log') }}",--}}
+            {{--    type: "POST",--}}
+            {{--    data: {--}}
+            {{--        person_id: personId,--}}
+            {{--        institute_id: instituteId,--}}
+            {{--        method: 'face_recognition'--}}
+            {{--    },--}}
+            {{--    headers: {--}}
+            {{--        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+            {{--    },--}}
+            {{--    success: function(response) {--}}
+            {{--        console.log('Attendance logged:', response);--}}
+            {{--    },--}}
+            {{--    error: function(error) {--}}
+            {{--        console.error('Error logging attendance:', error);--}}
+            {{--    }--}}
+            {{--});--}}
         }
 
         // Capture current frame
@@ -832,8 +893,43 @@
             // In a real app, you might want to save this image or send it to the server
             showStatus('Captured', 'Frame captured successfully', 'fa-camera', true);
 
-            // For demo purposes, we'll just log it
-            console.log('Frame captured');
+            // For Laravel app, you could upload the captured image
+            /*
+            const formData = new FormData();
+            formData.append('image', dataURItoBlob(imageData));
+            formData.append('institute_id', instituteId);
+
+            {{--$.ajax({--}}
+            {{--    url: "{{ route('api.capture.save') }}",--}}
+            {{--    type: "POST",--}}
+            {{--    data: formData,--}}
+            {{--    processData: false,--}}
+            {{--    contentType: false,--}}
+            {{--    headers: {--}}
+            {{--        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+            {{--    },--}}
+            {{--    success: function(response) {--}}
+            {{--        console.log('Frame saved:', response);--}}
+            {{--    },--}}
+            {{--    error: function(error) {--}}
+            {{--        console.error('Error saving frame:', error);--}}
+            {{--    }--}}
+            {{--});--}}
+            */
+        }
+
+        // Helper function to convert data URI to Blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ab], { type: mimeString });
         }
 
         // Switch camera (front/back)
