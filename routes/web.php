@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\RealtimeEvent;
+use App\Models\Institute;
 use App\Models\Testimonial;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,13 @@ Route::get('/', function (){
     $system = \App\Models\SystemSetting::first();
     return view('welcome', compact('testimonial', 'system'));
 })->name('welcome');
+
+Route::get('/attendance', function (){
+
+    $system = \App\Models\SystemSetting::first();
+    $institutes = Institute::all();
+    return view('frontend.face-attendance', compact( 'system', 'institutes'));
+})->name('face.attendance');
 
 Route::get('login/{role?}', function ($role = null) {
     // Default to 'guest' or another role if none is passed in the URL

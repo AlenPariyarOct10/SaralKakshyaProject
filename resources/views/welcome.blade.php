@@ -82,6 +82,9 @@
                     <a href="#contact" class="border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Contact
                     </a>
+                    <a href="{{route('face.attendance')}}" class="border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Face Attendance
+                    </a>
                 </div>
             </div>
             @if(!Auth::user())
