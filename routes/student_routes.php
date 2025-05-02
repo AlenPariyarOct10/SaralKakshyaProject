@@ -20,6 +20,6 @@ Route::group(['prefix' => 'student'], function () {
         Route::post('/update_profile_picture', [StudentProfileController::class, 'update_profile_picture'])->name('student.update_profile_picture');
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
         Route::get('/attendance/setup', [StudentAttendanceController::class, 'setup_index'])->name('student.attendance.setup.index');
-        Route::post('/attendance/setup', [StudentAttendanceController::class, 'setup_index'])->name('student.saveFacePhotos');
+        Route::post('/attendance/setup', [StudentAttendanceController::class, 'saveFacePhotos'])->name('student.saveFacePhotos');
     });
 });
