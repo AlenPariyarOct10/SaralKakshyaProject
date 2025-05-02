@@ -9,7 +9,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'face_data'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@localhost:3306/face_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -142,9 +143,10 @@ def recognize_face():
     if matched_student_id:
         return jsonify({'status': 'success', 'student_id': matched_student_id}), 200
     else:
-        return jsonify({'status': 'failure', 'message': 'No match found'}), 404
+        return jsonify({'status': 'failure', 'student_id': '-1'}), 404
 
 
 if __name__ == '__main__':
-    db.create_all()  # Create the database tables if they don't exist
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

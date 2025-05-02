@@ -1,4 +1,4 @@
-@extends('student-dashboard-layout')
+@extends('backend.layout.student-dashboard-layout')
 
 @section('username', $user->fname . ' ' . $user->lname)
 
@@ -56,6 +56,8 @@
             object-fit: cover;
             cursor: pointer;
             transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .photo-preview:hover {
@@ -144,6 +146,89 @@
 
         .capture-flash {
             animation: captureFlash 0.5s ease-out;
+        }
+
+        /* Captured image card styles */
+        .captured-image-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background-color: white;
+            margin-bottom: 16px;
+        }
+
+        .captured-image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .captured-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .image-card-footer {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .remove-photo-btn {
+            padding: 4px 8px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .remove-photo-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .photo-number {
+            font-weight: 500;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .photos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Image card entrance animation */
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-entrance {
+            animation: cardEntrance 0.3s ease-out forwards;
         }
     </style>
 @endsection
@@ -240,40 +325,11 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Captured Photos (0/5)</h4>
-                    <div class="flex flex-wrap gap-4">
-                        <!-- Photo placeholders -->
-                        <div class="relative">
-                            <div class="photo-preview bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 dark:text-gray-500 text-2xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 photo-indicator empty flex items-center justify-center">1</div>
-                        </div>
-                        <div class="relative">
-                            <div class="photo-preview bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 dark:text-gray-500 text-2xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 photo-indicator empty flex items-center justify-center">2</div>
-                        </div>
-                        <div class="relative">
-                            <div class="photo-preview bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 dark:text-gray-500 text-2xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 photo-indicator empty flex items-center justify-center">3</div>
-                        </div>
-                        <div class="relative">
-                            <div class="photo-preview bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 dark:text-gray-500 text-2xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 photo-indicator empty flex items-center justify-center">4</div>
-                        </div>
-                        <div class="relative">
-                            <div class="photo-preview bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 dark:text-gray-500 text-2xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 photo-indicator empty flex items-center justify-center">5</div>
-                        </div>
+                <!-- Captured Photos Container -->
+                <div class="mb-6">
+                    <h4 id="capturedPhotosCount" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Captured Photos (0/5)</h4>
+                    <div id="capturedPhotosContainer" class="photos-grid">
+                        <!-- Captured photos will be added here dynamically -->
                     </div>
                 </div>
 
@@ -337,7 +393,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Setup Complete!</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">Your face recognition setup has been successfully completed. You can now use facial recognition for attendance.</p>
-                <a href="{{ route('student.attendance') }}" class="btn-primary inline-block">
+                <a href="{{ route('student.attendance.index') }}" class="btn-primary inline-block">
                     <i class="fas fa-calendar-check mr-2"></i> View My Attendance
                 </a>
             </div>
@@ -372,6 +428,8 @@
         const cameraFeedback = document.getElementById('cameraFeedback');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const photoReviewContainer = document.getElementById('photoReviewContainer');
+        const capturedPhotosContainer = document.getElementById('capturedPhotosContainer');
+        const capturedPhotosCount = document.getElementById('capturedPhotosCount');
 
         // Update progress bar
         function updateProgress(step) {
@@ -425,6 +483,10 @@
         // Capture photo
         function capturePhoto() {
             if (processing) return;
+            if (capturedPhotos.length >= 5) {
+                showFeedback('Maximum number of photos already captured', 'error');
+                return;
+            }
 
             processing = true;
             loadingSpinner.classList.remove('hidden');
@@ -503,23 +565,56 @@
             }, 3000);
         }
 
+        // Remove a captured photo
+        function removePhoto(index) {
+            // Remove the photo from the array
+            capturedPhotos.splice(index, 1);
+            currentPhotoIndex = capturedPhotos.length;
+
+            // Update the UI
+            updateCapturedPhotosUI();
+            updateCaptureInstructions();
+
+            // Update button state
+            if (capturedPhotos.length < 5) {
+                goToStep3Btn.classList.add('opacity-50', 'cursor-not-allowed');
+                goToStep3Btn.disabled = true;
+            }
+
+            showFeedback('Photo removed', 'success');
+        }
+
         // Update the UI to show captured photos
         function updateCapturedPhotosUI() {
-            const photoContainers = document.querySelectorAll('.photo-preview');
-            const indicators = document.querySelectorAll('.photo-indicator');
-
             // Update the header text
-            document.querySelector('h4').textContent = `Captured Photos (${capturedPhotos.length}/5)`;
+            capturedPhotosCount.textContent = `Captured Photos (${capturedPhotos.length}/5)`;
 
-            // Update each photo container
+            // Clear the container
+            capturedPhotosContainer.innerHTML = '';
+
+            // Add each captured photo as a card
             capturedPhotos.forEach((photo, index) => {
-                photoContainers[index].innerHTML = '';
-                photoContainers[index].style.backgroundImage = `url(${photo})`;
-                photoContainers[index].style.backgroundSize = 'cover';
-                photoContainers[index].style.backgroundPosition = 'center';
+                const photoCard = document.createElement('div');
+                photoCard.className = 'captured-image-card card-entrance';
 
-                indicators[index].classList.remove('empty');
-                indicators[index].classList.add('completed');
+                photoCard.innerHTML = `
+                    <img src="${photo}" alt="Captured face ${index + 1}" class="captured-image">
+                    <div class="image-card-footer">
+                        <span class="photo-number">Photo ${index + 1}</span>
+                        <button class="remove-photo-btn" data-index="${index}">
+                            <i class="fas fa-trash-alt mr-1"></i> Remove
+                        </button>
+                    </div>
+                `;
+
+                capturedPhotosContainer.appendChild(photoCard);
+
+                // Add event listener to the remove button
+                const removeBtn = photoCard.querySelector('.remove-photo-btn');
+                removeBtn.addEventListener('click', function() {
+                    const photoIndex = parseInt(this.getAttribute('data-index'));
+                    removePhoto(photoIndex);
+                });
             });
         }
 
@@ -531,9 +626,9 @@
                 const photoElement = document.createElement('div');
                 photoElement.className = 'relative';
                 photoElement.innerHTML = `
-                <img src="${photo}" alt="Captured face ${index + 1}" class="w-full h-32 object-cover rounded-lg shadow-sm">
-                <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold">${index + 1}</div>
-            `;
+                    <img src="${photo}" alt="Captured face ${index + 1}" class="w-full h-32 object-cover rounded-lg shadow-sm">
+                    <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold">${index + 1}</div>
+                `;
                 photoReviewContainer.appendChild(photoElement);
             });
         }
@@ -562,7 +657,14 @@
             // Add CSRF token
             formData.append('_token', '{{ csrf_token() }}');
 
-            // Send to server
+            // Simulate submission for demo (uncomment and modify for actual implementation)
+            setTimeout(() => {
+                showStep(4);
+                progressBar.style.width = '100%';
+            }, 2000);
+
+            // Actual form submission (commented out for demonstration)
+
             fetch('{{ route("student.saveFacePhotos") }}', {
                 method: 'POST',
                 body: formData
@@ -585,6 +687,7 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
                 });
+
         }
 
         // Event listeners

@@ -69,7 +69,7 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="attendance.html" class="sidebar-item">
+            <a href="{{route("student.attendance.index")}}" class="sidebar-item">
                 <i class="fas fa-calendar-check"></i>
                 <span>Attendance</span>
             </a>
@@ -115,7 +115,7 @@
                     <button id="openSidebar" class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white"> @yield("title", "SaralKakshya") </h2>
                 </div>
 
                 <div class="flex items-center space-x-4">
