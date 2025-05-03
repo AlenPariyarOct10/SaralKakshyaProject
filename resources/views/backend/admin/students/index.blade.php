@@ -179,9 +179,6 @@
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
                     <input type="text" id="searchStudents" placeholder="Search students..." class="form-input pl-12 pr-4 py-2">
-                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                        <i class="fas fa-search"></i>
-                    </span>
                 </div>
                 <div>
                     <select id="batchFilter" class="form-input py-2">
@@ -214,9 +211,9 @@
                 <button id="exportBtn" class="btn-secondary flex items-center justify-center">
                     <i class="fas fa-download mr-2"></i> Export
                 </button>
-                <button id="addStudentBtn" class="btn-primary flex items-center justify-center">
-                    <i class="fas fa-plus mr-2"></i> Add New Student
-                </button>
+                <a href="{{route('admin.student.unapproved.index')}}" id="addStudentBtn" class="btn-primary flex items-center justify-center">
+                    <i class="fas fa-user-alt mr-2"></i> View Pending Approvals
+                </a>
             </div>
         </div>
 
@@ -304,22 +301,22 @@
             </div>
 
             <!-- Pagination -->
-            <div class="px-6 py-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Showing <span class="font-medium text-gray-700 dark:text-gray-300">1</span> to <span class="font-medium text-gray-700 dark:text-gray-300">5</span> of <span class="font-medium text-gray-700 dark:text-gray-300">248</span> students
-                </div>
-                <div class="flex items-center space-x-1">
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Previous page">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="p-2 rounded-md bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400" aria-label="Page 1">1</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 2">2</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 3">3</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Next page">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
+{{--            <div class="px-6 py-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">--}}
+{{--                <div class="text-sm text-gray-500 dark:text-gray-400">--}}
+{{--                    Showing <span class="font-medium text-gray-700 dark:text-gray-300">1</span> to <span class="font-medium text-gray-700 dark:text-gray-300">5</span> of <span class="font-medium text-gray-700 dark:text-gray-300">248</span> students--}}
+{{--                </div>--}}
+{{--                <div class="flex items-center space-x-1">--}}
+{{--                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Previous page">--}}
+{{--                        <i class="fas fa-chevron-left"></i>--}}
+{{--                    </button>--}}
+{{--                    <button class="p-2 rounded-md bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400" aria-label="Page 1">1</button>--}}
+{{--                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 2">2</button>--}}
+{{--                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 3">3</button>--}}
+{{--                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Next page">--}}
+{{--                        <i class="fas fa-chevron-right"></i>--}}
+{{--                    </button>--}}
+{{--                </div>--}}
+{{--            </div>--}}
         </div>
     </main>
 @endsection
