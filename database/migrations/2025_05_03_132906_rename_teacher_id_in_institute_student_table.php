@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('institute_student', function (Blueprint $table) {
-            $table->id();
-            $table->renameColumn("teacher_id", "student_id");
-            $table->timestamps();
+        Schema::table('institute_student', function (Blueprint $table) {
+            //
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('institute_student', function (Blueprint $table) {
-            $table->renameColumn("student_id", "teacher_id");
+            //
         });
     }
 };
