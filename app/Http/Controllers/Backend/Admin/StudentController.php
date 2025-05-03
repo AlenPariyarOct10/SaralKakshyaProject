@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -23,6 +24,19 @@ class StudentController extends Controller
         $students = Student::where('institute_id', $instituteId)->get();
 
         return view('backend.admin.students.index', compact('user', 'students'));
+    }
+
+    public function index_pending_students()
+    {
+        $adminInstituteId = Auth::user()->institute->id;
+        $user = Auth::user();
+
+        $student = Student::whereHas('institutes', function ($query) use ($adminInstituteId) {
+            $query->where('institute_id', $adminInstituteId)
+                ->whereNull('institute_student.approved_at');
+        })->orderBy('created_at', 'DESC')->get();
+
+        return view('backend.admin.students.unapproved', compact('student', 'user'));
     }
 
     /**

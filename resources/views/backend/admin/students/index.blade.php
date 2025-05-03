@@ -211,7 +211,7 @@
                 <button id="exportBtn" class="btn-secondary flex items-center justify-center">
                     <i class="fas fa-download mr-2"></i> Export
                 </button>
-                <a href="{{route('admin.student.unapproved.index')}}" id="addStudentBtn" class="btn-primary flex items-center justify-center">
+                <a href="{{route('admin.student.unapproved.index')}}" class="btn-primary flex items-center justify-center">
                     <i class="fas fa-user-alt mr-2"></i> View Pending Approvals
                 </a>
             </div>
