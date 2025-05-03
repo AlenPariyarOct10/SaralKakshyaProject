@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Face Recognition Attendance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -80,74 +82,35 @@
                 opacity: 1;
             }
         }
-    </style>
-    <style>
-        .pulse {
-            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+        .loading-spinner {
+            border: 3px solid rgba(229, 231, 235, 1);
+            border-top-color: rgba(16, 185, 129, 1);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            animation: spin 1s linear infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
-            50% {
-                opacity: 0.5;
-            }
         }
 
-        .face-box {
-            border: 3px solid #10B981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            transition: all 0.2s ease;
+        .face-detected {
+            animation: pulse-border 2s infinite;
         }
 
-        .scanning-line {
-            height: 2px;
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 1) 50%, rgba(16, 185, 129, 0) 100%);
-            animation: scan 2s linear infinite;
-            position: absolute;
-            left: 0;
-            right: 0;
-        }
-
-        @keyframes scan {
+        @keyframes pulse-border {
             0% {
-                top: 0;
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
             }
             100% {
-                top: 100%;
-            }
-        }
-
-        .dropdown-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-        }
-
-        .badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .slide-in {
-            animation: slideIn 0.3s ease forwards;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
             }
         }
     </style>
@@ -181,6 +144,13 @@
                     <div id="cameraStatusBadge" class="badge bg-yellow-400"></div>
                 </div>
                 <span>Camera</span>
+            </div>
+            <div id="apiStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                <div class="relative">
+                    <i class="fas fa-server"></i>
+                    <div id="apiStatusBadge" class="badge bg-yellow-400"></div>
+                </div>
+                <span>API</span>
             </div>
         </div>
     </div>
@@ -240,6 +210,10 @@
                             <span>Stop Recognition</span>
                         </button>
 
+                        <button id="switchCameraBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Switch Camera</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -308,7 +282,7 @@
 
                 <div id="loadingState" class="flex-1 flex flex-col items-center justify-center p-4 text-center hidden">
                     <div class="w-12 h-12 mb-3">
-                        <div class="w-full h-full rounded-full border-3 border-gray-200 border-t-emerald-500 animate-spin"></div>
+                        <div class="loading-spinner"></div>
                     </div>
                     <h3 class="text-base font-medium text-gray-800 mb-1">Processing</h3>
                     <p class="text-gray-500 text-sm">Analyzing facial features...</p>
@@ -332,7 +306,7 @@
                             <i class="fas fa-arrow-left"></i>
                             <span>Dashboard</span>
                         </a>
-                        <a href="{{ route('welcome') }}" class="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-center text-sm">
+                        <a href="" class="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-center text-sm">
                             <i class="fas fa-edit"></i>
                             <span>Manual</span>
                         </a>
@@ -345,6 +319,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Constants
+        const FLASK_API_URL = 'http://127.0.0.1:5000';
+
         // DOM Elements
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -357,6 +334,7 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
         const emptyState = document.getElementById('emptyState');
         const recognitionResult = document.getElementById('recognitionResult');
         const loadingState = document.getElementById('loadingState');
@@ -374,22 +352,71 @@
         const cameraTitle = document.getElementById('cameraTitle');
         const personImage = document.getElementById('personImage');
         const personIcon = document.getElementById('personIcon');
+        const faceDetectionOverlay = document.getElementById('faceDetectionOverlay');
 
         // Status indicators
         const cameraStatus = document.getElementById('cameraStatus');
         const cameraStatusBadge = document.getElementById('cameraStatusBadge');
+        const apiStatus = document.getElementById('apiStatus');
+        const apiStatusBadge = document.getElementById('apiStatusBadge');
 
         // Canvas contexts
         const context = canvas.getContext('2d');
-
+        const overlayContext = overlayCanvas.getContext('2d');
 
         // State variables
         let stream = null;
         let isRecognizing = false;
-        let recognitionInterval = null;
-        let facingMode = 'user';
-        let detectedFaces = [];
+        let recognitionTimer = null;
+        let faceDetectionTimer = null;
+        let facingMode = 'user'; // 'user' for front camera, 'environment' for back camera
         let instituteId = '';
+        let hasFace = false;
+        let faceBox = null;
+        let isAPIConnected = false;
+
+        // Check API connection
+        function checkAPIConnection() {
+            // Simple ping to API to verify connection
+            fetch(`${FLASK_API_URL}/recognize-face`, {
+                method: 'OPTIONS',
+                mode: 'cors'
+            })
+                .then(response => {
+                    if (response.ok || response.status === 204) {
+                        isAPIConnected = true;
+                        updateAPIStatus('connected');
+                    } else {
+                        isAPIConnected = false;
+                        updateAPIStatus('error');
+                    }
+                })
+                .catch(error => {
+                    console.error('API connection error:', error);
+                    isAPIConnected = false;
+                    updateAPIStatus('error');
+                });
+        }
+
+        // Update API status indicators
+        function updateAPIStatus(status) {
+            if (status === 'connecting') {
+                apiStatus.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
+                apiStatus.classList.add('bg-yellow-100');
+                apiStatusBadge.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
+                apiStatusBadge.classList.add('bg-yellow-400');
+            } else if (status === 'connected') {
+                apiStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-red-100');
+                apiStatus.classList.add('bg-green-100');
+                apiStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-red-500');
+                apiStatusBadge.classList.add('bg-green-500');
+            } else if (status === 'error') {
+                apiStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-green-100');
+                apiStatus.classList.add('bg-red-100');
+                apiStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-green-500');
+                apiStatusBadge.classList.add('bg-red-500');
+            }
+        }
 
         // Update time display
         function updateTimeDisplay() {
@@ -439,7 +466,7 @@
         }
 
         // Update status indicators
-        function updateStatusIndicators(camera, face, recognition) {
+        function updateCameraStatus(camera) {
             // Camera status
             if (camera === 'connecting') {
                 cameraStatus.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
@@ -457,14 +484,12 @@
                 cameraStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-green-500');
                 cameraStatusBadge.classList.add('bg-red-500');
             }
-
-
         }
 
         // Initialize camera
         async function initCamera() {
             try {
-                updateStatusIndicators('connecting', 'inactive', 'inactive');
+                updateCameraStatus('connecting');
                 showStatus('Initializing', 'Requesting camera access...');
 
                 // Stop any existing stream
@@ -491,22 +516,99 @@
                     overlayCanvas.width = video.videoWidth;
                     overlayCanvas.height = video.videoHeight;
 
-                    updateStatusIndicators('active', 'inactive', 'inactive');
+                    updateCameraStatus('active');
                     showStatus('Camera Ready', 'Camera initialized successfully', 'fa-check-circle', true);
 
+                    // Start face detection timer
+                    startFaceDetection();
                 };
             } catch (error) {
                 console.error('Error accessing camera:', error);
-                updateStatusIndicators('error', 'inactive', 'inactive');
+                updateCameraStatus('error');
                 showStatus('Camera Error', 'Failed to access camera', 'fa-exclamation-triangle');
             }
         }
 
+        // Basic face detection (using Canvas API for demonstration)
+        function detectFace() {
+            if (!stream || video.paused || video.ended) {
+                return;
+            }
+
+            // Draw the current video frame to the hidden canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Here we would typically use face-api.js or another face detection library
+            // For this example, we'll simulate face detection
+            // In a real implementation, you would use a proper face detection library
+
+            // Clear previous overlay
+            overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            // Simulate face detection result (roughly center of frame)
+            const randomOffset = Math.random() * 20 - 10; // Small random offset for realism
+
+            // 70% chance to detect a face when not recognizing
+            // If recognition is active, always show a face
+            const faceDetectionProbability = isRecognizing ? 0.95 : 0.7;
+            hasFace = Math.random() < faceDetectionProbability;
+
+            if (hasFace) {
+                const centerX = canvas.width / 2 + randomOffset;
+                const centerY = canvas.height / 2 + randomOffset;
+                const faceWidth = canvas.width * 0.2;
+                const faceHeight = canvas.height * 0.3;
+
+                faceBox = {
+                    x: centerX - faceWidth / 2,
+                    y: centerY - faceHeight / 2,
+                    width: faceWidth,
+                    height: faceHeight
+                };
+
+                // Draw face box
+                overlayContext.strokeStyle = '#10B981'; // Emerald green
+                overlayContext.lineWidth = 3;
+                overlayContext.beginPath();
+                overlayContext.rect(faceBox.x, faceBox.y, faceBox.width, faceBox.height);
+                overlayContext.stroke();
+
+                // Add face detected class for visual feedback
+                faceDetectionOverlay.innerHTML = `
+                    <div class="face-box face-detected absolute" style="
+                        left: ${faceBox.x}px;
+                        top: ${faceBox.y}px;
+                        width: ${faceBox.width}px;
+                        height: ${faceBox.height}px;
+                    "></div>
+                `;
+            } else {
+                faceBox = null;
+                faceDetectionOverlay.innerHTML = '';
+            }
+        }
+
+        // Start face detection
+        function startFaceDetection() {
+            // Clear any existing timer
+            if (faceDetectionTimer) {
+                clearInterval(faceDetectionTimer);
+            }
+
+            // Set up face detection timer
+            faceDetectionTimer = setInterval(detectFace, 200);
+        }
 
         // Start face recognition
         function startRecognition() {
             if (!stream) {
                 showStatus('Error', 'Camera not initialized', 'fa-exclamation-triangle');
+                return;
+            }
+
+            // Check if API is connected
+            if (!isAPIConnected) {
+                showStatus('Error', 'API not connected', 'fa-exclamation-triangle', true);
                 return;
             }
 
@@ -527,7 +629,6 @@
             scanningEffect.classList.remove('opacity-0');
             scanningEffect.classList.add('opacity-100');
 
-            updateStatusIndicators('active', detectedFaces.length > 0 ? 'detected' : 'detecting', 'processing');
             showStatus('Recognition Active', 'Looking for faces...', 'fa-search');
 
             // Hide empty state, show loading state
@@ -536,28 +637,43 @@
             recognitionResult.classList.add('hidden');
             errorState.classList.add('hidden');
 
-            // Simulate recognition process
-            recognitionInterval = setInterval(() => {
-                if (detectedFaces.length > 0) {
+            // Wait for a face to be detected, then recognize
+            checkForFaceAndRecognize();
+        }
+
+        // Check for face and recognize when found
+        function checkForFaceAndRecognize() {
+            // Clear existing timer if any
+            if (recognitionTimer) {
+                clearInterval(recognitionTimer);
+            }
+
+            recognitionTimer = setInterval(() => {
+                if (hasFace && faceBox) {
                     // Capture current frame
                     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                     // Get image data for processing
                     const imageData = canvas.toDataURL('image/jpeg');
 
-                    // Call API for face recognition (placeholder)
+                    // Call API for face recognition
                     recognizeFace(imageData);
 
                     // Stop the interval after starting recognition
-                    clearInterval(recognitionInterval);
+                    clearInterval(recognitionTimer);
+                } else {
+                    detectFace(); // Try to detect face
                 }
-            }, 1000);
+            }, 500);
         }
 
         // Stop face recognition
         function stopRecognition() {
             isRecognizing = false;
-            clearInterval(recognitionInterval);
+            if (recognitionTimer) {
+                clearInterval(recognitionTimer);
+            }
+
             startBtn.classList.remove('hidden');
             stopBtn.classList.add('hidden');
             recordingIndicator.classList.add('hidden');
@@ -567,42 +683,67 @@
             scanningEffect.classList.remove('opacity-100');
             scanningEffect.classList.add('opacity-0');
 
-            updateStatusIndicators('active', detectedFaces.length > 0 ? 'detected' : 'detecting', 'inactive');
             hideStatus();
         }
 
-        // API call placeholder for face recognition
+        // API call for face recognition
         function recognizeFace(imageData) {
             showStatus('Processing', 'Analyzing facial features...', 'fa-cog fa-spin');
 
-            // Simulate API call with delay
-            setTimeout(() => {
-                // Simulate successful recognition (80% of the time)
-                if (Math.random() > 0.2) {
-                    const confidence = 0.75 + Math.random() * 0.25; // Random confidence between 0.75 and 1.0
-                    const mockResponse = {
-                        success: true,
-                        person: {
-                            id: Math.floor(Math.random() * 1000),
-                            name: 'John Doe',
-                            employeeId: 'EMP' + Math.floor(Math.random() * 10000),
-                            department: 'Computer Science',
-                            role: 'Student'
-                        },
-                        confidence: confidence
-                    };
+            // Make API call to Flask backend
+            fetch(`${FLASK_API_URL}/recognize-face`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: imageData
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Successful recognition
+                        console.log("success : ",data);
+                        fetchStudentDetails(data.student_id, data.confidence);
+                    } else {
+                        // Failed recognition
+                        console.log("error : ",data);
+                        handleRecognitionFailure(data.message || 'No matching face found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Recognition API error:', error);
+                    handleRecognitionFailure('API Error: Could not process recognition request');
+                });
+        }
 
-                    handleRecognitionSuccess(mockResponse);
-                } else {
-                    // Simulate failed recognition
-                    handleRecognitionFailure('Unable to match face with any registered user');
-                }
-            }, 3000);
+        // Fetch student details from the backend
+        function fetchStudentDetails(studentId, confidence) {
+            // In a real implementation, you would make an API call to get student details
+            // For this example, we'll simulate a response with mock data
+
+            // Simulate API call delay
+            setTimeout(() => {
+                // Mock student data - in a real implementation, this would come from your backend
+                const studentData = {
+                    id: studentId,
+                    name: 'John Doe',
+                    student_id: 'STU' + studentId,
+                    department: 'Computer Science',
+                    role: 'Student'
+                };
+
+                handleRecognitionSuccess({
+                    success: true,
+                    person: studentData,
+                    confidence: confidence
+                });
+            }, 1000);
         }
 
         // Handle successful recognition
         function handleRecognitionSuccess(response) {
-            updateStatusIndicators('active', 'detected', 'success');
             showStatus('Success', 'Face recognized successfully!', 'fa-check-circle', true);
 
             // Hide loading state, show recognition result
@@ -612,7 +753,7 @@
 
             // Update recognition result
             recognizedName.textContent = response.person.name;
-            recognizedId.textContent = `${response.person.role} • ${response.person.employeeId}`;
+            recognizedId.textContent = `${response.person.role} • ${response.person.student_id}`;
 
             // Update confidence bar
             const confidencePercent = Math.round(response.confidence * 100);
@@ -629,7 +770,7 @@
                 minute: '2-digit'
             });
 
-            // Log attendance (API placeholder)
+            // Log attendance
             logAttendance(response.person.id);
 
             // Stop recognition after successful match
@@ -638,8 +779,6 @@
 
         // Handle failed recognition
         function handleRecognitionFailure(reason) {
-            updateStatusIndicators('active', detectedFaces.length > 0 ? 'detected' : 'detecting', 'error');
-
             // Hide loading state, show error state
             loadingState.classList.add('hidden');
             recognitionResult.classList.add('hidden');
@@ -652,44 +791,36 @@
             stopRecognition();
         }
 
-        // API call placeholder for logging attendance
-        function logAttendance(personId) {
-            console.log(`Logging attendance for person ID: ${personId} at institute ID: ${instituteId}`);
+        // API call for logging attendance
+        function logAttendance(studentId) {
+            // Make API call to your Laravel backend to log attendance
+            // This would typically be a POST request to your attendance logging endpoint
 
-            // Example API call structure (using Laravel API routes)
-            {{--$.ajax({--}}
-            {{--    url: "{{ route('api.attendance.log') }}",--}}
-            {{--    type: "POST",--}}
-            {{--    data: {--}}
-            {{--        person_id: personId,--}}
-            {{--        institute_id: instituteId,--}}
-            {{--        method: 'face_recognition'--}}
-            {{--    },--}}
+            const attendanceData = {
+                student_id: studentId,
+                institute_id: instituteId,
+                timestamp: new Date().toISOString(),
+                method: 'face_recognition'
+            };
+
+            // Send to your Laravel backend
+            {{--fetch('{{ route("api.attendance.log") }}', {--}}
+            {{--    method: 'POST',--}}
             {{--    headers: {--}}
-            {{--        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+            {{--        'Content-Type': 'application/json',--}}
+            {{--        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')--}}
             {{--    },--}}
-            {{--    success: function(response) {--}}
-            {{--        console.log('Attendance logged:', response);--}}
-            {{--    },--}}
-            {{--    error: function(error) {--}}
+            {{--    body: JSON.stringify(attendanceData)--}}
+            {{--})--}}
+            {{--    .then(response => response.json())--}}
+            {{--    .then(data => {--}}
+            {{--        console.log('Attendance logged:', data);--}}
+            {{--        // You could show a success message here if needed--}}
+            {{--    })--}}
+            {{--    .catch(error => {--}}
             {{--        console.error('Error logging attendance:', error);--}}
-            {{--    }--}}
-            {{--});--}}
-        }
-
-
-        // Helper function to convert data URI to Blob
-        function dataURItoBlob(dataURI) {
-            const byteString = atob(dataURI.split(',')[1]);
-            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-
-            return new Blob([ab], { type: mimeString });
+            {{--        // Handle error if needed--}}
+            {{--    });--}}
         }
 
         // Switch camera (front/back)
@@ -701,9 +832,15 @@
         // Event listeners
         startBtn.addEventListener('click', startRecognition);
         stopBtn.addEventListener('click', stopRecognition);
+        switchCameraBtn.addEventListener('click', switchCamera);
+        retryBtn.addEventListener('click', startRecognition);
 
-        // Initialize camera on page load
+        // Initialize
         initCamera();
+        checkAPIConnection();
+
+        // Periodically check API connection
+        setInterval(checkAPIConnection, 30000); // Check every 30 seconds
     });
 </script>
 </body>

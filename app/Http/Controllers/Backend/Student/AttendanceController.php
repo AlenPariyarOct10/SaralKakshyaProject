@@ -54,6 +54,7 @@ class AttendanceController extends Controller
         // Send to Python Flask API
         $response = Http::post('http://127.0.0.1:5000/register-face', [
             'student_id' => $parentId,
+            'institute_id' => $parentId,
             'images'     => $base64Images,
         ]);
 

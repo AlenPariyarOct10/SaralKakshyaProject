@@ -14,7 +14,6 @@
     {{$user->profile_picture}}
 @endsection
 
-
 @push("styles")
     <script>
         tailwind.config = {
@@ -75,25 +74,33 @@
 
 @section('content')
     <!-- Main Content Area -->
+
+
     <main class="scrollable-content p-4 md:p-6">
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success !</strong>
+                <span class="block sm:inline">{{session('success')}}</span>
+            </div>
+        @endif
+            @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Error !</strong>
+                <span class="block sm:inline">{{session('error')}}</span>
+            </div>
+        @endif
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
-                    <input type="text" id="searchTeachers" placeholder="Search teachers..." class="form-input pl-12 pr-4 py-2">
-
+                    <input type="text" id="searchTeachers" placeholder="Search teachers..." class="form-input pr-4 py-2">
                 </div>
-
             </div>
-            <div class="flex justify-end">
-                <a href="{{route('admin.teacher.unapproved.index')}}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
-                    <i class="fa-solid fa-hourglass-end mr-2"></i> Pending Approval
-                    <span class="ml-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                        {{$pendingCount}}
-                    </span>
-                </a>
-            </div>
-
+        <div class="flex justify-end">
+            <a href="{{route('admin.teacher.index')}}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
+                <i class="fa-solid fa-arrow-left mr-2"></i> View all
+            </a>
+        </div>
 
         </div>
 
@@ -105,8 +112,7 @@
                     <tr>
                         <th scope="col" class="table-header">Name</th>
                         <th scope="col" class="table-header">Email</th>
-                        <th scope="col" class="table-header">Phone</th>
-                        <th scope="col" class="table-header">Status</th>
+                        <th scope="col" class="table-header">Created at</th>
                         <th scope="col" class="table-header">Actions</th>
                     </tr>
                     </thead>
@@ -128,17 +134,10 @@
                                 </div>
                             </td>
                             <td class="table-cell">{{ $teacher->email }}</td>
-                            <td class="table-cell">{{ $teacher->phone }}</td>
                             <td class="table-cell">
-                                @if($teacher->status)
                                     <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                                        Active
+                                        {{$teacher->created_at->diffForHumans()}}
                                     </span>
-                                @else
-                                    <span class="badge bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
-                                        Blocked
-                                    </span>
-                                @endif
                             </td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
@@ -147,19 +146,16 @@
                                             title="View Profile">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    @if($teacher->status)
-                                        <button class="block-teacher-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
-                                                data-id="{{ $teacher->id }}"
-                                                title="Block Teacher">
-                                            <i class="fas fa-ban"></i>
+
+                                    <form action="{{route('admin.teacher.approve', $teacher->id)}}" method="POST">
+                                        @method("PUT")
+                                        @csrf
+                                        <button class="approve-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
+                                                    data-id="{{ $teacher->id }}"
+                                                    title="Approve Teacher">
+                                                <i class="fas fa-check-circle"></i>
                                         </button>
-                                    @else
-                                        <button class="unblock-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
-                                                data-id="{{ $teacher->id }}"
-                                                title="Unblock Teacher">
-                                            <i class="fas fa-check-circle"></i>
-                                        </button>
-                                    @endif
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -168,10 +164,6 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="px-6 py-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
-{{--                {{ $teachers->links() }}--}}
-            </div>
         </div>
     </main>
 @endsection
@@ -272,7 +264,6 @@
 
 @section('scripts')
     <script>
-
         // DOM Elements
         const teacherProfileModal = document.getElementById('teacherProfileModal');
         const blockConfirmModal = document.getElementById('blockConfirmModal');
@@ -281,6 +272,7 @@
         const cancelBlockBtn = document.getElementById('cancelBlockBtn');
         const searchInput = document.getElementById('searchTeachers');
         const departmentFilter = document.getElementById('departmentFilter');
+        const approveTeacherBtn = document.querySelectorAll('.approve-teacher-btn');
 
         // View Profile
         document.querySelectorAll('.view-profile-btn').forEach(button => {
@@ -361,20 +353,16 @@
         // Search and Filter
         function filterTeachers() {
             const searchTerm = searchInput.value.toLowerCase();
-            const department = departmentFilter.value;
 
             document.querySelectorAll('tbody tr').forEach(row => {
                 const name = row.querySelector('td:first-child').textContent.toLowerCase();
-                const teacherDepartment = row.querySelector('td:nth-child(4)').textContent;
 
                 const matchesSearch = name.includes(searchTerm);
-                const matchesDepartment = department === '' || teacherDepartment === department;
 
-                row.classList.toggle('hidden', !(matchesSearch && matchesDepartment));
+                row.classList.toggle('hidden', !(matchesSearch));
             });
         }
 
         searchInput.addEventListener('input', filterTeachers);
-        departmentFilter.addEventListener('change', filterTeachers);
     </script>
 @endsection

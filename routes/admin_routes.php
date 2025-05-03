@@ -79,7 +79,11 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get("/test-email", [AdminAnnouncementController::class, "email"]);
         Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
+
+        //Teacher
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
+        Route::get('/teacher/unapproved', [AdminTeacherController::class, "index_pending_teachers"])->name('admin.teacher.unapproved.index');
+        Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
         Route::get('/setting', [AdminProfileController::class, "index"])->name("admin.settings");

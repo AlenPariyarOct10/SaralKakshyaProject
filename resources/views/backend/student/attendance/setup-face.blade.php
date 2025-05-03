@@ -386,6 +386,9 @@
                 </div>
             </div>
 
+            hello{{$user}}
+
+
             <!-- Step 4: Success -->
             <div id="step4" class="card text-center hidden">
                 <div class="w-20 h-20 mx-auto mb-4 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">

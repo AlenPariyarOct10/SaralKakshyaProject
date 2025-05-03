@@ -16,7 +16,8 @@ class AuthController extends Controller
     public function showRegister()
     {
         $system_info = SystemSetting::first();
-        return view('backend.teacher.signup', compact('system_info'));
+        $institutes = Institute::withoutTrashed()->get();
+        return view('backend.teacher.signup', compact('system_info', 'institutes'));
     }
 
     // Show login form
@@ -37,24 +38,33 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-//
         $credentials = $request->only('email', 'password');
         $instituteId = $request->input('institute');
 
         if (Auth::guard('teacher')->attempt($credentials)) {
             $teacher = Auth::guard('teacher')->user();  // Get the authenticated teacher
-            $isAssociatedWithInstitute = $teacher->institutes()->where('institutes.id', $instituteId)->exists();
 
-            if ($isAssociatedWithInstitute) {
+            // Check if the teacher is associated with the institute and approved
+            $isApproved = $teacher->institutes()
+                ->where('institutes.id', $instituteId)
+                ->wherePivot('isApproved', 1)
+                ->exists();
+
+            if ($isApproved) {
                 return redirect()->intended(route('teacher.dashboard'));
             } else {
                 Auth::guard('teacher')->logout();
-                return redirect()->route('teacher.login')->withErrors(['institute' => 'You are not associated with the selected institute.'])->withInput(['email'=>$request->get('email'), 'institute'=>$instituteId]);
+                return redirect()->route('teacher.login')->withErrors([
+                    'institute' => 'You are either not associated with the selected institute or not yet approved.'
+                ])->withInput(['email' => $request->get('email'), 'institute' => $instituteId]);
             }
         }
 
-        return redirect()->route('teacher.login')->withErrors(['email' => 'Invalid credentials'])->withInput(['email'=>$request->get('email'), 'institute'=>$instituteId]);
+        return redirect()->route('teacher.login')->withErrors([
+            'email' => 'Invalid credentials'
+        ])->withInput(['email' => $request->get('email'), 'institute' => $instituteId]);
     }
+
 
 
     // Handle registration of a new teacher

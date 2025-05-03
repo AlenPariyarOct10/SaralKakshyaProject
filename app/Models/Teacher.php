@@ -49,7 +49,7 @@ class Teacher extends Authenticatable
 
     public function institutes()
     {
-        return $this->belongsToMany(Institute::class, 'institute_teacher')->withTimestamps();;
+        return $this->belongsToMany(Institute::class, 'institute_teacher')->withTimestamps();
     }
 
     public function activityLogs()

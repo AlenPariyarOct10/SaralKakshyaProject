@@ -31,8 +31,6 @@
     <!-- Card Container -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Header -->
-
-
         <!-- Form -->
         <div class="p-6">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create Teacher Account</h2>
@@ -72,9 +70,7 @@
                     <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</p>
                 </div>
 
-                @component('components.login.institute-input') @endcomponent
-
-
+                @component('components.login.institute-input', compact("institutes")) @endcomponent
                 <!-- Password Input -->
                 <div class="mb-4">
                     <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>

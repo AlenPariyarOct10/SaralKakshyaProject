@@ -23,6 +23,7 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 class FaceData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, unique=True, nullable=False)
+    institute_id = db.Column(db.Integer, nullable=False)
     histogram = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -78,10 +79,20 @@ def lbp_histogram(image):
     hist /= (hist.sum() + 1e-7)  # normalize
     return hist.tolist()
 
-def compare_histograms(hist1, hist2):
+def euclidean_distance(hist1, hist2):
+    """
+    Calculate Euclidean distance between two histograms
+    """
     if hist1 is None or hist2 is None:
         return float('inf')
-    return np.sqrt(np.sum((np.array(hist1) - np.array(hist2)) ** 2))
+
+    # Convert to numpy arrays for efficient computation
+    h1 = np.array(hist1)
+    h2 = np.array(hist2)
+
+    # Calculate Euclidean distance
+    distance = np.sqrt(np.sum((h1 - h2) ** 2))
+    return distance
 
 # ---------- FLASK ROUTES ----------
 @app.route('/register-face', methods=['POST'])
@@ -89,7 +100,8 @@ def register_face():
     try:
         data = request.json
         student_id = data.get('student_id')
-        images = data.get('images')  # list of 5 base64 images
+        institute_id = data.get('institute_id')
+        images = data.get('images')
 
         if not student_id or not images or len(images) != 5:
             return jsonify({'error': 'Missing or invalid data'}), 400
@@ -166,27 +178,31 @@ def recognize_face():
         min_distance = float('inf')
         matched_student_id = None
 
-        # Compare with stored histograms
+        # Compare with stored histograms using Euclidean distance
         for face in stored_faces:
             stored_hist = json.loads(face.histogram)
-            distance = compare_histograms(input_hist, stored_hist)
+            distance = euclidean_distance(input_hist, stored_hist)
 
             if distance < min_distance:
                 min_distance = distance
                 matched_student_id = face.student_id
 
-        # Check if a match was found (using a threshold)
-        threshold = 0.3  # Adjust this value based on testing
+        # Threshold for face recognition (adjust based on testing)
+        threshold = 0.3
         if min_distance <= threshold and matched_student_id is not None:
+            # Calculate confidence score (inverse relationship with distance)
+            confidence = 1 - (min_distance / threshold)
             return jsonify({
                 'success': True,
                 'student_id': matched_student_id,
-                'confidence': 1 - (min_distance / threshold)
+                'confidence': confidence,
+                'distance': float(min_distance)  # Convert numpy float to Python float
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'message': 'No matching face found'
+                'message': 'No matching face found',
+                'distance': float(min_distance)  # Include distance for debugging
             }), 404
 
     except Exception as e:
