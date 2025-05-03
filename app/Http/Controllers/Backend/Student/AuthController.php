@@ -54,36 +54,55 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
+        // Validate input
+        $validated = $request->validate([
+            'email' => 'required|email|max:255',
             'institute' => 'required|exists:institutes,id',
-            'password' => 'required|min:6',
+            'password' => 'required|string|min:8',
         ]);
 
-        $credentials = $request->only('email', 'password');
-        $instituteId = $request->input('institute');
-
-        if (Auth::guard('student')->attempt($credentials)) {
-            $student = Auth::guard('student')->user();  // Get the authenticated teacher
-
-            $isApproved = $student->institutes()
-                ->where('institutes.id', $instituteId)
-                ->wherePivot('isApproved', 1)
-                ->exists();
-
-            if ($isApproved) {
-                return redirect()->intended(route('student.dashboard'));
-            } else {
-                Auth::guard('student')->logout();
-                return redirect()->route('student.login')->withErrors([
-                    'institute' => 'You are either not associated with the selected institute or not yet approved.'
-                ])->withInput(['email' => $request->get('email'), 'institute' => $instituteId]);
-            }
+        // Attempt authentication
+        if (!Auth::guard('student')->attempt($request->only('email', 'password'))) {
+            return back()
+                ->withErrors(['email' => 'Invalid credentials'])
+                ->withInput($request->only('email', 'institute'));
         }
-        return redirect()->route('student.login')->withErrors([
-            'email' => 'Invalid credentials'
-        ])->withInput(['email' => $request->get('email'), 'institute' => $instituteId]);
 
+        $student = Auth::guard('student')->user();
+
+        // Check account status
+        if (!$student->status) {
+            Auth::guard('student')->logout();
+            return back()
+                ->with('error', 'Your account is not activated. Please contact support.')
+                ->withInput($request->only('email', 'institute'));
+        }
+
+        // Check institute approval
+        $isApproved = $student->institutes()
+            ->where('institutes.id', $validated['institute'])
+            ->wherePivot('is_approved', true)
+            ->exists();
+
+        if (!$isApproved) {
+            Auth::guard('student')->logout();
+            return back()
+                ->withErrors([
+                    'institute' => 'You are either not associated with the selected institute or not yet approved.'
+                ])
+                ->withInput($request->only('email', 'institute'));
+        }
+
+        // Regenerate session for security
+        $request->session()->regenerate();
+
+        // Log login activity
+        activity()
+            ->causedBy($student)
+            ->withProperties(['ip' => $request->ip()])
+            ->log('Student logged in');
+
+        return redirect()->intended(route('student.dashboard'));
     }
 
     public function logout()
