@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend\Admin;
 
+use App\Exports\Admin\TeacherExport;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use Carbon\Carbon;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TeacherController extends Controller
 {
@@ -33,6 +35,12 @@ class TeacherController extends Controller
         return view('backend.admin.teachers.index', compact('user','teachers', 'pendingCount'));
     }
 
+    public function generatePDF()
+    {
+        $fileName = 'Teachers_'.Auth::user()->institute->name.'_'.now()->format('[d M, Y]').'.xlsx';
+        return Excel::download(new TeacherExport(), $fileName);
+    }
+
     public function index_pending_teachers()
     {
         $adminInstituteId = Auth::user()->institute->id;
@@ -44,6 +52,25 @@ class TeacherController extends Controller
         })->orderBy('created_at', 'DESC')->get();
 
         return view('backend.admin.teachers.unapproved', compact('teachers', 'user'));
+    }
+
+    public function toggle_status($id)
+    {
+        try {
+            $teacher = Teacher::findOrFail($id);
+            if ($teacher->status == 1) {
+                $teacher->status = 0;
+            } else {
+                $teacher->status = 1;
+            }
+
+            $teacher->save();
+
+            return json_encode(['status' => 'success']);
+        }catch (\Exception $exception)
+        {
+            return json_encode(['status' => 'failed']);
+        }
     }
 
     public function approve_teacher($id)

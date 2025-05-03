@@ -1,10 +1,13 @@
-@php use Illuminate\Support\Facades\Auth; @endphp
+@php use Illuminate\Support\Facades\Auth;
+ $system_name = \App\Models\SystemSetting::all()->first()->name;
+@endphp
+
     <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Classroom - Dashboard</title>
+    <title>{{$system_name}} - @yield("title") </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/js/app.js'])
@@ -85,25 +88,21 @@
                     <i class="fas fa-book"></i>
                     <span>Assignments</span>
                 </a>
-                <a href="live-class.html" class="sidebar-item">
-                    <i class="fas fa-video"></i>
-                    <span>Live Classes</span>
-                </a>
-                <a href="announcements.html" class="sidebar-item">
+                <a href="{{route('teacher.announcement.index')}}" class="sidebar-item">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
 
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                    <a href="profile.html" class="sidebar-item">
+                    <a href="{{route('teacher.profile.index')}}" class="sidebar-item">
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>
-                    <a href="settings.html" class="sidebar-item">
+                    <a href="{{route('teacher.setting.index')}}" class="sidebar-item">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                    <form action="{{ route('admin.logout') }}" method="POST"
+                    <form action="{{ route('teacher.logout') }}" method="POST"
                           class="sidebar-item text-red-500 dark:text-red-400">
                         @csrf
                         <button type="submit" class="flex items-center">

@@ -79,6 +79,9 @@
                     </p>
                 </div>
 
+                @component('components.login.institute-input', compact("institutes")) @endcomponent
+
+
                 <!-- Password Input -->
                 <div class="mb-4">
                     <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>

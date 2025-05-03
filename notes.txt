@@ -1,2 +1,15 @@
 Required
 pip install flask flask_sqlalchemy opencv-python numpy
+
+
+#For Excel -> maatwebsite/excel
+composer require maatwebsite/excel
+
+php artisan make:export TeachersExport --model=Teacher
+Creates a .php file , link it with view file
+
+
+public function exportExcel()
+{
+    return Excel::download(new TeachersExport, 'teachers_list.xlsx');
+}

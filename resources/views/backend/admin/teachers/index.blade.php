@@ -86,6 +86,9 @@
 
             </div>
             <div class="flex justify-end">
+                <a id="exportBtn" href="{{route('admin.teacher.download.excel')}}" class="btn-secondary flex items-center justify-center mr-2">
+                    <i class="fas fa-download mr-2"></i> Export
+                </a>
                 <a href="{{route('admin.teacher.unapproved.index')}}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
                     <i class="fa-solid fa-hourglass-end mr-2"></i> Pending Approval
                     <span class="ml-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
@@ -112,7 +115,7 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($teachers as $teacher)
-                        <tr>
+                        <tr id="teacher-row-{{$teacher->id}}">
                             <td class="table-cell">
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
@@ -128,14 +131,14 @@
                                 </div>
                             </td>
                             <td class="table-cell">{{ $teacher->email }}</td>
-                            <td class="table-cell">{{ $teacher->phone }}</td>
+                            <td class="table-cell">{{ ($teacher->phone)?$teacher->phone:'Not given' }}</td>
                             <td class="table-cell">
                                 @if($teacher->status)
-                                    <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                    <span id="status-badge-{{$teacher->id}}" class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                         Active
                                     </span>
                                 @else
-                                    <span class="badge bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                    <span id="status-badge-{{$teacher->id}}" class="badge bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
                                         Blocked
                                     </span>
                                 @endif
@@ -205,10 +208,7 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
                                 <p id="teacherPhone" class="font-medium"></p>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Department</p>
-                                <p id="teacherDepartment" class="font-medium"></p>
-                            </div>
+
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Address</p>
                                 <p id="teacherAddress" class="font-medium"></p>
@@ -280,7 +280,6 @@
         const closeBlockModal = document.getElementById('closeBlockModal');
         const cancelBlockBtn = document.getElementById('cancelBlockBtn');
         const searchInput = document.getElementById('searchTeachers');
-        const departmentFilter = document.getElementById('departmentFilter');
 
         // View Profile
         document.querySelectorAll('.view-profile-btn').forEach(button => {
@@ -295,7 +294,6 @@
                     document.getElementById('teacherName').textContent = `${teacher.fname} ${teacher.lname}`;
                     document.getElementById('teacherEmail').textContent = teacher.email;
                     document.getElementById('teacherPhone').textContent = teacher.phone;
-                    document.getElementById('teacherDepartment').textContent = teacher.department;
                     document.getElementById('teacherAddress').textContent = teacher.address;
                     document.getElementById('teacherJoiningDate').textContent = new Date(teacher.created_at).toLocaleDateString();
                     document.getElementById('teacherStatus').textContent = teacher.status;
@@ -322,28 +320,59 @@
                 document.getElementById('confirmBlockBtn').textContent = isBlocking ? 'Block' : 'Unblock';
                 document.getElementById('confirmBlockBtn').onclick = async () => {
                     try {
-                        const response = await fetch(`/api/teachers/${teacherId}/toggle-status`, {
+                        const response = await fetch(`/admin/teacher/status/${teacherId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            }
+                            },
+                            body: JSON.stringify({}) // optional if you don’t need to send data
                         });
 
-                        if (response.ok) {
-                            location.reload();
+                        const data = await response.json();
+
+                        if (response.ok && data.status) {
+
+                            let badge = document.getElementById(`status-badge-${teacherId}`);
+
+
+                            if (badge.innerText.trim() === "Active") {
+                                badge.innerText = "Blocked";
+                                badge.classList.remove('bg-green-100', 'text-green-800');
+                                badge.classList.add('bg-red-100', 'text-red-800');
+                            } else {
+                                badge.innerText = "Active";
+                                badge.classList.remove('bg-red-100', 'text-red-800');
+                                badge.classList.add('bg-green-100', 'text-green-800');
+                            }
+
+                            blockConfirmModal.classList.add('hidden');
+
+                            await Toast.fire({
+                                icon: 'success',
+                                title: 'Status updated successfully',
+                            });
+
                         } else {
-                            throw new Error('Failed to update status');
+                            throw new Error(data.message || 'Failed to update status');
                         }
                     } catch (error) {
-                        console.error('Error updating teacher status:', error);
-                        alert('Failed to update teacher status');
+                        console.log("failed", error);
+
+                        blockConfirmModal.classList.add('hidden');
+
+                        await Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to update',
+                        });
                     }
+
                 };
 
                 blockConfirmModal.classList.remove('hidden');
             });
         });
+
 
         // Close modals
         closeProfileModal.addEventListener('click', () => {
@@ -361,20 +390,17 @@
         // Search and Filter
         function filterTeachers() {
             const searchTerm = searchInput.value.toLowerCase();
-            const department = departmentFilter.value;
 
             document.querySelectorAll('tbody tr').forEach(row => {
                 const name = row.querySelector('td:first-child').textContent.toLowerCase();
-                const teacherDepartment = row.querySelector('td:nth-child(4)').textContent;
+                const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
 
-                const matchesSearch = name.includes(searchTerm);
-                const matchesDepartment = department === '' || teacherDepartment === department;
+                const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
 
-                row.classList.toggle('hidden', !(matchesSearch && matchesDepartment));
+                row.classList.toggle('hidden', !matchesSearch);
             });
         }
 
         searchInput.addEventListener('input', filterTeachers);
-        departmentFilter.addEventListener('change', filterTeachers);
     </script>
 @endsection
