@@ -22,24 +22,22 @@ class AttendanceController extends Controller
 
     public function saveFacePhotos(Request $request)
     {
-        if (!$request->hasFile('photo_1')) {
-            return response()->json(['success' => false, 'message' => 'No photos uploaded.'], 400);
+        $photos = $request->only(['photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5']);
+
+        if (count($photos) !== 5) {
+            return response()->json(['success' => false, 'message' => 'Please upload exactly 5 valid photos.'], 422);
         }
 
-        $user = auth()->user(); // Authenticated student
+        $user = auth()->user();
         $parentId = $user->id;
-
         $base64Images = [];
 
-        foreach ($request->files as $photo) {
-            if ($photo->isValid()) {
+        foreach ($photos as $photo) {
+            if ($photo && $photo->isValid()) {
                 $extension = $photo->getClientOriginalExtension();
                 $filename = uniqid('face_') . '.' . $extension;
-
-                // Store the photo
                 $path = $photo->storeAs('uploads/faces', $filename, 'public');
 
-                // Save record to DB
                 Attachment::create([
                     'title'       => 'Face Photo ' . $parentId,
                     'file_type'   => $extension,
@@ -48,15 +46,9 @@ class AttendanceController extends Controller
                     'path'        => $path,
                 ]);
 
-                // Convert to base64
                 $imageContent = Storage::disk('public')->get($path);
                 $base64Images[] = base64_encode($imageContent);
             }
-        }
-
-        // Ensure 5 photos
-        if (count($base64Images) !== 5) {
-            return response()->json(['success' => false, 'message' => 'Please upload exactly 5 valid photos.'], 422);
         }
 
         // Send to Python Flask API
@@ -71,6 +63,7 @@ class AttendanceController extends Controller
             'flask_response' => $response->json()
         ]);
     }
+
 
 
     public function setup_index()

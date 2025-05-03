@@ -182,22 +182,6 @@
                 </div>
                 <span>Camera</span>
             </div>
-
-            <div id="faceStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                <div class="relative">
-                    <i class="fas fa-user"></i>
-                    <div id="faceStatusBadge" class="badge bg-gray-400"></div>
-                </div>
-                <span>Face Detection</span>
-            </div>
-
-            <div id="recognitionStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                <div class="relative">
-                    <i class="fas fa-fingerprint"></i>
-                    <div id="recognitionStatusBadge" class="badge bg-gray-400"></div>
-                </div>
-                <span>Recognition</span>
-            </div>
         </div>
     </div>
 
@@ -256,17 +240,6 @@
                             <span>Stop Recognition</span>
                         </button>
 
-                        <div class="flex gap-2">
-                            <button id="captureBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
-                                <i class="fas fa-camera"></i>
-                                <span>Capture</span>
-                            </button>
-
-                            <button id="switchCameraBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
-                                <i class="fas fa-sync-alt"></i>
-                                <span>Switch Camera</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -290,7 +263,7 @@
                 <div id="recognitionResult" class="flex-1 p-4 hidden">
                     <div class="text-center mb-4">
                         <div class="w-20 h-20 rounded-full bg-emerald-50 border-4 border-emerald-500 mx-auto mb-3 flex items-center justify-center overflow-hidden">
-                            <img id="personImage" src="{{ asset('images/placeholder.svg') }}" alt="Person" class="w-full h-full object-cover hidden">
+                            <img id="personImage" src="" alt="Person" class="w-full h-full object-cover hidden">
                             <i id="personIcon" class="fas fa-user-circle text-emerald-300 text-4xl"></i>
                         </div>
                         <h3 id="recognizedName" class="text-lg font-semibold text-gray-800"></h3>
@@ -376,7 +349,6 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const overlayCanvas = document.getElementById('overlayCanvas');
-        const faceDetectionOverlay = document.getElementById('faceDetectionOverlay');
         const scanningEffect = document.getElementById('scanningEffect');
         const statusOverlay = document.getElementById('statusOverlay');
         const statusIcon = document.getElementById('statusIcon');
@@ -385,8 +357,6 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
-        const captureBtn = document.getElementById('captureBtn');
-        const switchCameraBtn = document.getElementById('switchCameraBtn');
         const emptyState = document.getElementById('emptyState');
         const recognitionResult = document.getElementById('recognitionResult');
         const loadingState = document.getElementById('loadingState');
@@ -407,21 +377,17 @@
 
         // Status indicators
         const cameraStatus = document.getElementById('cameraStatus');
-        const faceStatus = document.getElementById('faceStatus');
-        const recognitionStatus = document.getElementById('recognitionStatus');
         const cameraStatusBadge = document.getElementById('cameraStatusBadge');
-        const faceStatusBadge = document.getElementById('faceStatusBadge');
-        const recognitionStatusBadge = document.getElementById('recognitionStatusBadge');
 
         // Canvas contexts
         const context = canvas.getContext('2d');
-        const overlayContext = overlayCanvas.getContext('2d');
+
 
         // State variables
         let stream = null;
         let isRecognizing = false;
         let recognitionInterval = null;
-        let facingMode = 'user'; // 'user' for front camera, 'environment' for back camera
+        let facingMode = 'user';
         let detectedFaces = [];
         let instituteId = '';
 
@@ -492,51 +458,7 @@
                 cameraStatusBadge.classList.add('bg-red-500');
             }
 
-            // Face detection status
-            if (face === 'inactive') {
-                faceStatus.classList.remove('bg-green-100', 'bg-yellow-100', 'bg-red-100');
-                faceStatus.classList.add('bg-gray-100');
-                faceStatusBadge.classList.remove('bg-green-500', 'bg-yellow-400', 'bg-red-500');
-                faceStatusBadge.classList.add('bg-gray-400');
-            } else if (face === 'detecting') {
-                faceStatus.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
-                faceStatus.classList.add('bg-yellow-100');
-                faceStatusBadge.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
-                faceStatusBadge.classList.add('bg-yellow-400');
-            } else if (face === 'detected') {
-                faceStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-red-100');
-                faceStatus.classList.add('bg-green-100');
-                faceStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-red-500');
-                faceStatusBadge.classList.add('bg-green-500');
-            } else if (face === 'error') {
-                faceStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-green-100');
-                faceStatus.classList.add('bg-red-100');
-                faceStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-green-500');
-                faceStatusBadge.classList.add('bg-red-500');
-            }
 
-            // Recognition status
-            if (recognition === 'inactive') {
-                recognitionStatus.classList.remove('bg-green-100', 'bg-yellow-100', 'bg-red-100');
-                recognitionStatus.classList.add('bg-gray-100');
-                recognitionStatusBadge.classList.remove('bg-green-500', 'bg-yellow-400', 'bg-red-500');
-                recognitionStatusBadge.classList.add('bg-gray-400');
-            } else if (recognition === 'processing') {
-                recognitionStatus.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
-                recognitionStatus.classList.add('bg-yellow-100');
-                recognitionStatusBadge.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
-                recognitionStatusBadge.classList.add('bg-yellow-400');
-            } else if (recognition === 'success') {
-                recognitionStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-red-100');
-                recognitionStatus.classList.add('bg-green-100');
-                recognitionStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-red-500');
-                recognitionStatusBadge.classList.add('bg-green-500');
-            } else if (recognition === 'error') {
-                recognitionStatus.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-green-100');
-                recognitionStatus.classList.add('bg-red-100');
-                recognitionStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-green-500');
-                recognitionStatusBadge.classList.add('bg-red-500');
-            }
         }
 
         // Initialize camera
@@ -572,8 +494,6 @@
                     updateStatusIndicators('active', 'inactive', 'inactive');
                     showStatus('Camera Ready', 'Camera initialized successfully', 'fa-check-circle', true);
 
-                    // Start face detection
-                    startFaceDetection();
                 };
             } catch (error) {
                 console.error('Error accessing camera:', error);
@@ -582,117 +502,6 @@
             }
         }
 
-        // Start face detection
-        function startFaceDetection() {
-            updateStatusIndicators('active', 'detecting', 'inactive');
-
-            // In a real application, you would use a face detection library
-            // For this demo, we'll simulate face detection
-            simulateFaceDetection();
-        }
-
-        // Simulate face detection (in a real app, use a library like face-api.js)
-        function simulateFaceDetection() {
-            // Clear previous detection interval if any
-            if (window.faceDetectionInterval) {
-                clearInterval(window.faceDetectionInterval);
-            }
-
-            window.faceDetectionInterval = setInterval(() => {
-                if (!video.paused && !video.ended) {
-                    // Capture current frame for processing
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    // Simulate face detection (random position and size)
-                    const shouldDetectFace = Math.random() > 0.3; // 70% chance to detect a face
-
-                    if (shouldDetectFace) {
-                        // Generate a random face position (in a real app, this would come from the face detection API)
-                        const centerX = canvas.width * (0.4 + Math.random() * 0.2); // Center-ish with some variation
-                        const centerY = canvas.height * (0.4 + Math.random() * 0.2);
-                        const faceWidth = canvas.width * (0.2 + Math.random() * 0.1);
-                        const faceHeight = faceWidth * 1.3; // Faces are usually taller than wide
-
-                        detectedFaces = [{
-                            x: centerX - faceWidth / 2,
-                            y: centerY - faceHeight / 2,
-                            width: faceWidth,
-                            height: faceHeight,
-                            confidence: 0.7 + Math.random() * 0.3 // Random confidence between 0.7 and 1.0
-                        }];
-
-                        updateStatusIndicators('active', 'detected', isRecognizing ? 'processing' : 'inactive');
-                        drawFaceOverlays();
-                    } else {
-                        detectedFaces = [];
-                        updateStatusIndicators('active', 'detecting', isRecognizing ? 'processing' : 'inactive');
-                        clearFaceOverlays();
-                    }
-                }
-            }, 500); // Check for faces every 500ms
-        }
-
-        // Draw face detection overlays
-        function drawFaceOverlays() {
-            // Clear previous overlays
-            overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
-            // Draw face boxes for each detected face
-            detectedFaces.forEach(face => {
-                // Draw face box
-                overlayContext.strokeStyle = '#10B981'; // Emerald green
-                overlayContext.lineWidth = 3;
-                overlayContext.beginPath();
-                overlayContext.rect(face.x, face.y, face.width, face.height);
-                overlayContext.stroke();
-
-                // Draw confidence label
-                const confidencePercent = Math.round(face.confidence * 100);
-                overlayContext.fillStyle = 'rgba(16, 185, 129, 0.8)';
-                overlayContext.fillRect(face.x, face.y - 25, 120, 20);
-                overlayContext.fillStyle = 'white';
-                overlayContext.font = '12px Inter, sans-serif';
-                overlayContext.fillText(`Confidence: ${confidencePercent}%`, face.x + 5, face.y - 10);
-
-                // Draw corner accents
-                const cornerLength = 20;
-                overlayContext.strokeStyle = '#10B981';
-                overlayContext.lineWidth = 4;
-
-                // Top-left corner
-                overlayContext.beginPath();
-                overlayContext.moveTo(face.x, face.y + cornerLength);
-                overlayContext.lineTo(face.x, face.y);
-                overlayContext.lineTo(face.x + cornerLength, face.y);
-                overlayContext.stroke();
-
-                // Top-right corner
-                overlayContext.beginPath();
-                overlayContext.moveTo(face.x + face.width - cornerLength, face.y);
-                overlayContext.lineTo(face.x + face.width, face.y);
-                overlayContext.lineTo(face.x + face.width, face.y + cornerLength);
-                overlayContext.stroke();
-
-                // Bottom-right corner
-                overlayContext.beginPath();
-                overlayContext.moveTo(face.x + face.width, face.y + face.height - cornerLength);
-                overlayContext.lineTo(face.x + face.width, face.y + face.height);
-                overlayContext.lineTo(face.x + face.width - cornerLength, face.y + face.height);
-                overlayContext.stroke();
-
-                // Bottom-left corner
-                overlayContext.beginPath();
-                overlayContext.moveTo(face.x + cornerLength, face.y + face.height);
-                overlayContext.lineTo(face.x, face.y + face.height);
-                overlayContext.lineTo(face.x, face.y + face.height - cornerLength);
-                overlayContext.stroke();
-            });
-        }
-
-        // Clear face overlays
-        function clearFaceOverlays() {
-            overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-        }
 
         // Start face recognition
         function startRecognition() {
@@ -868,55 +677,6 @@
             {{--});--}}
         }
 
-        // Capture current frame
-        function captureFrame() {
-            if (!stream) {
-                showStatus('Error', 'Camera not initialized', 'fa-exclamation-triangle', true);
-                return;
-            }
-
-            // Draw current frame to canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // If faces are detected, draw overlays
-            if (detectedFaces.length > 0) {
-                detectedFaces.forEach(face => {
-                    context.strokeStyle = '#10B981';
-                    context.lineWidth = 3;
-                    context.strokeRect(face.x, face.y, face.width, face.height);
-                });
-            }
-
-            // Convert to image data URL
-            const imageData = canvas.toDataURL('image/jpeg');
-
-            // In a real app, you might want to save this image or send it to the server
-            showStatus('Captured', 'Frame captured successfully', 'fa-camera', true);
-
-            // For Laravel app, you could upload the captured image
-            /*
-            const formData = new FormData();
-            formData.append('image', dataURItoBlob(imageData));
-            formData.append('institute_id', instituteId);
-
-            {{--$.ajax({--}}
-            {{--    url: "{{ route('api.capture.save') }}",--}}
-            {{--    type: "POST",--}}
-            {{--    data: formData,--}}
-            {{--    processData: false,--}}
-            {{--    contentType: false,--}}
-            {{--    headers: {--}}
-            {{--        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
-            {{--    },--}}
-            {{--    success: function(response) {--}}
-            {{--        console.log('Frame saved:', response);--}}
-            {{--    },--}}
-            {{--    error: function(error) {--}}
-            {{--        console.error('Error saving frame:', error);--}}
-            {{--    }--}}
-            {{--});--}}
-            */
-        }
 
         // Helper function to convert data URI to Blob
         function dataURItoBlob(dataURI) {
@@ -941,12 +701,6 @@
         // Event listeners
         startBtn.addEventListener('click', startRecognition);
         stopBtn.addEventListener('click', stopRecognition);
-        captureBtn.addEventListener('click', captureFrame);
-        switchCameraBtn.addEventListener('click', switchCamera);
-        retryBtn.addEventListener('click', () => {
-            errorState.classList.add('hidden');
-            emptyState.classList.remove('hidden');
-        });
 
         // Initialize camera on page load
         initCamera();

@@ -8,6 +8,14 @@ yarn-error.log
 bootstrap/compiled.php
 app/storage/
 
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+*.egg-info/
+
 # Laravel 5 & Lumen specific
 public/storage
 public/hot
