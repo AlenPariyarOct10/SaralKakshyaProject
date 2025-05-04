@@ -371,8 +371,8 @@
         let faceDetectionTimer = null;
         let facingMode = 'user'; // 'user' for front camera, 'environment' for back camera
         let instituteId = '';
-        let hasFace = false;
-        let faceBox = null;
+        let hasFace = true;
+        let faceBox = true;
         let isAPIConnected = false;
 
         // Check API connection
@@ -538,54 +538,14 @@
             // Draw the current video frame to the hidden canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Here we would typically use face-api.js or another face detection library
-            // For this example, we'll simulate face detection
-            // In a real implementation, you would use a proper face detection library
-
             // Clear previous overlay
             overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-            // Simulate face detection result (roughly center of frame)
-            const randomOffset = Math.random() * 20 - 10; // Small random offset for realism
-
-            // 70% chance to detect a face when not recognizing
-            // If recognition is active, always show a face
-            const faceDetectionProbability = isRecognizing ? 0.95 : 0.7;
-            hasFace = Math.random() < faceDetectionProbability;
-
-            if (hasFace) {
-                const centerX = canvas.width / 2 + randomOffset;
-                const centerY = canvas.height / 2 + randomOffset;
-                const faceWidth = canvas.width * 0.2;
-                const faceHeight = canvas.height * 0.3;
-
-                faceBox = {
-                    x: centerX - faceWidth / 2,
-                    y: centerY - faceHeight / 2,
-                    width: faceWidth,
-                    height: faceHeight
-                };
-
-                // Draw face box
-                overlayContext.strokeStyle = '#10B981'; // Emerald green
-                overlayContext.lineWidth = 3;
-                overlayContext.beginPath();
-                overlayContext.rect(faceBox.x, faceBox.y, faceBox.width, faceBox.height);
-                overlayContext.stroke();
-
-                // Add face detected class for visual feedback
-                faceDetectionOverlay.innerHTML = `
-                    <div class="face-box face-detected absolute" style="
-                        left: ${faceBox.x}px;
-                        top: ${faceBox.y}px;
-                        width: ${faceBox.width}px;
-                        height: ${faceBox.height}px;
-                    "></div>
-                `;
-            } else {
-                faceBox = null;
-                faceDetectionOverlay.innerHTML = '';
-            }
+            // In a real implementation, you would use a proper face detection library here
+            // For this example, we'll just set hasFace to false since we removed the simulation
+            hasFace = true;
+            faceBox = true;
+            faceDetectionOverlay.innerHTML = '';
         }
 
         // Start face detection
@@ -601,6 +561,7 @@
 
         // Start face recognition
         function startRecognition() {
+            console.log("start");
             if (!stream) {
                 showStatus('Error', 'Camera not initialized', 'fa-exclamation-triangle');
                 return;
@@ -688,6 +649,7 @@
 
         // API call for face recognition
         function recognizeFace(imageData) {
+            console.log("hello");
             showStatus('Processing', 'Analyzing facial features...', 'fa-cog fa-spin');
 
             // Make API call to Flask backend
@@ -697,35 +659,60 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    image: imageData
+                    image: imageData,
+                    institute_id: instituteId,
                 })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Successful recognition
-                        console.log("success : ",data);
+                        console.log(data);
                         fetchStudentDetails(data.student_id, data.confidence);
                     } else {
-                        // Failed recognition
-                        console.log("error : ",data);
                         handleRecognitionFailure(data.message || 'No matching face found');
                     }
                 })
                 .catch(error => {
-                    console.error('Recognition API error:', error);
-                    handleRecognitionFailure('API Error: Could not process recognition request');
+                    handleRecognitionFailure('No matching face found');
                 });
         }
 
         // Fetch student details from the backend
-        function fetchStudentDetails(studentId, confidence) {
-            // In a real implementation, you would make an API call to get student details
-            // For this example, we'll simulate a response with mock data
-
-            // Simulate API call delay
-            setTimeout(() => {
+        async function fetchStudentDetails(studentId, confidence) {
                 // Mock student data - in a real implementation, this would come from your backend
+
+                await fetch("{{route('student.getInfo')}}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        id:studentId,
+                        institute_id: instituteId,
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log("recognized ", data.student);
+                            // fetchStudentDetails(data.student_id, data.confidence);
+
+                            handleRecognitionSuccess({
+                                success: true,
+                                person: data.student,
+                                confidence: confidence
+                            });
+                        } else {
+                            // handleRecognitionFailure(data.message || 'No matching face found');
+                            console.log("error", data);
+                        }
+                    })
+                    .catch(error => {
+                        handleRecognitionFailure('No matching face found');
+                        console.log("error", error);
+
+                    });
                 const studentData = {
                     id: studentId,
                     name: 'John Doe',
@@ -734,12 +721,7 @@
                     role: 'Student'
                 };
 
-                handleRecognitionSuccess({
-                    success: true,
-                    person: studentData,
-                    confidence: confidence
-                });
-            }, 1000);
+
         }
 
         // Handle successful recognition
@@ -752,8 +734,17 @@
             errorState.classList.add('hidden');
 
             // Update recognition result
-            recognizedName.textContent = response.person.name;
-            recognizedId.textContent = `${response.person.role} • ${response.person.student_id}`;
+            recognizedName.textContent = response.person.fname+" "+response.person.lname;
+            recognizedId.textContent = `Student • Roll : ${response.person.id} • ${response.person.institute.name}`
+            console.log(response.person.profile_picture);
+            if(response.person.profile_picture!=null) {
+                document.getElementById("personImage").src = "{{ asset('storage/profile_pictures') }}/" +response.person.profile_picture;
+                document.getElementById("personImage").classList.remove("hidden");
+                document.getElementById("personIcon").classList.add("hidden");
+            }else{
+                document.getElementById("personImage").classList.add("hidden");
+                document.getElementById("personIcon").classList.remove("hidden");
+            }
 
             // Update confidence bar
             const confidencePercent = Math.round(response.confidence * 100);
@@ -800,27 +791,26 @@
                 student_id: studentId,
                 institute_id: instituteId,
                 timestamp: new Date().toISOString(),
-                method: 'face_recognition'
             };
 
             // Send to your Laravel backend
-            {{--fetch('{{ route("api.attendance.log") }}', {--}}
-            {{--    method: 'POST',--}}
-            {{--    headers: {--}}
-            {{--        'Content-Type': 'application/json',--}}
-            {{--        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')--}}
-            {{--    },--}}
-            {{--    body: JSON.stringify(attendanceData)--}}
-            {{--})--}}
-            {{--    .then(response => response.json())--}}
-            {{--    .then(data => {--}}
-            {{--        console.log('Attendance logged:', data);--}}
-            {{--        // You could show a success message here if needed--}}
-            {{--    })--}}
-            {{--    .catch(error => {--}}
-            {{--        console.error('Error logging attendance:', error);--}}
-            {{--        // Handle error if needed--}}
-            {{--    });--}}
+            fetch('{{ route("api.attendance.log") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(attendanceData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Attendance logged:', data);
+                    // You could show a success message here if needed
+                })
+                .catch(error => {
+                    console.error('Error logging attendance:', error);
+                    // Handle error if needed
+                });
         }
 
         // Switch camera (front/back)

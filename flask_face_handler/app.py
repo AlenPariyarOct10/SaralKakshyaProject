@@ -11,7 +11,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-app.config['UPLOAD_FOLDER'] = 'face_data'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -80,9 +79,8 @@ def lbp_histogram(image):
     return hist.tolist()
 
 def euclidean_distance(hist1, hist2):
-    """
-    Calculate Euclidean distance between two histograms
-    """
+
+    #Calculate Euclidean distance between two histograms
     if hist1 is None or hist2 is None:
         return float('inf')
 
@@ -106,47 +104,130 @@ def register_face():
         if not student_id or not images or len(images) != 5:
             return jsonify({'error': 'Missing or invalid data'}), 400
 
-        student_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"student_{student_id}")
-        os.makedirs(student_folder, exist_ok=True)
-
         all_histograms = []
-        saved_paths = []
 
-        for idx, base64_img in enumerate(images):
-            img = decode_and_save_image(base64_img, None)
+        for base64_img in images:  # No need for `idx` or folder logic
+            img = decode_and_save_image(base64_img, None)  # Pass `None` for path
             if img is None:
-                return jsonify({'error': f'Failed to decode image {idx + 1}'}), 400
+                return jsonify({'error': 'Failed to decode image'}), 400
 
-            # Crop the face and compute the LBP histogram
             face_image = crop_face(img)
             if face_image is None:
-                return jsonify({'error': f'No face detected in image {idx + 1}'}), 400
+                return jsonify({'error': 'No face detected in image'}), 400
 
             hist = lbp_histogram(face_image)
             if hist is None:
-                return jsonify({'error': f'Failed to compute histogram for image {idx + 1}'}), 400
+                return jsonify({'error': 'Failed to compute histogram'}), 400
 
             all_histograms.append(hist)
 
-        # Calculate the average histogram
         avg_histogram = np.mean(all_histograms, axis=0).tolist()
 
-        # Save to database
-        try:
-            face_data = FaceData(student_id=student_id, histogram=json.dumps(avg_histogram))
-            db.session.add(face_data)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': f'Database error: {str(e)}'}), 500
+        # Save to database (unchanged)
+        face_data = FaceData(student_id=student_id, institute_id=institute_id, histogram=json.dumps(avg_histogram))
+        db.session.add(face_data)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Face registered successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+
+@app.route('/has-face', methods=['POST'])
+def face_exists():
+    try:
+        data = request.json
+        institute_id = data.get('institute_id')
+        student_id = data.get('student_id')
+
+        # Validate input parameters
+        if not institute_id or not student_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameters'
+            }), 400
+
+        # Check if the student exists in the database
+        face_data = FaceData.query.filter_by(
+            student_id=student_id,
+            institute_id=institute_id
+        ).first()
+
+        if face_data:
+            return jsonify({
+                'success': True,
+                'exists': True,
+                'message': 'Face data exists for this student',
+                'student_id': student_id,
+                'institute_id': institute_id
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'exists': False,
+                'message': 'No face data found for this student',
+                'student_id': student_id,
+                'institute_id': institute_id
+            }), 200
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Server error: {str(e)}'
+        })
+
+
+@app.route('/update-face', methods=['POST'])
+def update_face():
+    try:
+        data = request.json
+        student_id = data.get('student_id')
+        institute_id = data.get('institute_id')
+        images = data.get('images')
+
+        if not student_id or not images or len(images) != 5:
+            return jsonify({'error': 'Missing or invalid data'}), 400
+
+        # Check if student exists
+        existing_face = FaceData.query.filter_by(student_id=student_id).first()
+        if not existing_face:
+            return jsonify({'error': 'Student not found in database'}), 404
+
+        all_histograms = []
+
+        for base64_img in images:
+            img = decode_and_save_image(base64_img, None)
+            if img is None:
+                return jsonify({'error': 'Failed to decode image'}), 400
+
+            face_image = crop_face(img)
+            if face_image is None:
+                return jsonify({'error': 'No face detected in image'}), 400
+
+            hist = lbp_histogram(face_image)
+            if hist is None:
+                return jsonify({'error': 'Failed to compute histogram'}), 400
+
+            all_histograms.append(hist)
+
+        avg_histogram = np.mean(all_histograms, axis=0).tolist()
+
+        # Update existing record
+        existing_face.histogram = json.dumps(avg_histogram)
+        existing_face.institute_id = institute_id
+        existing_face.created_at = datetime.utcnow()
+
+        db.session.commit()
 
         return jsonify({
             'success': True,
-            'message': 'Face registered successfully',
-            'student_id': student_id
+            'message': 'Face data updated successfully',
+            'student_id': student_id,
+            'institute_id': institute_id
         }), 200
 
     except Exception as e:
+        db.session.rollback()
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 @app.route('/recognize-face', methods=['POST'])
@@ -154,9 +235,10 @@ def recognize_face():
     try:
         data = request.json
         image_base64 = data.get('image')
+        institute_id = data.get('institute_id')
 
-        if not image_base64:
-            return jsonify({'error': 'Missing image data'}), 400
+        if not image_base64 or not institute_id:
+            return jsonify({'error': 'Missing image data or institute_id'}), 400
 
         # Decode and process the image
         img = decode_and_save_image(image_base64, None)
@@ -173,8 +255,8 @@ def recognize_face():
         if input_hist is None:
             return jsonify({'error': 'Failed to compute histogram'}), 400
 
-        # Query the database for stored face data
-        stored_faces = FaceData.query.all()
+        # Query the database for stored face data within the same institute
+        stored_faces = FaceData.query.filter_by(institute_id=institute_id).all()
         min_distance = float('inf')
         matched_student_id = None
 
@@ -195,6 +277,7 @@ def recognize_face():
             return jsonify({
                 'success': True,
                 'student_id': matched_student_id,
+                'institute_id': institute_id,
                 'confidence': confidence,
                 'distance': float(min_distance)  # Convert numpy float to Python float
             }), 200
@@ -203,7 +286,7 @@ def recognize_face():
                 'success': False,
                 'message': 'No matching face found',
                 'distance': float(min_distance)  # Include distance for debugging
-            }), 404
+            }), 200
 
     except Exception as e:
         return jsonify({'error': f'Server error: {str(e)}'}), 500

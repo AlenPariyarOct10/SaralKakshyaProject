@@ -241,9 +241,14 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Face Recognition Setup</h1>
                 <p class="text-gray-600 dark:text-gray-400">Capture 5 photos of your face to enable attendance through facial recognition</p>
             </div>
-
+            <div class="overriding-warning bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-3 rounded relative"
+                 role="alert">
+                <strong class="font-bold">Alert !</strong>
+                <span class="block sm:inline">You have already configured face recognition setup. If you proceed existing setup will be overwritten.</span>
+            </div>
             <!-- Setup Progress -->
             <div class="card mb-8">
+
                 <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Setup Progress</h3>
                 <div class="relative">
                     <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200 dark:bg-gray-700">
@@ -386,7 +391,6 @@
                 </div>
             </div>
 
-            hello{{$user}}
 
 
             <!-- Step 4: Success -->
@@ -412,6 +416,7 @@
         let capturedPhotos = [];
         let currentPhotoIndex = 0;
         let processing = false;
+        let overriding = false;
 
         // DOM elements
         const step1 = document.getElementById('step1');
@@ -483,7 +488,46 @@
             }
         }
 
-        // Capture photo
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('http://127.0.0.1:5000/has-face', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    institute_id: '{{Auth::user()->institute_id}}',
+                    student_id: '{{Auth::user()->id}}'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        overriding = true;
+                    } else {
+                        overriding = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
+                });
+
+            const warnings = document.querySelectorAll('.overriding-warning');
+            warnings.forEach(warning => {
+                if (overriding == true) {
+                    warning.classList.add("hidden");
+                } else {
+                    warning.classList.remove("hidden");
+                }
+            });
+
+        });
+
+
+            // Capture photo
         function capturePhoto() {
             if (processing) return;
             if (capturedPhotos.length >= 5) {
@@ -514,7 +558,7 @@
                 // Simulate face detection (would be done on the server in a real app)
                 setTimeout(() => {
                     // 80% chance of successful face detection for demo purposes
-                    const faceDetected = Math.random() < 0.8;
+                    const faceDetected = true;
 
                     if (faceDetected) {
                         // Add to captured photos array
@@ -547,7 +591,7 @@
         // Update capture instructions based on current photo index
         function updateCaptureInstructions() {
             const instructions = [
-                'Position your face in the circle',
+                'Position your face in the center',
                 'Tilt your head slightly to the right',
                 'Tilt your head slightly to the left',
                 'Tilt your head slightly upward',
@@ -668,28 +712,56 @@
 
             // Actual form submission (commented out for demonstration)
 
-            fetch('{{ route("student.saveFacePhotos") }}', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success screen
-                        showStep(4);
-                        progressBar.style.width = '100%';
-                    } else {
-                        alert('Error: ' + data.message);
+            if(overriding==true)
+            {
+                fetch('{{ route("student.updateFacePhotos") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success screen
+                            showStep(4);
+                            progressBar.style.width = '100%';
+                        } else {
+                            alert('Error: ' + data.message);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                    }
+                    });
+            }else{
+                fetch('{{ route("student.saveFacePhotos") }}', {
+                    method: 'POST',
+                    body: formData
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success screen
+                            showStep(4);
+                            progressBar.style.width = '100%';
+                        } else {
+                            alert('Error: ' + data.message);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
+                    });
+            }
+
+
 
         }
 

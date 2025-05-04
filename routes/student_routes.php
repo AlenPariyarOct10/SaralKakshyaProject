@@ -7,6 +7,11 @@ use App\Http\Controllers\Backend\Student\ProfileController as StudentProfileCont
 use App\Http\Controllers\Backend\Student\AttendanceController as StudentAttendanceController;
 
 Route::group(['prefix' => 'student'], function () {
+
+    Route::POST('/attendance/getuser', [StudentAttendanceController::class, 'user_info_for_face_recognition'])->name('student.getInfo');
+    Route::POST('/attendance/register', [StudentAttendanceController::class, 'mark_attendance'])->name('student.face.mark');
+
+
     Route::middleware('guest:student')->group(function () {
         Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('student.login');
         Route::post('/login', [StudentAuthController::class, 'login'])->name('student.login');
@@ -21,5 +26,6 @@ Route::group(['prefix' => 'student'], function () {
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
         Route::get('/attendance/setup', [StudentAttendanceController::class, 'setup_index'])->name('student.attendance.setup.index');
         Route::post('/attendance/setup', [StudentAttendanceController::class, 'saveFacePhotos'])->name('student.saveFacePhotos');
+        Route::post('/attendance/setup/update', [StudentAttendanceController::class, 'updateFacePhotos'])->name('student.updateFacePhotos');
     });
 });
