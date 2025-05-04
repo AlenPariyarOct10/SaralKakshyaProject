@@ -26,4 +26,9 @@ class Notification extends Model
     {
         return $this->morphTo();
     }
+
+    public function seenStatuses()
+    {
+        return $this->morphMany(SeenStatus::class, 'seenable');
+    }
 }

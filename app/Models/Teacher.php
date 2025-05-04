@@ -58,4 +58,9 @@ class Teacher extends Authenticatable
             ->where('user_type', 'teacher');
     }
 
+    public function seenStatuses()
+    {
+        return $this->morphMany(SeenStatus::class, 'user');
+    }
+
 }
