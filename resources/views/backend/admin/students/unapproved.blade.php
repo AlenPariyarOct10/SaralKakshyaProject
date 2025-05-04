@@ -117,49 +117,62 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach($teachers as $teacher)
+                    @forelse($students as $student)
                         <tr>
                             <td class="table-cell">
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
-                                        <img class="h-10 w-10 rounded-full object-cover"
-                                             src="{{ $teacher->profile_picture ?? 'https://ui-avatars.com/api/?name='.urlencode($teacher->fname.' '.$teacher->lname) }}"
-                                             alt="{{ $teacher->fname }} {{ $teacher->lname }}">
+                                        <img src="{{
+                                                    $student->profile_picture
+                                                        ? asset('/storage/profile_pictures/'.$student->profile_picture)
+                                                        : 'https://ui-avatars.com/api/?name=' . urlencode($student->fname . ' ' . $student->lname) . '&background=random'
+                                                }}"
+
+                                             alt="{{ $student->fname }} {{ $student->lname }} Profile Picture"
+                                             class="w-10 h-10 rounded-full object-cover"
+                                        >
                                     </div>
                                     <div class="ml-4">
                                         <div class="font-medium text-gray-900 dark:text-white">
-                                            {{ $teacher->fname }} {{ $teacher->lname }}
+                                            {{ $student->fname }} {{ $student->lname }}
                                         </div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="table-cell">{{ $teacher->email }}</td>
+                            <td class="table-cell">{{ $student->email }}</td>
                             <td class="table-cell">
                                     <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                                        {{$teacher->created_at->diffForHumans()}}
+                                        {{$student->created_at->diffForHumans()}}
                                     </span>
                             </td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
                                     <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
-                                            data-id="{{ $teacher->id }}"
+                                            data-id="{{ $student->id }}"
                                             title="View Profile">
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    <form action="{{route('admin.teacher.approve', $teacher->id)}}" method="POST">
+                                    <form action="{{route('admin.student.approve', $student->id)}}" method="POST">
                                         @method("PUT")
                                         @csrf
-                                        <button class="approve-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
-                                                    data-id="{{ $teacher->id }}"
-                                                    title="Approve Teacher">
+                                        <button class="approve-student-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
+                                                    data-id="{{ $student->id }}"
+                                                    title="Approve Student">
                                                 <i class="fas fa-check-circle"></i>
                                         </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td class="table-cell">
+                              No Data Found
+                            </td>
+
+                        </tr>
+                    @endforelse
                     </tbody>
                 </table>
             </div>

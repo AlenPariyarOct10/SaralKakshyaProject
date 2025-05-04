@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Institute;
 use App\Models\Student;
 use App\Models\SystemSetting;
@@ -97,17 +98,37 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         // Log login activity
-        activity()
-            ->causedBy($student)
-            ->withProperties(['ip' => $request->ip()])
-            ->log('Student logged in');
+        ActivityLog::create([
+            'user_id'     => $student->id,
+            'user_type'   => 'student',
+            'action_type' => 'login',
+            'description' => 'Student logged in',
+            'model_type'  => get_class($student),
+            'model_id'    => $student->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
 
         return redirect()->intended(route('student.dashboard'));
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        ActivityLog::create([
+            'user_id'     => Auth::guard('student')->id(),
+            'user_type'   => 'student',
+            'action_type' => 'logout',
+            'description' => 'Student logged out',
+            'model_type'  => get_class(Auth::guard('student')->user()),
+            'model_id'    => Auth::guard('student')->id(),
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
         Auth::guard('student')->logout();
+
         return redirect()->route('student.login');
     }
 }
