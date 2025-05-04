@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Models\Institute;
 use App\Models\Student;
@@ -37,6 +38,18 @@ class AuthController extends Controller
             'lname' => $request->lname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        ActivityLog::create([
+            'user_id'     => $admin->id,
+            'user_type'   => 'admin',
+            'action_type' => 'register',
+            'description' => 'Admin registered an account',
+            'model_type'  => get_class($admin),
+            'model_id'    => $admin->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
         ]);
 
         if ($admin) {
@@ -88,17 +101,41 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
+        // Log registration activity
+        ActivityLog::create([
+            'user_id'     => $admin->id,
+            'user_type'   => 'student',
+            'action_type' => 'login',
+            'description' => 'Admin logged in',
+            'model_type'  => get_class($admin),
+            'model_id'    => $admin->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
         return back()->withErrors(['email' => 'Invalid credentials or institute'])->withInput();
     }
 
 
 
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::guard('admin')->logout(); // Logout the admin
+        // Log registration activity
+        ActivityLog::create([
+            'user_id'     => Auth::guard('admin')->id(),
+            'user_type'   => 'admin',
+            'action_type' => 'logout',
+            'description' => 'Admin logged out',
+            'model_type'  => get_class(Auth::guard('admin')->user()),
+            'model_id'    => Auth::guard('admin')->id(),
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
 
-
+        Auth::guard('admin')->logout();
         return redirect()->route('admin.login');
     }
 

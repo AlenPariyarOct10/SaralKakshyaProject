@@ -33,15 +33,33 @@ class AuthController extends Controller
             'password_confirmation' => 'required|string|min:6',
         ]);
 
+        // Create the student
         $student = Student::create([
-            'fname' => $request->fname,
-            'lname' => $request->lname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // Hashing the password
+            'fname'    => $request->fname,
+            'lname'    => $request->lname,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
         ]);
+
+        // Attach to institute
         $student->institutes()->attach($request->institute);
+
+        // Log registration activity
+        ActivityLog::create([
+            'user_id'     => $student->id,
+            'user_type'   => 'student',
+            'action_type' => 'register',
+            'description' => 'Student registered an account',
+            'model_type'  => get_class($student),
+            'model_id'    => $student->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
         return redirect()->route('student.login')->with('success', 'You have successfully registered.');
     }
+
     public function showLogin()
     {
         if (Auth::check()) {
