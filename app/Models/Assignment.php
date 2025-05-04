@@ -19,4 +19,9 @@ class Assignment extends Model
         return $this->belongsTo(Teacher::class);
     }
 
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notifiable');
+    }
+
 }

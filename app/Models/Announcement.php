@@ -18,5 +18,9 @@ class Announcement extends Model
     {
         return $this->belongsTo(Institute::class);
     }
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notifiable');
+    }
 
 }

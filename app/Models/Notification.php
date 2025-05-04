@@ -21,4 +21,9 @@ class Notification extends Model
 {
     protected $table = 'notifications';
     protected $fillable = ['title', 'creator_type', 'creator_id', 'url', 'visibility', 'scope_type', 'scope_id', 'subscope_type', 'subscope_id'];
+
+    public function notifiable()
+    {
+        return $this->morphTo();
+    }
 }
