@@ -14,6 +14,7 @@ use App\Http\Controllers\Backend\Admin\TestimonialController as AdminTestimonial
 use App\Http\Controllers\Backend\Admin\AcademicInstituteController as AdminAcademicInstituteController;
 use App\Http\Controllers\Backend\Admin\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Backend\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Backend\Admin\SubjectTeacherController as AdminSubjectTeacherController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -90,6 +91,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
         Route::POST('/teacher/status/{id}', [AdminTeacherController::class, "toggle_status"])->name('admin.teacher.status');
         Route::get('/teacher/download/excel', [AdminTeacherController::class, "generatePDF"])->name('admin.teacher.download.excel');
+
+        //SubjectTeacher
+        Route::get('/subject-teacher', [AdminSubjectTeacherController::class, "index"])->name('admin.subject-teacher.index');
+
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
         Route::get('/setting', [AdminProfileController::class, "index"])->name("admin.settings");

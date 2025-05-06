@@ -14,6 +14,10 @@
     {{$user->profile_picture}}
 @endsection
 
+@section("title")
+    Dashbaord
+@endsection
+
 @section('content')
     <main class="scrollable-content p-4 md:p-6">
 

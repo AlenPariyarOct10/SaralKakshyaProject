@@ -153,13 +153,21 @@ class AttendanceController extends Controller
         $student_id = $request->student_id;
         $institute_id = $request->institute_id;
         $timestamp = $request->timestamp;
-        protected $fillable = ['attendee_type', 'attendee_id', 'subject_id', 'date','attended_at', 'status', 'method', 'creator_type', 'creator_id', 'is_verified', 'remarks'];
 
         Attendance::create([
             "attendee_type"=>"student",
             "attendee_id" => $student_id,
-            "subject_id" =>
-        ])
+            "institute_id" => $institute_id,
+            "date" => now(),
+            "attended_at" => now(),
+            "subject_id" => null,
+            "status"=>"present",
+            "method"=>"face",
+            "creator_id"=>$student_id,
+            "creator_type"=>"student",
+            "is_verified"=>0,
+            "remarks"=>null,
+        ]);
     }
 
     /**

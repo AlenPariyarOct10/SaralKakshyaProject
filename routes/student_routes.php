@@ -9,7 +9,7 @@ use App\Http\Controllers\Backend\Student\AttendanceController as StudentAttendan
 Route::group(['prefix' => 'student'], function () {
 
     Route::POST('/attendance/getuser', [StudentAttendanceController::class, 'user_info_for_face_recognition'])->name('student.getInfo');
-    Route::POST('/attendance/register', [StudentAttendanceController::class, 'mark_attendance'])->name('student.face.mark');
+    Route::POST('/attendance/face/mark', [StudentAttendanceController::class, 'mark_attendance'])->name('student.face.mark');
 
 
     Route::middleware('guest:student')->group(function () {

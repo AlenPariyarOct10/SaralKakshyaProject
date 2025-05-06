@@ -794,7 +794,7 @@
             };
 
             // Send to your Laravel backend
-            fetch('{{ route("api.attendance.log") }}', {
+            fetch('{{ route("student.face.mark") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

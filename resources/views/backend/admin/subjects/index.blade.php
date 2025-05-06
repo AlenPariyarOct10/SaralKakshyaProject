@@ -86,6 +86,10 @@ $user = Auth::user();
     </style>
 @endpush
 
+@section("title")
+    Subjects
+@endsection
+
 @section('content')
     <main class="scrollable-content p-4 md:p-6">
 
@@ -115,13 +119,23 @@ $user = Auth::user();
                 </div>
             </div>
 
-            <!-- Add Subject Button -->
-            <div class="flex justify-end">
-                <a href="{{ route('admin.subjects.create') }}"
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
-                    <i class="fas fa-plus mr-2"></i> Add New Subject
-                </a>
+            <div class="flex">
+                <!-- Add Subject Button -->
+                <div class="flex justify-end mr-2">
+                    <a href="{{ route('admin.subject-teacher.index') }}"
+                       class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition shadow-sm">
+                        <i class="fa-regular fa-address-card mr-2"></i> Manage Subject-Teacher
+                    </a>
+                </div>
+                <!-- Add Subject Button -->
+                <div class="flex justify-end">
+                    <a href="{{ route('admin.subjects.create') }}"
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
+                        <i class="fas fa-plus mr-2"></i> Add New Subject
+                    </a>
+                </div>
             </div>
+
         </div>
 
         <!-- Programs Table -->

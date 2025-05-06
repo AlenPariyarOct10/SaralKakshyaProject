@@ -14,6 +14,10 @@
     {{$user->profile_picture}}
 @endsection
 
+@section("title")
+    Programs
+@endsection
+
 @push("styles")
     <script>
         tailwind.config = {

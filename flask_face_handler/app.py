@@ -75,7 +75,7 @@ def lbp_histogram(image):
             lbp[i - 1, j - 1] = binary
     hist, _ = np.histogram(lbp.ravel(), bins=256, range=(0, 256))
     hist = hist.astype("float")
-    hist /= (hist.sum() + 1e-7)  # normalize
+    hist /= (hist.sum() + 1e-7)
     return hist.tolist()
 
 def euclidean_distance(hist1, hist2):
@@ -114,6 +114,8 @@ def register_face():
             face_image = crop_face(img)
             if face_image is None:
                 return jsonify({'error': 'No face detected in image'}), 400
+
+            face_image  = resize_face(face_image)
 
             hist = lbp_histogram(face_image)
             if hist is None:
@@ -204,6 +206,8 @@ def update_face():
             if face_image is None:
                 return jsonify({'error': 'No face detected in image'}), 400
 
+            face_image  = resize_face(face_image)
+
             hist = lbp_histogram(face_image)
             if hist is None:
                 return jsonify({'error': 'Failed to compute histogram'}), 400
@@ -250,6 +254,8 @@ def recognize_face():
         if face_image is None:
             return jsonify({'error': 'No face detected in image'}), 400
 
+        face_image  = resize_face(face_image)
+
         # Compute the LBP histogram
         input_hist = lbp_histogram(face_image)
         if input_hist is None:
@@ -270,7 +276,7 @@ def recognize_face():
                 matched_student_id = face.student_id
 
         # Threshold for face recognition (adjust based on testing)
-        threshold = 0.3
+        threshold = 0.75
         if min_distance <= threshold and matched_student_id is not None:
             # Calculate confidence score (inverse relationship with distance)
             confidence = 1 - (min_distance / threshold)
@@ -290,6 +296,9 @@ def recognize_face():
 
     except Exception as e:
         return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+def resize_face(image, size=(100, 100)):
+    return cv2.resize(image, size, interpolation=cv2.INTER_AREA)
 
 if __name__ == '__main__':
     with app.app_context():
