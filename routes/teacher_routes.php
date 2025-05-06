@@ -29,6 +29,8 @@ Route::group(['prefix' => 'teacher'], function () {
 
         //Profile
         Route::get('/profile', [TeacherProfileController::class, "index"])->name('teacher.profile.index');
+        Route::PUT('/profile', [TeacherProfileController::class, "store"])->name('teacher.profile.update');
+        Route::get('/profile/show', [TeacherProfileController::class, "show"])->name('teacher.profile.show');
 
         //Setting
         Route::get('/setting', [TeacherSettingController::class, "index"])->name('teacher.setting.index');

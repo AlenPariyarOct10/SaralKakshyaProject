@@ -301,8 +301,8 @@
                             </select>
                         </div>
                         <div>
-                            <label for="programStatus" class="form-label">Status</label>
-                            <select id="programStatus" name="status" class="form-input" required>
+                            <label for="batchStatus" class="form-label">Status</label>
+                            <select id="batchStatus" name="status" class="form-input" required>
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
@@ -310,8 +310,8 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="batchProgram" class="form-label">Enter Batch Title</label>
-                            <input type="text" name="batch" id="batchProgram" class="form-input" placeholder="Batch Title" required="">
+                            <label for="batchTitle" class="form-label">Enter Batch Title</label>
+                            <input type="text" name="batch" id="batchTitle" class="form-input" placeholder="Batch Title" required="">
                         </div>
                         <div>
                             <label for="batchProgram" class="form-label">Insert Batch</label>
@@ -565,30 +565,50 @@
             });
         });
 
-
         $(document).ready(function () {
             $("#addBatchButton").click(function () {
-                // Get form data
                 let department = $("#batchDepartment").val();
                 let program = $("#batchProgram").val();
                 let semester = $("#batchSemester").val();
-                let status = $("#programStatus").val();
-                let batchTitle = $("#batchProgram").val();
+                let status = $("#batchStatus").val();
+                let batchTitle = $("#batchTitle").val(); // assuming this exists
 
-                // Validate if all required fields are selected/filled
-                if (department === "null" || program === "null" || semester === "null" || batchTitle.trim() === "") {
+                if (!department || !program || !semester || !batchTitle || !status) {
                     alert("Please fill in all required fields.");
                     return;
                 }
 
-                // Append batch details to the textarea
-                let batchInfo = `Department: ${department}, Program: ${program}, Semester: ${semester}, Status: ${status}, Title: ${batchTitle}`;
-                $("#allBatches").val(function (index, currentValue) {
-                    return currentValue ? currentValue + "\n" + batchInfo : batchInfo;
-                });
+                $.ajax({
+                    url: "{{ route('admin.program.batch') }}",
+                    type: "POST",
+                    data: {
+                        department_id: department,
+                        program_id: program,
+                        semester: semester,
+                        batch: batchTitle,
+                        status: status,
+                        _token: '{{ csrf_token() }}' // Laravel CSRF token
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Bacth added succesfully',
+                            });
 
-                // Optionally, reset batch title input after adding
-                $("#batchProgram").val("");
+                            // Optionally reset fields
+                            $("#batchTitle").val("");
+                        } else {
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Failed to add batch',
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        alert("An error occurred: " + xhr.responseText);
+                    }
+                });
             });
         });
 

@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -51,6 +52,7 @@ class AuthController extends Controller
                 ->exists();
 
             if ($isApproved) {
+                session(["institute_id" => $instituteId]);
                 return redirect()->intended(route('teacher.dashboard'));
             } else {
                 Auth::guard('teacher')->logout();
@@ -92,6 +94,7 @@ class AuthController extends Controller
     // Handle logout functionality
     public function logout()
     {
+        Session::forget('institute_id');
         Auth::guard('teacher')->logout(); // Logout the teacher
         return redirect()->route('teacher.login');
     }

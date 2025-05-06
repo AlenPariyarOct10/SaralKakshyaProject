@@ -15,6 +15,7 @@ use App\Http\Controllers\Backend\Admin\AcademicInstituteController as AdminAcade
 use App\Http\Controllers\Backend\Admin\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Backend\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Backend\Admin\SubjectTeacherController as AdminSubjectTeacherController;
+use App\Http\Controllers\Backend\Admin\BatchController as AdminBatchController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -62,6 +63,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/department/get_program_semesters', [AdminProgramController::class, 'get_program_semesters'])->name('admin.department.get_program_semesters');
         Route::get('/programs/{id}/semesters', [AdminProgramController::class, 'getSemesters']);
         Route::get('/programs/{id}/subjects', [AdminProgramController::class, 'getSubjects']);
+
+        //Program Bacth Controller
+        Route::POST('/program/batch', [AdminBatchController::class, 'store'])->name('admin.program.batch');
+
         //Testimonial
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
         Route::post('/testimonial', [AdminTestimonialController::class, "store"])->name('admin.testimonial.store');
@@ -94,6 +99,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         //SubjectTeacher
         Route::get('/subject-teacher', [AdminSubjectTeacherController::class, "index"])->name('admin.subject-teacher.index');
+
 
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");

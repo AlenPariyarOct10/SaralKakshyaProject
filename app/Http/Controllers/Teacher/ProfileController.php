@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -12,7 +15,12 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //
+
+        $teacher = Teacher::where('id', Auth::user()->id)->first();
+        $institute = Institute::where('id', session("institute_id"))->first();
+
+
+        return view('backend.teacher.profile.index', compact('teacher', 'institute'));
     }
 
     /**

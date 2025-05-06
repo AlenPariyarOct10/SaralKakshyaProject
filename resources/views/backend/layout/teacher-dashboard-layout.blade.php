@@ -290,6 +290,7 @@
             notificationDropdown.classList.add('hidden');
             profileDropdown.classList.add('hidden');
         });
-    </script>
+    </script>\
+    @yield("scripts")
     </body>
 </html>

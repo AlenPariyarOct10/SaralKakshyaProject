@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute;
+use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubjectTeacherController extends Controller
 {
@@ -12,7 +15,8 @@ class SubjectTeacherController extends Controller
      */
     public function index()
     {
-        //
+        $allSubjects = Subject::where('created_by', Auth::id())->get();
+        return view("backend.admin.subjectteacher.index", compact('allSubjects'));
     }
 
     /**
