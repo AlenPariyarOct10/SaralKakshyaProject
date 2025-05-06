@@ -60,6 +60,7 @@
             }
         }
     </style>
+    @stack("styles")
 </head>
 @section("content")
     <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
@@ -125,7 +126,7 @@
                                 class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
                     </div>
 
                     <div class="flex items-center space-x-4">

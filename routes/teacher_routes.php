@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\Teacher\AssignmentController as TeacherAssignme
 use App\Http\Controllers\Teacher\AnnouncementController as TeacherAnnouncementController;
 use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\SettingController as TeacherSettingController;
+use App\Http\Controllers\Backend\Teacher\PersonalRoutineController as TeacherPersonalRoutineController;
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::middleware('guest:teacher')->group(function () {
@@ -31,6 +32,7 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/profile', [TeacherProfileController::class, "index"])->name('teacher.profile.index');
         Route::PUT('/profile', [TeacherProfileController::class, "store"])->name('teacher.profile.update');
         Route::get('/profile/show', [TeacherProfileController::class, "show"])->name('teacher.profile.show');
+        Route::get('/profile/routine', [TeacherPersonalRoutineController::class, "index"])->name('teacher.profile.routine.show');
 
         //Setting
         Route::get('/setting', [TeacherSettingController::class, "index"])->name('teacher.setting.index');
