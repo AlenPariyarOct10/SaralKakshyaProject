@@ -123,7 +123,7 @@
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
                                         <img class="h-10 w-10 rounded-full object-cover"
-                                             src="{{ $teacher->profile_picture ?? 'https://ui-avatars.com/api/?name='.urlencode($teacher->fname.' '.$teacher->lname) }}"
+                                             src="{{ ($teacher->profile_picture) ? asset('storage/' . $teacher->profile_picture) : 'https://ui-avatars.com/api/?name='.urlencode($teacher->fname.' '.$teacher->lname) }}"
                                              alt="{{ $teacher->fname }} {{ $teacher->lname }}">
                                     </div>
                                     <div class="ml-4">

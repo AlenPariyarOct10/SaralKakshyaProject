@@ -11,6 +11,7 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">My Attendance</h1>
                 <div class="mt-4 md:mt-0">
                     <a href="{{route('student.attendance.setup.index')}}" class="cursor-pointer px-3 py-2 mr-2 rounded-md bg-primary-500 text-white hover:bg-primary-600">
+
                         Setup Attendance
                     </a>
                     <select id="periodSelector" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary-500">

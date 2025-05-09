@@ -55,6 +55,22 @@
 
 @section('content')
     <main class="scrollable-content p-4 md:p-6">
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success !</strong>
+                <span class="block sm:inline">{{session('success')}}</span>
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Whoops!</strong>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="mb-6">
             <a href="{{ route('admin.announcement.index') }}" class="flex items-center text-primary-600 hover:text-primary-800">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Announcements
@@ -271,18 +287,20 @@
                             <i class="fas fa-trash mr-2"></i> Delete
                         </button>
                     </form>
-                    @if(!$announcement->is_pinned)
+                    @if(!$announcement->pinned)
                         <form action="{{ route('admin.announcement.pin', $announcement->id) }}" method="POST">
+                            @method("PUT")
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-                                <i class="fas fa-thumbtack mr-2"></i> Pin
+                                <i class="fas fa-thumbtack mr-2"></i> Unpin
                             </button>
                         </form>
                     @else
-                        <form action="{{ route('admin.announcement.unpin', $announcement->id) }}" method="POST">
+                        <form action="{{ route('admin.announcement.pin', $announcement->id) }}" method="POST">
+                            @method("PUT")
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-                                <i class="fas fa-thumbtack-slash mr-2"></i> Unpin
+                                <i class="fas fa-thumbtack mr-2"></i> Pin
                             </button>
                         </form>
                     @endif

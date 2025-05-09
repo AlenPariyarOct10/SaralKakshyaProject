@@ -7,16 +7,35 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy.exc import SQLAlchemyError
+import logging
+from werkzeug.utils import secure_filename
 
+# Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db'
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'face_images'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
+
+# Create directories if they don't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Initialize database
 db = SQLAlchemy(app)
 
 # Load Haar Cascade for face detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+if face_cascade.empty():
+    logger.error("Failed to load Haar Cascade classifier")
+    exit(1)
 
 # ---------- DATABASE MODELS ----------
 class FaceData(db.Model):
@@ -25,72 +44,156 @@ class FaceData(db.Model):
     institute_id = db.Column(db.Integer, nullable=False)
     histogram = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    image_path = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<FaceData {self.student_id}>'
 
 # ---------- UTILITY FUNCTIONS ----------
-def decode_and_save_image(base64_str, path):
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+def save_image_file(image, student_id, prefix=""):
     try:
-        # Remove data:image/jpeg;base64, if present
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{prefix}_{student_id}_{timestamp}.jpg"
+        filename = secure_filename(filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        cv2.imwrite(filepath, image)
+        return filepath
+    except Exception as e:
+        logger.error(f"Error saving image: {str(e)}")
+        return None
+
+def decode_and_process_image(base64_str, student_id=None, purpose="register"):
+    try:
         if ',' in base64_str:
             base64_str = base64_str.split(',')[1]
 
         img_data = base64.b64decode(base64_str)
         np_arr = np.frombuffer(img_data, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        return img
-    except Exception as e:
-        print(f"Error decoding image: {str(e)}")
-        return None
+        color_img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-def crop_face(image):
+        # Save the original color image
+        img_path = save_image_file(color_img, student_id, purpose) if student_id else None
+
+        # Convert to grayscale for processing
+        gray_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
+        return gray_img, img_path
+    except Exception as e:
+        logger.error(f"Error decoding image: {str(e)}")
+        return None, None
+
+def detect_and_crop_face(image):
     if image is None:
         return None
 
-    # Detect faces in the image
-    faces = face_cascade.detectMultiScale(image, scaleFactor=1.1, minNeighbors=5)
-    if len(faces) > 0:
-        # Take the first detected face
-        (x, y, w, h) = faces[0]
-        return image[y:y + h, x:x + w]  # Crop the face
-    return None  # Return None if no face is detected
+    # Enhanced face detection parameters
+    faces = face_cascade.detectMultiScale(
+        image,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(50, 50),
+        flags=cv2.CASCADE_SCALE_IMAGE
+    )
 
-def lbp_histogram(image):
+    if len(faces) > 0:
+        (x, y, w, h) = faces[0]
+        # Add padding around the detected face
+        padding = int(w * 0.2)
+        x = max(0, x - padding)
+        y = max(0, y - padding)
+        w = min(image.shape[1] - x, w + 2*padding)
+        h = min(image.shape[0] - y, h + 2*padding)
+        return image[y:y + h, x:x + w]
+    return None
+
+def preprocess_face(image, target_size=(100, 100)):
+    try:
+        # Apply histogram equalization for better contrast
+        eq_img = cv2.equalizeHist(image)
+        # Resize with anti-aliasing
+        resized = cv2.resize(eq_img, target_size, interpolation=cv2.INTER_AREA)
+        # Apply Gaussian blur to reduce noise
+        blurred = cv2.GaussianBlur(resized, (3, 3), 0)
+        return blurred
+    except Exception as e:
+        logger.error(f"Error preprocessing face: {str(e)}")
+        return None
+
+def compute_lbp_features(image, grid_size=(8, 8)):
     if image is None:
         return None
 
     h, w = image.shape
-    lbp = np.zeros((h - 2, w - 2), dtype=np.uint8)
-    for i in range(1, h - 1):
-        for j in range(1, w - 1):
-            center = image[i, j]
-            binary = (
-                (image[i - 1, j - 1] > center) << 7 |
-                (image[i - 1, j] > center) << 6 |
-                (image[i - 1, j + 1] > center) << 5 |
-                (image[i, j + 1] > center) << 4 |
-                (image[i + 1, j + 1] > center) << 3 |
-                (image[i + 1, j] > center) << 2 |
-                (image[i + 1, j - 1] > center) << 1 |
-                (image[i, j - 1] > center) << 0
-            )
-            lbp[i - 1, j - 1] = binary
-    hist, _ = np.histogram(lbp.ravel(), bins=256, range=(0, 256))
-    hist = hist.astype("float")
-    hist /= (hist.sum() + 1e-7)
-    return hist.tolist()
+    gh, gw = grid_size
+    bh, bw = h // gh, w // gw
 
-def euclidean_distance(hist1, hist2):
+    if bh == 0 or bw == 0:
+        logger.warning(f"Image too small for grid size {grid_size}")
+        return None
 
-    #Calculate Euclidean distance between two histograms
+    histograms = []
+
+    for i in range(gh):
+        for j in range(gw):
+            # Handle edge blocks
+            y_start = i * bh
+            y_end = (i + 1) * bh if i < gh - 1 else h
+            x_start = j * bw
+            x_end = (j + 1) * bw if j < gw - 1 else w
+
+            block = image[y_start:y_end, x_start:x_end]
+
+            # Skip blocks that are too small for LBP
+            if block.shape[0] < 3 or block.shape[1] < 3:
+                continue
+
+            # Compute LBP for the block
+            lbp_block = np.zeros((block.shape[0] - 2, block.shape[1] - 2), dtype=np.uint8)
+            for y in range(1, block.shape[0] - 1):
+                for x in range(1, block.shape[1] - 1):
+                    center = block[y, x]
+                    code = 0
+                    code |= (block[y-1, x-1] > center) << 7
+                    code |= (block[y-1, x] > center) << 6
+                    code |= (block[y-1, x+1] > center) << 5
+                    code |= (block[y, x+1] > center) << 4
+                    code |= (block[y+1, x+1] > center) << 3
+                    code |= (block[y+1, x] > center) << 2
+                    code |= (block[y+1, x-1] > center) << 1
+                    code |= (block[y, x-1] > center) << 0
+                    lbp_block[y-1, x-1] = code
+
+            # Compute histogram for the block
+            hist, _ = np.histogram(lbp_block.ravel(), bins=256, range=(0, 256))
+            hist = hist.astype("float")
+            hist /= (hist.sum() + 1e-7)  # Normalize
+            histograms.extend(hist.tolist())
+
+    return histograms if histograms else None
+
+def calculate_similarity(hist1, hist2):
     if hist1 is None or hist2 is None:
         return float('inf')
 
-    # Convert to numpy arrays for efficient computation
+    # Convert to numpy arrays
     h1 = np.array(hist1)
     h2 = np.array(hist2)
 
+    # Handle different length histograms
+    min_len = min(len(h1), len(h2))
+
     # Calculate Euclidean distance
-    distance = np.sqrt(np.sum((h1 - h2) ** 2))
-    return distance
+    return np.sqrt(np.sum((h1[:min_len] - h2[:min_len]) ** 2))
+
+def validate_ids(student_id, institute_id):
+    try:
+        student_id = int(student_id)
+        institute_id = int(institute_id)
+        return student_id > 0 and institute_id > 0
+    except (ValueError, TypeError):
+        return False
 
 # ---------- FLASK ROUTES ----------
 @app.route('/register-face', methods=['POST'])
@@ -101,83 +204,66 @@ def register_face():
         institute_id = data.get('institute_id')
         images = data.get('images')
 
-        if not student_id or not images or len(images) != 5:
-            return jsonify({'error': 'Missing or invalid data'}), 400
+        # Validate input
+        if not validate_ids(student_id, institute_id):
+            return jsonify({'success': False, 'error': 'Invalid student or institute ID'}), 400
 
-        all_histograms = []
+        if not images or len(images) < 1:
+            return jsonify({'success': False, 'error': 'At least one image is required'}), 400
 
-        for base64_img in images:  # No need for `idx` or folder logic
-            img = decode_and_save_image(base64_img, None)  # Pass `None` for path
-            if img is None:
-                return jsonify({'error': 'Failed to decode image'}), 400
+        # Check if face already exists
+        existing_face = FaceData.query.filter_by(student_id=student_id).first()
+        if existing_face:
+            return jsonify({
+                'success': False,
+                'error': 'Face data already exists for this student',
+                'exists': True
+            }), 409
 
-            face_image = crop_face(img)
-            if face_image is None:
-                return jsonify({'error': 'No face detected in image'}), 400
+        # Process the first image
+        base64_img = images[0]
+        gray_img, img_path = decode_and_process_image(base64_img, student_id, "reg")
+        if gray_img is None:
+            return jsonify({'success': False, 'error': 'Failed to decode image'}), 400
 
-            face_image  = resize_face(face_image)
+        # Detect and crop face
+        face_image = detect_and_crop_face(gray_img)
+        if face_image is None:
+            return jsonify({'success': False, 'error': 'No face detected in image'}), 400
 
-            hist = lbp_histogram(face_image)
-            if hist is None:
-                return jsonify({'error': 'Failed to compute histogram'}), 400
+        # Preprocess and extract features
+        processed_face = preprocess_face(face_image)
+        if processed_face is None:
+            return jsonify({'success': False, 'error': 'Face preprocessing failed'}), 400
 
-            all_histograms.append(hist)
+        hist = compute_lbp_features(processed_face)
+        if hist is None:
+            return jsonify({'success': False, 'error': 'Feature extraction failed'}), 400
 
-        avg_histogram = np.mean(all_histograms, axis=0).tolist()
+        # Store in database
+        face_data = FaceData(
+            student_id=student_id,
+            institute_id=institute_id,
+            histogram=json.dumps(hist),
+            image_path=img_path
+        )
 
-        # Save to database (unchanged)
-        face_data = FaceData(student_id=student_id, institute_id=institute_id, histogram=json.dumps(avg_histogram))
         db.session.add(face_data)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'Face registered successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
-
-
-@app.route('/has-face', methods=['POST'])
-def face_exists():
-    try:
-        data = request.json
-        institute_id = data.get('institute_id')
-        student_id = data.get('student_id')
-
-        # Validate input parameters
-        if not institute_id or not student_id:
-            return jsonify({
-                'success': False,
-                'error': 'Missing required parameters'
-            }), 400
-
-        # Check if the student exists in the database
-        face_data = FaceData.query.filter_by(
-            student_id=student_id,
-            institute_id=institute_id
-        ).first()
-
-        if face_data:
-            return jsonify({
-                'success': True,
-                'exists': True,
-                'message': 'Face data exists for this student',
-                'student_id': student_id,
-                'institute_id': institute_id
-            }), 200
-        else:
-            return jsonify({
-                'success': True,
-                'exists': False,
-                'message': 'No face data found for this student',
-                'student_id': student_id,
-                'institute_id': institute_id
-            }), 200
-
-    except Exception as e:
         return jsonify({
-            'success': False,
-            'error': f'Server error: {str(e)}'
-        })
+            'success': True,
+            'message': 'Face registered successfully',
+            'image_path': img_path
+        }), 200
 
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Database operation failed'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @app.route('/update-face', methods=['POST'])
 def update_face():
@@ -187,38 +273,45 @@ def update_face():
         institute_id = data.get('institute_id')
         images = data.get('images')
 
-        if not student_id or not images or len(images) != 5:
-            return jsonify({'error': 'Missing or invalid data'}), 400
+        # Validate input
+        if not validate_ids(student_id, institute_id):
+            return jsonify({'success': False, 'error': 'Invalid student or institute ID'}), 400
 
-        # Check if student exists
+        if not images or len(images) < 1:
+            return jsonify({'success': False, 'error': 'At least one image is required'}), 400
+
+        # Check if face exists
         existing_face = FaceData.query.filter_by(student_id=student_id).first()
         if not existing_face:
-            return jsonify({'error': 'Student not found in database'}), 404
+            return jsonify({
+                'success': False,
+                'error': 'Student not found in database'
+            }), 404
 
-        all_histograms = []
+        # Process the first image
+        base64_img = images[0]
+        gray_img, img_path = decode_and_process_image(base64_img, student_id, "upd")
+        if gray_img is None:
+            return jsonify({'success': False, 'error': 'Failed to decode image'}), 400
 
-        for base64_img in images:
-            img = decode_and_save_image(base64_img, None)
-            if img is None:
-                return jsonify({'error': 'Failed to decode image'}), 400
+        # Detect and crop face
+        face_image = detect_and_crop_face(gray_img)
+        if face_image is None:
+            return jsonify({'success': False, 'error': 'No face detected in image'}), 400
 
-            face_image = crop_face(img)
-            if face_image is None:
-                return jsonify({'error': 'No face detected in image'}), 400
+        # Preprocess and extract features
+        processed_face = preprocess_face(face_image)
+        if processed_face is None:
+            return jsonify({'success': False, 'error': 'Face preprocessing failed'}), 400
 
-            face_image  = resize_face(face_image)
+        hist = compute_lbp_features(processed_face)
+        if hist is None:
+            return jsonify({'success': False, 'error': 'Feature extraction failed'}), 400
 
-            hist = lbp_histogram(face_image)
-            if hist is None:
-                return jsonify({'error': 'Failed to compute histogram'}), 400
-
-            all_histograms.append(hist)
-
-        avg_histogram = np.mean(all_histograms, axis=0).tolist()
-
-        # Update existing record
-        existing_face.histogram = json.dumps(avg_histogram)
+        # Update database record
+        existing_face.histogram = json.dumps(hist)
         existing_face.institute_id = institute_id
+        existing_face.image_path = img_path if img_path else existing_face.image_path
         existing_face.created_at = datetime.utcnow()
 
         db.session.commit()
@@ -226,13 +319,43 @@ def update_face():
         return jsonify({
             'success': True,
             'message': 'Face data updated successfully',
-            'student_id': student_id,
-            'institute_id': institute_id
+            'image_path': existing_face.image_path
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Database operation failed'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/has-face', methods=['POST'])
+def face_exists():
+    try:
+        data = request.json
+        student_id = data.get('student_id')
+        institute_id = data.get('institute_id')
+
+        # Validate input
+        if not validate_ids(student_id, institute_id):
+            return jsonify({'success': False, 'error': 'Invalid student or institute ID'}), 400
+
+        # Check database
+        face_data = FaceData.query.filter_by(
+            student_id=student_id,
+            institute_id=institute_id
+        ).first()
+
+        return jsonify({
+            'success': True,
+            'exists': bool(face_data),
+            'has_image': bool(face_data and face_data.image_path)
         }), 200
 
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
+        logger.error(f"Error checking face existence: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @app.route('/recognize-face', methods=['POST'])
 def recognize_face():
@@ -241,64 +364,90 @@ def recognize_face():
         image_base64 = data.get('image')
         institute_id = data.get('institute_id')
 
-        if not image_base64 or not institute_id:
-            return jsonify({'error': 'Missing image data or institute_id'}), 400
+        # Validate input
+        if not image_base64:
+            return jsonify({'success': False, 'error': 'Missing image data'}), 400
 
-        # Decode and process the image
-        img = decode_and_save_image(image_base64, None)
-        if img is None:
-            return jsonify({'error': 'Failed to decode image'}), 400
+        if not institute_id or not str(institute_id).isdigit():
+            return jsonify({'success': False, 'error': 'Invalid institute ID'}), 400
 
-        # Crop the face
-        face_image = crop_face(img)
+        institute_id = int(institute_id)
+
+        # Process input image
+        gray_img, _ = decode_and_process_image(image_base64, purpose="recognition")
+        if gray_img is None:
+            return jsonify({'success': False, 'error': 'Failed to decode image'}), 400
+
+        # Detect and crop face
+        face_image = detect_and_crop_face(gray_img)
         if face_image is None:
-            return jsonify({'error': 'No face detected in image'}), 400
+            return jsonify({'success': False, 'error': 'No face detected in image'}), 400
 
-        face_image  = resize_face(face_image)
+        # Preprocess and extract features
+        processed_face = preprocess_face(face_image)
+        if processed_face is None:
+            return jsonify({'success': False, 'error': 'Face preprocessing failed'}), 400
 
-        # Compute the LBP histogram
-        input_hist = lbp_histogram(face_image)
+        input_hist = compute_lbp_features(processed_face)
         if input_hist is None:
-            return jsonify({'error': 'Failed to compute histogram'}), 400
+            return jsonify({'success': False, 'error': 'Feature extraction failed'}), 400
 
-        # Query the database for stored face data within the same institute
+        # Get all faces from the institute
         stored_faces = FaceData.query.filter_by(institute_id=institute_id).all()
+        if not stored_faces:
+            return jsonify({
+                'success': False,
+                'error': 'No face data available for this institute'
+            }), 404
+
+        # Find the best match
         min_distance = float('inf')
         matched_student_id = None
+        matched_face = None
 
-        # Compare with stored histograms using Euclidean distance
         for face in stored_faces:
-            stored_hist = json.loads(face.histogram)
-            distance = euclidean_distance(input_hist, stored_hist)
+            try:
+                stored_hist = json.loads(face.histogram)
+                distance = calculate_similarity(input_hist, stored_hist)
 
-            if distance < min_distance:
-                min_distance = distance
-                matched_student_id = face.student_id
+                logger.debug(f"Comparing with student {face.student_id}: distance={distance:.4f}")
 
-        # Threshold for face recognition (adjust based on testing)
-        threshold = 0.75
+                if distance < min_distance:
+                    min_distance = distance
+                    matched_student_id = face.student_id
+                    matched_face = face
+            except json.JSONDecodeError:
+                logger.warning(f"Invalid histogram data for student {face.student_id}")
+                continue
+
+        # Recognition threshold (adjust based on your testing)
+        threshold = 2
+
         if min_distance <= threshold and matched_student_id is not None:
-            # Calculate confidence score (inverse relationship with distance)
-            confidence = 1 - (min_distance / threshold)
+            # Calculate confidence (0-1 scale)
+            confidence = min(1.0, max(0.0, 1 - (min_distance / threshold)))
+
+            logger.info(f"Face recognized: student_id={matched_student_id}, confidence={confidence:.2f}, distance={min_distance:.4f}")
+
             return jsonify({
                 'success': True,
                 'student_id': matched_student_id,
-                'institute_id': institute_id,
-                'confidence': confidence,
-                'distance': float(min_distance)  # Convert numpy float to Python float
+                'confidence': round(confidence, 2),
+                'distance': round(min_distance, 4),
+                'image_path': matched_face.image_path if matched_face else None
             }), 200
         else:
+            logger.info(f"No match found. Closest distance: {min_distance:.4f} (threshold: {threshold})")
             return jsonify({
                 'success': False,
                 'message': 'No matching face found',
-                'distance': float(min_distance)  # Include distance for debugging
+                'closest_distance': round(min_distance, 4),
+                'threshold': threshold
             }), 200
 
     except Exception as e:
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
-
-def resize_face(image, size=(100, 100)):
-    return cv2.resize(image, size, interpolation=cv2.INTER_AREA)
+        logger.error(f"Recognition error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

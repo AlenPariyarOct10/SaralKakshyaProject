@@ -259,7 +259,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150">
                         <td class="table-cell">
                             <div class="flex items-center">
-                                <img class="student-avatar mr-3" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student">
+                                <img class="student-avatar mr-3" src={{$student->profile_picture?asset("/storage/$student->profile_picture"):"https://randomuser.me/api/portraits/men/32.jpg"}} alt="Student">
                                 <div>
                                     <div class="font-medium text-gray-800 dark:text-white">{{$student->fname." ".$student->lname}}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ucfirst($student->gender)}}</div>

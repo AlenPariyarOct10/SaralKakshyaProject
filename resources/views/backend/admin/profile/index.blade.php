@@ -71,6 +71,9 @@
             .content-wrapper {
                 @apply h-[calc(100vh-64px)] overflow-y-auto;
             }
+            .error-message {
+                @apply text-red-500 text-xs mt-1;
+            }
         }
     </style>
 @endpush
@@ -88,17 +91,27 @@
             <div class="lg:col-span-2">
                 <div class="card p-6">
                     <h2 class="section-title">Profile Information</h2>
-                    <form id="profileForm" class="space-y-6">
+                    <form id="profileForm" class="space-y-6" action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
                         <!-- Profile Picture -->
                         <div class="flex items-center space-x-6">
-                            <div class="shrink-0">
-                                <img class="h-16 w-16 object-cover rounded-full"
-                                     src="{{ asset($user->profile_picture) ?? 'https://ui-avatars.com/api/?name='.urlencode($user->fname.' '.$user->lname) }}"
+                            <div class="shrink-0 relative">
+                                <img id="profileImagePreview" class="h-16 w-16 object-cover rounded-full"
+                                     src="{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=random' }}"
                                      alt="Profile picture">
+                                <div id="uploadSpinner" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full hidden">
+                                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </div>
                             </div>
                             <label class="block">
-                                <span class="btn-secondary">Change Photo</span>
-                                <input type="file" class="hidden" accept="image/*">
+                                <span class="btn-secondary cursor-pointer">Change Photo</span>
+                                <input type="file" id="profileImage" name="profile_picture" class="hidden" accept="image/*">
+                                <div id="profileImageError" class="error-message"></div>
                             </label>
                         </div>
 
@@ -106,11 +119,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="form-label" for="fname">First Name</label>
-                                <input type="text" id="fname" name="fname" class="form-input" value="{{ $user->fname }}" required>
+                                <input type="text" id="fname" name="fname" class="form-input" value="{{ old('fname', $user->fname) }}" required>
+                                <div id="fnameError" class="error-message"></div>
                             </div>
                             <div>
                                 <label class="form-label" for="lname">Last Name</label>
-                                <input type="text" id="lname" name="lname" class="form-input" value="{{ $user->lname }}" required>
+                                <input type="text" id="lname" name="lname" class="form-input" value="{{ old('lname', $user->lname) }}" required>
+                                <div id="lnameError" class="error-message"></div>
                             </div>
                         </div>
 
@@ -118,26 +133,36 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="form-label" for="email">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-input" value="{{ $user->email }}" required>
+                                <input type="email" id="email" name="email" class="form-input" value="{{ old('email', $user->email) }}" required>
+                                <div id="emailError" class="error-message"></div>
                             </div>
                             <div>
                                 <label class="form-label" for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" class="form-input" value="{{ $user->phone }}" required>
+                                <input type="tel" id="phone" name="phone" class="form-input" value="{{ old('phone', $user->phone) }}" required>
+                                <div id="phoneError" class="error-message"></div>
                             </div>
                         </div>
 
                         <!-- Address -->
                         <div>
                             <label class="form-label" for="address">Address</label>
-                            <textarea id="address" name="address" rows="3" class="form-input">{{ $user->address }}</textarea>
+                            <textarea id="address" name="address" rows="3" class="form-input">{{ old('address', $user->address) }}</textarea>
+                            <div id="addressError" class="error-message"></div>
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="submit" class="btn-primary">Save Changes</button>
+                            <button type="submit" class="btn-primary" id="submitProfile">
+                                <span id="submitProfileText">Save Changes</span>
+                                <span id="submitProfileSpinner" class="hidden ml-2">
+                                    <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </span>
+                            </button>
                         </div>
                     </form>
                 </div>
-
             </div>
 
             <!-- Account Settings -->
@@ -146,47 +171,37 @@
                     <h2 class="section-title">Account Settings</h2>
 
                     <!-- Change Password -->
-                    <form id="passwordForm" class="space-y-4">
+                    <form id="passwordForm" class="space-y-4" action="{{ route('admin.profile.changePassword') }}" method="POST">
+                        @method("PUT")
+                        @csrf
                         <div>
                             <label class="form-label" for="currentPassword">Current Password</label>
-                            <input type="password" id="currentPassword" name="currentPassword" class="form-input" required>
+                            <input type="password" id="currentPassword" name="current_password" class="form-input" required>
+                            <div id="currentPasswordError" class="error-message"></div>
                         </div>
                         <div>
                             <label class="form-label" for="newPassword">New Password</label>
-                            <input type="password" id="newPassword" name="newPassword" class="form-input" required>
+                            <input type="password" id="newPassword" name="password" class="form-input" required>
+                            <div id="newPasswordError" class="error-message"></div>
                         </div>
                         <div>
                             <label class="form-label" for="confirmPassword">Confirm New Password</label>
-                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
+                            <input type="password" id="confirmPassword" name="password_confirmation" class="form-input" required>
+                            <div id="confirmPasswordError" class="error-message"></div>
                         </div>
-                        <button type="submit" class="btn-primary w-full">Update Password</button>
+                        <button type="submit" class="btn-primary w-full" id="submitPassword">
+                            <span id="submitPasswordText">Update Password</span>
+                            <span id="submitPasswordSpinner" class="hidden ml-2">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
+                        </button>
                     </form>
 
                     <hr class="my-6 border-gray-200 dark:border-gray-700">
 
-                    <!-- Notification Settings -->
-                    <div class="space-y-4">
-                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">Notification Settings</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox" checked>
-                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Email Notifications</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox" checked>
-                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">SMS Notifications</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <hr class="my-6 border-gray-200 dark:border-gray-700">
-
-                    <!-- Danger Zone -->
-                    <div>
-                        <h3 class="text-sm font-medium text-red-600 dark:text-red-400">Danger Zone</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Once you delete your account, there is no going back.</p>
-                        <button type="button" class="mt-4 btn-danger w-full">Delete Account</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -195,56 +210,204 @@
 
 @section('scripts')
     <script>
-        // Profile Form Submission
+        // Profile Image Preview
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('profileImagePreview');
+            const errorElement = document.getElementById('profileImageError');
+
+            // Reset error
+            errorElement.textContent = '';
+
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    errorElement.textContent = 'Please select a valid image file (JPEG, PNG, GIF, WEBP)';
+                    return;
+                }
+
+                // Validate file size (max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    errorElement.textContent = 'Image size must be less than 2MB';
+                    return;
+                }
+
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Profile Form Submission with AJAX
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('submitProfile');
+            const submitText = document.getElementById('submitProfileText');
+            const spinner = document.getElementById('submitProfileSpinner');
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitText.textContent = 'Saving...';
+            spinner.classList.remove('hidden');
+
             try {
-                // In a real application, you would send the form data to the server
-                // For this demo, we'll just show a success message
-                alert('Profile updated successfully');
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.entries(data.errors).forEach(([field, messages]) => {
+                            const errorElement = document.getElementById(`${field}Error`);
+                            if (errorElement) {
+                                errorElement.textContent = messages[0];
+                            }
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to update profile');
+                    }
+                } else {
+                    // Success
+                    alert('Profile updated successfully');
+                    if (data.profile_picture) {
+                        document.getElementById('profileImagePreview').src = data.profile_picture;
+                    }
+                }
             } catch (error) {
                 console.error('Error updating profile:', error);
-                alert('Failed to update profile');
+                alert(error.message || 'Failed to update profile');
+            } finally {
+                // Reset button state
+                submitButton.disabled = false;
+                submitText.textContent = 'Save Changes';
+                spinner.classList.add('hidden');
             }
         });
 
-        // Password Form Submission
+        // Password Form Submission with AJAX
         document.getElementById('passwordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('submitPassword');
+            const submitText = document.getElementById('submitPasswordText');
+            const spinner = document.getElementById('submitPasswordSpinner');
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+            // Validate password match
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (newPassword !== confirmPassword) {
-                alert('New passwords do not match');
+            if (newPassword.trim() === '' || confirmPassword.trim() === '') {
+                document.getElementById('newPasswordError').textContent = 'Password cannot be empty';
+                document.getElementById('confirmPasswordError').textContent = 'Password cannot be empty';
                 return;
             }
 
+            if (newPassword !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                return;
+            }
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitText.textContent = 'Updating...';
+            spinner.classList.remove('hidden');
+
             try {
-                // In a real application, you would send the form data to the server
-                // For this demo, we'll just show a success message
-                alert('Password updated successfully');
-                e.target.reset();
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Handle validation errors
+                    if (data.errors) {
+                        let errorMessages = [];
+                        Object.entries(data.errors).forEach(([field, messages]) => {
+                            const errorElement = document.getElementById(`${field}Error`);
+                            if (errorElement) {
+                                errorElement.textContent = messages[0];
+                            }
+                            // Collect error messages for SweetAlert
+                            errorMessages.push(messages[0]);
+                        });
+
+                        // Show error messages in SweetAlert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Password update failed',
+                            html: errorMessages.join('<br>'), // Display all errors in the toast
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to update password');
+                    }
+                } else {
+                    // Success Toast
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Password updated successfully',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    form.reset();
+                }
             } catch (error) {
+                // Error Toast
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An error occurred',
+                    text: error.message || 'Failed to update password!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true
+                });
                 console.error('Error updating password:', error);
-                alert('Failed to update password');
+            } finally {
+                // Reset button state
+                submitButton.disabled = false;
+                submitText.textContent = 'Update Password';
+                spinner.classList.add('hidden');
             }
         });
 
-        // Profile Picture Upload
-        document.querySelector('input[type="file"]').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    // In a real application, you would upload the file to the server
-                    // For this demo, we'll just show a success message
-                    alert('Profile picture updated successfully');
-                } catch (error) {
-                    console.error('Error uploading profile picture:', error);
-                    alert('Failed to upload profile picture');
-                }
-            }
-        });
+
     </script>
 @endsection

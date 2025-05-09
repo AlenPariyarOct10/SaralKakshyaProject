@@ -160,7 +160,7 @@
                     <!-- Profile Dropdown -->
                     <div class="relative">
                         <button id="profileBtn" class="flex items-center space-x-2">
-                            <img src="{{ $user->profile_picture ? asset('storage/profile_pictures/' . $user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}"
+                            <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}"
                                  alt="Profile" class="w-8 h-8 rounded-full">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">@yield('username')</span>
                             <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:block"></i>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attachment;
 use App\Models\Institute;
 use App\Models\SystemSetting;
 use App\Models\Teacher;
@@ -72,6 +73,7 @@ class AuthController extends Controller
     // Handle registration of a new teacher
     public function register(Request $request)
     {
+        // Validate Phase 1 inputs
         $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
@@ -81,14 +83,78 @@ class AuthController extends Controller
             'password_confirmation' => 'required|string|min:6',
         ]);
 
+        // Create teacher and associate institute
         $teacher = Teacher::create([
             'fname' => $request->fname,
             'lname' => $request->lname,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Hashing the password
+            'password' => Hash::make($request->password),
+            'status' => 'inactive',
         ]);
         $teacher->institutes()->attach($request->institute);
-        return redirect()->route('teacher.login')->with('success', 'You have successfully registered.');
+
+        // Store the teacher ID in session for Phase 2
+        $request->session()->put('teacher_id', $teacher->id);
+
+        // Redirect to Phase 2
+        return redirect()->route('teacher.register.step2');
+    }
+
+    public function showRegisterStep2Form()
+    {
+        // Ensure teacher ID exists in session
+        if (!session()->has('teacher_id')) {
+            return redirect()->route('teacher.register')->with('error', 'Please complete the first step of registration.');
+        }
+
+        return view('backend.teacher.signup-step2');
+    }
+
+    public function registerStep2(Request $request)
+    {
+        // Ensure teacher ID exists in session
+        if (!session()->has('teacher_id')) {
+            return redirect()->route('teacher.register')->with('error', 'Please complete the first step of registration.');
+        }
+
+        // Validate Phase 2 inputs
+        $request->validate([
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:255',
+            'gender' => 'required|in:male,female,other',
+            'dob' => 'required|date',
+            'qualification' => 'required|string|max:255',
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'educational_attachment' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
+        ]);
+
+        // Retrieve the teacher from session
+        $teacher = Teacher::find(session('teacher_id'));
+
+        // Update teacher details
+        $teacher->update([
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'gender' => $request->gender,
+            'dob' => $request->dob,
+            'qualification' => $request->qualification,
+            'profile_picture' => $request->file('profile_picture')->store('profile_pictures', 'public'),
+        ]);
+
+        // Save educational qualification attachment
+        Attachment::create([
+            'title' => 'Educational Qualification',
+            'file_type' => $request->file('educational_attachment')->getClientOriginalExtension(),
+            'parent_type' => Teacher::class,
+            'parent_id' => $teacher->id,
+            'path' => $request->file('educational_attachment')->store('attachments', 'public'),
+        ]);
+
+        // Clear session
+        $request->session()->forget('teacher_id');
+
+        // Redirect to login with success message
+        return redirect()->route('teacher.login')->with('success', 'Registration completed successfully. You can now log in.');
     }
 
     // Handle logout functionality

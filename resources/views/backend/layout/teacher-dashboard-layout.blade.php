@@ -85,7 +85,7 @@
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="{{route('teacher.assignment.index')}}" class="sidebar-item {{Route::is('teacher.assignment.index')}}">
+                <a href="{{route('teacher.assignment.index')}}" class="sidebar-item {{(Route::is('teacher.assignment.index')?'active':'')}}">
                     <i class="fas fa-book"></i>
                     <span>Assignments</span>
                 </a>
@@ -95,7 +95,7 @@
                 </a>
 
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                    <a href="{{route('teacher.profile.index')}}" class="sidebar-item">
+                    <a href="{{route('teacher.profile.index')}}" class="sidebar-item {{(Route::is('teacher.profile.*')?'active':'')}}">
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>
@@ -181,7 +181,7 @@
                         <div class="relative">
                             <button id="profileBtn" class="flex items-center space-x-2">
                                 <img
-                                    src="{{ Auth::user()->profile_picture ? asset(Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->fname." ".Auth::user()->lname) . '&background=0D8ABC&color=fff' }}"
+                                    src="{{ Auth::user()->profile_picture ? asset('./storage/'.Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->fname." ".Auth::user()->lname) . '&background=0D8ABC&color=fff' }}"
                                     alt="Profile" class="w-8 h-8 rounded-full">
                                 <span
                                     class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{Auth::user()->fname." ".Auth::user()->lname}}</span>

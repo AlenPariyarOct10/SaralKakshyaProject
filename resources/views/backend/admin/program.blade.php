@@ -89,7 +89,18 @@
 
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
-
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-500 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success !</strong>
+                <span class="block sm:inline">{{session('success')}}</span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-500 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Error !</strong>
+                <span class="block sm:inline">{{session('error')}}</span>
+            </div>
+        @endif
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
@@ -209,7 +220,7 @@
                     </button>
                 </div>
 
-                <form action="{{route('admin.programs.store')}}" method="POST">
+                <form id="programForm" action="{{route('admin.programs.store')}}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="programName" class="form-label">Program Name</label>
@@ -498,83 +509,68 @@
         $(document).ready(function () {
             $("#batchDepartment").on("change", function () {
                 let departmentId = $(this).val();
+                $("#batchProgram").html('<option value="null">Select Program</option>');
+                $("#batchSemester").html('<option value="null">Select Semester</option>');
 
-                if (departmentId === "null") {
-                    return; // Do nothing if no department is selected
-                }
+                if (departmentId === "null") return;
 
                 $.ajax({
-                    url: "{{route('admin.department.get_department_programs')}}",  // Replace with your actual route
+                    url: "{{route('admin.department.get_department_programs')}}",
                     type: "GET",
                     data: {
                         department_id: departmentId,
-                        _token: $('meta[name="csrf-token"]').attr("content") // CSRF Token for Laravel
+                        _token: $('meta[name="csrf-token"]').attr("content")
                     },
                     success: function (response) {
-                        console.log("Success:", response);
-                        selectedDepartment = response;
-
-                        // Populate the Program dropdown with the received data
                         let programDropdown = $("#batchProgram");
-                        console.log(programDropdown);
-                        programDropdown.empty();
-                        programDropdown.append('<option value="null">Select Program</option>');
+                        programDropdown.empty().append('<option value="null">Select Program</option>');
 
-                        response.forEach((item)=>{
-                            programDropdown.append(`<option value="${item.id}">${item.name}</option>`);
-                        })
-
+                        response.forEach((item) => {
+                            programDropdown.append(
+                                `<option value="${item.id}" data-semesters="${item.total_semesters}">
+                            ${item.name}
+                        </option>`
+                            );
+                        });
                     },
                     error: function (xhr, status, error) {
                         console.error("Error:", error);
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to load programs'
+                        });
                     }
                 });
             });
-        });
-        $(document).ready(function () {
+
             $("#batchProgram").on("change", function () {
-                let programId = $(this).val();
+                let semesterDropdown = $("#batchSemester");
+                semesterDropdown.empty().append('<option value="null">Select Semester</option>');
 
-                if (programId === "null") {
-                    return; // Do nothing if no program is selected
-                }
+                let selectedOption = $(this).find(":selected");
+                if (selectedOption.val() === "null") return;
 
-                console.log("result 1", selectedDepartment);
-                console.log("result 2", programId);
+                let totalSemesters = selectedOption.data("semesters");
+                if (!totalSemesters || isNaN(totalSemesters)) return;
 
-                let totalSemesters = null;
-
-                selectedDepartment.forEach((item) => {
-
-                    if (item.id == programId) {
-                        totalSemesters = item.total_semesters;
-                    }
-                });
-
-                // Ensure totalSemesters is valid
-                if (totalSemesters) {
-                    console.log("total", totalSemesters);
-                    let semesterDropdown = document.getElementById('batchSemester');
-
-                    console.log("sd, ",semesterDropdown);
-
-                    for (let i = 1; i <= totalSemesters; i++) {
-                        semesterDropdown.innerHTML += `<option value="${i}">${i}</option>`;
-                    }
+                for (let i = 1; i <= totalSemesters; i++) {
+                    semesterDropdown.append(`<option value="${i}">Semester ${i}</option>`);
                 }
             });
-        });
 
-        $(document).ready(function () {
             $("#addBatchButton").click(function () {
                 let department = $("#batchDepartment").val();
                 let program = $("#batchProgram").val();
                 let semester = $("#batchSemester").val();
                 let status = $("#batchStatus").val();
-                let batchTitle = $("#batchTitle").val(); // assuming this exists
+                let batchTitle = $("#batchTitle").val();
 
-                if (!department || !program || !semester || !batchTitle || !status) {
-                    alert("Please fill in all required fields.");
+                if (!department || !program || !semester || !batchTitle || !status ||
+                    department === "null" || program === "null" || semester === "null") {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Please fill all required fields'
+                    });
                     return;
                 }
 
@@ -587,26 +583,25 @@
                         semester: semester,
                         batch: batchTitle,
                         status: status,
-                        _token: '{{ csrf_token() }}' // Laravel CSRF token
+                        _token: '{{ csrf_token() }}'
                     },
                     success: function (response) {
-                        if (response.status === "success") {
+                        if (response.success) {
                             Toast.fire({
                                 icon: 'success',
-                                title: 'Bacth added succesfully',
+                                title: response.message || 'Batch added successfully'
                             });
-
-                            // Optionally reset fields
                             $("#batchTitle").val("");
                         } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: 'Failed to add batch',
-                            });
+                            throw new Error(response.message || 'Failed to add batch');
                         }
                     },
                     error: function (xhr) {
-                        alert("An error occurred: " + xhr.responseText);
+                        let errorMsg = xhr.responseJSON?.message || 'An error occurred';
+                        Toast.fire({
+                            icon: 'error',
+                            title: errorMsg
+                        });
                     }
                 });
             });
@@ -640,50 +635,91 @@
             deleteModal.classList.add('hidden');
         });
 
-        // Edit Program
+        // Edit Program - Fixed Version
         const editButtons = document.querySelectorAll('.edit-program-btn');
+        const editProgramModal = document.getElementById('editProgramModal');
+        const closeEditModal = document.getElementById('closeEditModal');
 
         editButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const id = button.getAttribute('data-id');
-                modalTitle.textContent = 'Edit Program';
-                programId.value = id;
-                        fetch(`/admin/programs/${id}/edit`, {
-                            method: "GET",
-                            headers: {
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                                "Content-Type": "application/json",
-                            },
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-                                document.getElementById('programName').value = data.name;
-                                document.getElementById('department').value = data.department.id;
-                                document.getElementById('totalSemesters').value = data.total_semesters;
-                                document.getElementById('durationYears').value = data.duration;
-                                document.getElementById('programDescription').value = data.description;
 
-                                // Set status based on badge text
-                                if (data.status === 'Active') {
-                                    document.getElementById('editProgramStatus').value = 'active';
-                                } else if (status === 'Under Review') {
-                                    document.getElementById('editProgramStatus').value = 'review';
-                                } else {
-                                    document.getElementById('editProgramStatus').value = 'inactive';
-                                }
+                fetch(`/admin/programs/${id}/edit`, {
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json",
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate form fields
+                        document.getElementById('editProgramName').value = data.name;
+                        document.getElementById('editDepartment').value = data.department_id;
+                        document.getElementById('totalSemesters').value = data.total_semesters;
+                        document.getElementById('durationYears').value = data.duration;
+                        document.getElementById('programDescription').value = data.description || '';
+                        document.getElementById('editProgramStatus').value = data.status;
+                        document.getElementById('programId').value = data.id;
 
-                                programModal.classList.remove('hidden');
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
+                        editProgramModal.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to load program data'
+                        });
+                    });
             });
         });
 
+        // Close edit modal
+        closeEditModal.addEventListener('click', () => {
+            editProgramModal.classList.add('hidden');
+        });
+
+        // Edit form submission
+        document.getElementById('editProgramForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const id = document.getElementById('programId').value;
+
+            fetch(`/admin/programs/${id}`, {
+                method: 'POST',
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Accept": "application/json",
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Program updated successfully'
+                        });
+                        editProgramModal.classList.add('hidden');
+                        // Optionally refresh the page or update the table row
+                        location.reload();
+                    } else {
+                        throw new Error(data.message || 'Update failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Toast.fire({
+                        icon: 'error',
+                        title: error.message
+                    });
+                });
+        });
+
         // Delete Program
-        const deleteButtons = document.querySelectorAll('.delete-program-btn');
+        // Delete Program - Fixed Version
         let programToDelete = null;
+        const deleteButtons = document.querySelectorAll('.delete-program-btn');
 
         deleteButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -692,41 +728,41 @@
             });
         });
 
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (programToDelete) {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (!programToDelete) return;
 
-                const row = document.querySelector(`.delete-program-btn[data-id="${programToDelete}"]`).closest('tr');
-                row.remove();
-
-                fetch(`/admin/programs/${programToDelete}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Content-Type": "application/json",
-                    },
+            fetch(`/admin/programs/${programToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Accept": "application/json",
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Program deleted successfully'
+                        });
+                        // Remove the row from the table
+                        document.querySelector(`.delete-program-btn[data-id="${programToDelete}"]`)
+                            .closest('tr').remove();
+                    } else {
+                        throw new Error(data.message || 'Delete failed');
+                    }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Program Deleted',
-                            })
-                        } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: 'Failed to delete',
-                            })
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);  // Log any errors
+                .catch(error => {
+                    console.error('Error:', error);
+                    Toast.fire({
+                        icon: 'error',
+                        title: error.message
                     });
-
-                deleteModal.classList.add('hidden');
-                programToDelete = null;
-            }
+                })
+                .finally(() => {
+                    deleteModal.classList.add('hidden');
+                    programToDelete = null;
+                });
         });
 
         // Search and Filter

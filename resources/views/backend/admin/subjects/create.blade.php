@@ -122,7 +122,176 @@
             <ul class="mt-2 list-disc list-inside text-sm" id="error-list">
             </ul>
         </div>
-        @livewire('admin.create-subject-form', compact('programs'))
+        <div class="card">
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                    <strong class="font-bold">Success !</strong>
+                    <span class="block sm:inline">{{session('success')}}</span>
+                </div>
+            @endif
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                    <strong class="font-bold">Whoops!</strong>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="p-6">
+                <form action="{{ route('admin.subjects.store') }}" method="POST">
+                    @csrf
+                    <!-- Basic Information -->
+                    <div class="mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Basic Information</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="subjectName" class="form-label">Subject Name <span class="text-red-500">*</span></label>
+                                <input type="text" id="subjectName" name="name" class="form-input" placeholder="Enter subject name" required>
+                                @error('name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="subjectCode" class="form-label">Subject Code <span class="text-red-500">*</span></label>
+                                <input type="text" id="subjectCode" name="code" class="form-input" placeholder="e.g. CS101" required>
+                                @error('code')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <!--Subjects Marks-->
+                            <div>
+                                <label for="subjectName" class="form-label">External Full Marks <span class="text-red-500">*</span></label>
+                                <input type="text" id="max_external_marks" name="max_external_marks" class="form-input" placeholder="Enter full marks (External)" required>
+                                @error('max_external_marks')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="subjectName" class="form-label">Internal Full Marks <span class="text-red-500">*</span></label>
+                                <input type="text" id="max_internal_marks" name="max_internal_marks" class="form-input" placeholder="Enter full marks (Internal)" required>
+                                @error('max_internal_marks')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <!--Credit Hour-->
+                            <div>
+                                <label for="credit" class="form-label">Credit Hours <span class="text-red-500">*</span></label>
+                                <input type="number" id="credit" name="credit" class="form-input" min="1" max="6" placeholder="e.g. 3" required>
+                                @error('credit')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="status" class="form-label">Status</label>
+                                <select id="status" name="status" class="form-input">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                                @error('status')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program and Batch Information -->
+                    <div class="mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Program Information</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Program Dropdown -->
+                            <div>
+                                <label for="program" class="form-label">Program <span class="text-red-500">*</span></label>
+                                <select id="program" name="program_id" class="form-input" required>
+                                    <option value="">Select Program</option>
+                                @foreach($programs as $program)
+                                        <option value="{{$program->id}}">{{$program->name}}</option>
+                                @endforeach
+                                </select>
+
+                            </div>
+
+                            <!-- Semester Dropdown -->
+                            <div>
+                                <label for="semester" class="form-label">Semester <span class="text-red-500">*</span></label>
+                                <select id="semester" name="semester" class="form-input" required>
+                                    <option value="">Select Semester</option>
+                                </select>
+                                @error('selectedSemester')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Description</h2>
+                        <div>
+                            <label for="description" class="form-label">Subject Description</label>
+                            <textarea id="description" name="description" rows="4" class="form-input" placeholder="Enter subject description"></textarea>
+                            @error('description')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <!-- Evaluation Formats -->
+                    <div class="mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">Evaluation Formats  [<span id="total-weight" class="text-sm font-medium text-gray-900 dark:text-white mb-3">Evaluation Formats</span>]</h2>
+                        <div class="mb-3">
+                            <label for="reuse_format" class="form-label">Use existing format </label>
+                            <select id="reuse_format" class="form-input">
+                                <option value="">Select Subject to duplicate format</option>
+
+                            </select>
+                            @error('selectedProgram')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div id="evaluation-formats" class="space-y-4">
+                            <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="criteria_1" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                                    <input type="text" id="criteria_1" name="criteria[]" class="form-input" placeholder="e.g. Midterm Exam" required>
+                                </div>
+                                <div>
+                                    <label for="full_marks_1" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                                    <input type="number" id="full_marks_1" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
+                                </div>
+                                <div>
+                                    <label for="pass_marks_1" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                                    <input type="number" id="pass_marks_1" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
+                                </div>
+                                <div>
+                                    <label for="marks_weight_1" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                                    <input type="number" id="marks_weight_1" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <button type="button" id="add-evaluation-format" class="btn-secondary flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Add Another Evaluation Format
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3 mt-8">
+                        <a href="{{ route('admin.subjects.index') }}" class="btn-secondary">Cancel</a>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i> Save Subject
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+
     </main>
 @endsection
 
@@ -135,56 +304,29 @@
             let max_internal_marks = 0;
             let total = 0;
 
-            $('#add-evaluation-format').on('click', function () {
-                evaluationCount++;
-
-                const newEvaluationFormat = `
-                    <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
-                            <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
-                        </div>
-                        <div>
-                            <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
-                            <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
-                        </div>
-                        <div class="relative">
-                            <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
-                            <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
-                        </div>
-                        <div>
-                            <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
-                            <div class="flex">
-                                <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
-                               <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
-                                  <i class="fas fa-trash-alt"></i>
-                               </button>
-                           </div>
-
-                        </div>
-                    </div>
-                `;
-
-                $('#evaluation-formats').append(newEvaluationFormat);
-
-                // Add event listener to the newly added remove button
-                $('.remove-evaluation').last().on('click', function () {
-                    $(this).closest('.evaluation-format').remove();
-                });
-
-
+            $('#add-evaluation-format').on('click', function() {
+                addNewEvaluationFormat();
             });
 
             function calculateTotalWeight() {
-                total = 0;
-                $(".marks-weight").each(function () {
-                    const val = parseFloat($(this).val());
-                    if (!isNaN(val)) {
-                        total += val;
-                    }
+                let total = 0;
+                $(".marks-weight").each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    total += val;
                 });
                 $("#total-weight").text(total);
+
+                // Check against max internal marks
+                const maxInternal = parseFloat($('#max_internal_marks').val()) || 0;
+                if (total > maxInternal) {
+                    $("#total-weight").addClass('text-red-500');
+                } else {
+                    $("#total-weight").removeClass('text-red-500');
+                }
             }
+
+// Recalculate when weights or max internal marks change
+            $(document).on('input', '.marks-weight, #max_internal_marks', calculateTotalWeight);
 
             $(document).ready(function () {
                 calculateTotalWeight();
@@ -204,176 +346,291 @@
                 });
             });
 
-            $('form').on('submit', function (e) {
-                let isValid = true;
-                let error = [];
+            // Replace your existing form submit handler with this:
 
-                if ($('#subjectName').val().trim() === '') {
-                    isValid = false;
-                    error.push("Name field cannot be empty");
-                }
+            $('form').on('submit', function(e) {
+                e.preventDefault();
 
-                if ($('#subjectCode').val().trim() === '') {
-                    error.push("Subject code field cannot be empty");
-                    isValid = false;
-                }
+                // Show loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Saving...');
 
-                if (max_internal_marks < total) {
-                    error.push("Marks weight cannot exceed max internal marks");
-                    isValid = false;
-                }
+                // Hide any previous errors
+                $('.error-message').addClass('hidden');
 
-                if (!isValid) {
-                    $('.error-message').classList.remove("hidden")
+                // Collect form data
+                const formData = new FormData(this);
 
-                    error.forEach((item) => {
-                        $('#error-list').innerHTML += `<li>${item}</li>`;
-                    });
-                    e.preventDefault();
-                } else {
-                    $('.error-message').classList.add("hidden");
-                }
+                // Send AJAX request
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Show success message
+                            Toast.fire({
+                                icon: 'success',
+                                title: response.message
+                            });
+
+                            // Redirect after a short delay
+                            setTimeout(() => {
+                                window.location.href = response.redirect;
+                            }, 1500);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html('<i class="fas fa-save mr-2"></i> Save Subject');
+
+                        if (xhr.status === 422) {
+                            // Validation errors
+                            const errors = xhr.responseJSON.errors;
+                            const errorList = $('#error-list').html('');
+
+                            // Show error container
+                            $('.error-message').removeClass('hidden');
+
+                            // Add each error to the list
+                            $.each(errors, function(key, value) {
+                                errorList.append(`<li>${value}</li>`);
+                            });
+
+                            // Scroll to errors
+                            $('html, body').animate({
+                                scrollTop: $('.error-message').offset().top - 100
+                            }, 500);
+                        } else {
+                            // Other errors
+                            Toast.fire({
+                                icon: 'error',
+                                title: xhr.responseJSON?.message || 'An error occurred while saving the subject'
+                            });
+                        }
+                    }
+                });
             });
 
 
-            document.getElementById('program').addEventListener('change', function () {
+
+            document.getElementById('program').addEventListener('change', function() {
                 const programId = this.value;
-                const url = `/admin/programs/${programId}/semesters`;
-                const fetchSubjects = `/admin/programs/${programId}/subjects`;
-                console.log('Fetching:', url);
+                const semesterSelect = document.getElementById('semester');
+                const subjectSelect = document.getElementById('reuse_format');
 
-                fetch(url)
+                // Clear existing options
+                semesterSelect.innerHTML = '<option value="">Select Semester</option>';
+                subjectSelect.innerHTML = '<option value="">Select one</option>';
+
+                if (!programId) return;
+
+                // Show loading state
+                const originalSemesterHTML = semesterSelect.innerHTML;
+                semesterSelect.disabled = true;
+                semesterSelect.innerHTML = '<option value="">Loading semesters...</option>';
+
+                fetch(`/admin/programs/${programId}/semesters`)
                     .then(response => {
+                        console.log(response);
                         if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
+                            throw new Error('Failed to fetch semesters');
                         }
                         return response.json();
                     })
-                    .then(data => {
-                        const semesterSelect = document.getElementById('semester');
+                    .then(totalSemesters => {
+                        console.log(totalSemesters);
                         semesterSelect.innerHTML = '<option value="">Select Semester</option>';
-                        for (let i = data; i >= 1; i--) {
-                            semesterSelect.innerHTML += `<option value="${i}">${i} Semester</option>`;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('There was a problem with the fetch operation:', error);
-                    });
 
-                fetch(fetchSubjects)
+                        if (!totalSemesters || totalSemesters === 0) {
+                            Toast.fire({
+                                icon: 'warning',
+                                title: 'No semesters found for this program.'
+                            });
+                            return Promise.reject('No semesters found'); // Prevent subject fetch
+                        }
+
+                        // Generate semester options in descending order
+                        for (let i = totalSemesters.total_semesters; i >= 1; i--) {
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = `${i} Semester`;
+                            semesterSelect.appendChild(option);
+                        }
+
+                        // Now fetch subjects for this program
+                        return fetch(`/admin/programs/${programId}/subjects`);
+                    })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
+                            throw new Error('Failed to fetch subjects');
                         }
                         return response.json();
                     })
-                    .then(data => {
-                        const subjectSelect = document.getElementById('reuse_format');
-                        subjectSelect.innerHTML = ' <option value="">Select one</option>';
+                    .then(subjects => {
+                        console.log(subjects);
+                        if (!subjects || subjects.length === 0) {
+                            Toast.fire({
+                                icon: 'info',
+                                title: 'No subjects found for this program.'
+                            });
+                            return;
+                        }else{
+                            subjects.subjects.forEach(subject => {
+                                const option = document.createElement('option');
+                                option.value = subject.id;
+                                option.textContent = `Same as ${subject.name}`;
+                                subjectSelect.appendChild(option);
+                            });
+                        }
 
-                        data.forEach((item) => {
-                            subjectSelect.innerHTML += `<option value="${item.id}">Same as ${item.name}</option>`;
-                        })
+
                     })
                     .catch(error => {
-                        console.error('There was a problem with the fetch operation:', error);
+                        console.error('Error:', error);
+                        semesterSelect.innerHTML = originalSemesterHTML;
+                        Toast.fire({
+                            icon: 'error',
+                            title: error.message || error
+                        });
+                    })
+                    .finally(() => {
+                        semesterSelect.disabled = false;
                     });
+
             });
 
-            document.getElementById('reuse_format').addEventListener('change', function () {
+            document.getElementById('reuse_format').addEventListener('change', function() {
                 const subjectId = this.value;
+                const evaluationFormats = $('#evaluation-formats');
 
-                // Check if the value is not selected
-                if (subjectId === "") {
-                    // Clear all existing evaluation formats
-                    $('#evaluation-formats').html(""); // Clear existing formats
-                    evaluationCount = 1; // Reset evaluation count
+                // Clear existing formats
+                evaluationFormats.empty();
+                evaluationCount = 1;
 
-                    const newEvaluationFormat = `
-            <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
-                    <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
-                </div>
-                <div>
-                    <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
-                    <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
-                </div>
-                <div class="relative">
-                    <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
-                    <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
-                </div>
-                <div>
-                    <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
-                    <div class="flex">
-                        <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
-                        <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-                    $('#evaluation-formats').append(newEvaluationFormat);
-                    calculateTotalWeight(); // Recalculate total weight
-                } else {
-                    // Fetch and populate evaluation formats as per selected subject
-                    const url = `/admin/subject/${subjectId}/evaluations`;
-                    console.log('Fetching:', url);
+                if (!subjectId) {
+                    // Add default empty format
+                    addNewEvaluationFormat();
+                    return;
+                }
 
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok ' + response.statusText);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            $('#evaluation-formats').html(""); // Clear existing formats
-                            data.forEach((item) => {
-                                const newEvaluationFormat = `
-                        <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
-                                <input type="text" value="${item.criteria}" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
-                            </div>
-                            <div>
-                                <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
-                                <input type="number" value="${item.full_marks}" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
-                            </div>
-                            <div class="relative">
-                                <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
-                                <input type="number" value="${item.pass_marks}" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
-                            </div>
-                            <div>
-                                <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
-                                <div class="flex">
-                                    <input type="number" value="${item.marks_weight}" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
-                                    <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
+                // Show loading state
+                evaluationFormats.html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading evaluation formats...</div>');
+// Define the handleResponse function at the top of your script
+                function handleResponse(response) {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                }
+                // Fetch evaluation formats
+                fetch(`/admin/subject/${subjectId}/evaluations`)
+                    .then(handleResponse)
+                    .then(formats => {
+                        evaluationFormats.empty();
+
+                        if (!formats || formats.length === 0) {
+                            Toast.fire({
+                                icon: 'info',
+                                title: 'No evaluation formats found for this subject'
+                            });
+                            addNewEvaluationFormat();
+                            return;
+                        }
+
+                        // Add each evaluation format
+                        formats.forEach(format => {
+                            const formatHtml = `
+                    <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                            <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" value="${format.criteria}" required>
+                        </div>
+                        <div>
+                            <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                            <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" value="${format.full_marks}" min="1" required>
+                        </div>
+                        <div>
+                            <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                            <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" value="${format.pass_marks}" min="1" required>
+                        </div>
+                        <div>
+                            <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                            <div class="flex">
+                                <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" value="${format.marks_weight}" min="1" required>
+                                <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
-                    `;
+                    </div>
+                `;
 
-                                evaluationCount++; // Increment the evaluation count for each added format
-                                $('#evaluation-formats').append(newEvaluationFormat);
-                            });
-
-                            // Attach the click event listener for remove buttons
-                            $('#evaluation-formats').off('click').on('click', '.remove-evaluation', function () {
-                                console.log("clicked");
-                                $(this).closest('.evaluation-format').remove();
-                                evaluationCount--; // Decrease the evaluation count when removing a format
-                                calculateTotalWeight(); // Recalculate total weight after removal
-                            });
-                        })
-                        .catch(error => {
-                            console.error('There was a problem with the fetch operation:', error);
+                            evaluationFormats.append(formatHtml);
+                            evaluationCount++;
                         });
-                }
+
+                        // Recalculate total weight
+                        calculateTotalWeight();
+
+                        // Attach remove handlers
+                        $('.remove-evaluation').off('click').on('click', function() {
+                            $(this).closest('.evaluation-format').remove();
+                            calculateTotalWeight();
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading evaluation formats:', error);
+                        evaluationFormats.empty();
+                        addNewEvaluationFormat();
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Failed to load evaluation formats'
+                        });
+                    });
             });
+
+// Helper function to add a new empty evaluation format
+            function addNewEvaluationFormat() {
+                const newFormat = `
+        <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" placeholder="e.g. Final Exam" required>
+            </div>
+            <div>
+                <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" min="1" placeholder="e.g. 100" required>
+            </div>
+            <div>
+                <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" min="1" placeholder="e.g. 40" required>
+            </div>
+            <div>
+                <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" min="1" placeholder="e.g. 40" required>
+                    <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+                $('#evaluation-formats').append(newFormat);
+                calculateTotalWeight();
+
+                // Attach remove handler
+                $('.remove-evaluation').last().on('click', function() {
+                    $(this).closest('.evaluation-format').remove();
+                    calculateTotalWeight();
+                });
+            }
 
         });
     </script>

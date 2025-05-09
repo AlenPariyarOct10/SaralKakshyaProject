@@ -97,7 +97,7 @@
                 </div>
             </div>
         <div class="flex justify-end">
-            <a href="{{route('admin.teacher.index')}}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
+            <a href="{{route('admin.student.index')}}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
                 <i class="fa-solid fa-arrow-left mr-2"></i> View all
             </a>
         </div>
@@ -124,7 +124,7 @@
                                     <div class="h-10 w-10 flex-shrink-0">
                                         <img src="{{
                                                     $student->profile_picture
-                                                        ? asset('/storage/profile_pictures/'.$student->profile_picture)
+                                                        ? asset('/storage/'.$student->profile_picture)
                                                         : 'https://ui-avatars.com/api/?name=' . urlencode($student->fname . ' ' . $student->lname) . '&background=random'
                                                 }}"
 

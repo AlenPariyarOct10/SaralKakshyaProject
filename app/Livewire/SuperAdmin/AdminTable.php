@@ -18,7 +18,9 @@ class AdminTable extends Component
 
     public function setApproved($id)
     {
-        Admin::where('id', $id)->update(['is_approved' => 1]);
+        $admin = Admin::withTrashed()->findOrFail($id); // Get even if soft deleted
+        $admin->update(['is_approved' => 1]);
+        $admin->restore(); // This sets deleted_at to null safely
         session()->flash('message', 'Admin approved successfully!');
     }
 

@@ -6,75 +6,54 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Institute;
 use App\Models\Program;
-use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProgramController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $institute = Institute::where('created_by', Auth::id())->first();
-
         $allDepartments = Department::where('institute_id', $institute->id)->get();
-        $programs = Program::with('department')->where('created_by', Auth::guard('admin')->id())->get();
+        $programs = Program::with('department')
+            ->where('created_by', Auth::guard('admin')->id())
+            ->get();
+
         $user = Auth::guard('admin')->user();
         return view('backend.admin.program', compact('user', 'allDepartments', 'programs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        $instituteId = Institute::where('created_by', Auth::guard('admin')->id())->value('id');
+
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'department_id' => 'required|integer|exists:departments,id',
             'total_semesters' => 'required|integer|max:15',
             'duration' => 'required|integer|max:15',
-            'status' => 'required|string',
-            'description' => 'required|string|max:500',
+            'status' => 'required|string|in:active,inactive',
+            'description' => 'nullable|string|max:500',
         ]);
 
+        // Add additional fields after validation
+        $validated['institute_id'] = $instituteId;
         $validated['created_by'] = Auth::guard('admin')->id();
-        $status = Program::create($validated);
 
-        if ($status)
-        {
-            return redirect()->route('admin.programs.index')->with('success', 'Program created successfully');
-        }else{
-            return redirect()->route('admin.programs.index')->with('error', 'Failed to create program');
+        try {
+            $program = Program::create($validated);
+            return redirect()->route('admin.programs.index')
+                ->with('success', 'Program created successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.programs.index')
+                ->with('error', 'Failed to create program: ' . $e->getMessage());
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        $program = Program::with('department')->find($id); // Using `find()` simplifies the query
+        $program = Program::with('department')->find($id);
 
-        // Check if the program was found
         if (!$program) {
             return response()->json(['message' => 'Program not found'], 404);
         }
@@ -85,19 +64,19 @@ class ProgramController extends Controller
     public function getSemesters($id)
     {
         $program = Program::find($id);
-        return response()->json($program ? $program->total_semesters : 0);
+        return response()->json([
+            'total_semesters' => $program ? $program->total_semesters : 0
+        ]);
     }
 
     public function getSubjects($id)
     {
-        $program = Program::find($id);
-        return response()->json($program ? $program->subjects : 0);
+        $program = Program::with('subjects')->find($id);
+        return response()->json([
+            'subjects' => $program ? $program->subjects : []
+        ]);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -105,47 +84,43 @@ class ProgramController extends Controller
             'department_id' => 'required|integer|exists:departments,id',
             'total_semesters' => 'required|integer|max:15',
             'duration' => 'required|integer|max:15',
-            'status' => 'required|string',
+            'status' => 'required|string|in:active,inactive',
             'description' => 'nullable|string|max:500',
         ]);
 
         $program = Program::findOrFail($id);
 
-        $status = $program->update($validated);
-
-        if ($status) {
-            return response()->json(['success' => 'Program updated successfully']);
-        } else {
-            return response()->json(['error' => 'Failed to update program']);
+        try {
+            $program->update($validated);
+            return response()->json(['success' => true, 'message' => 'Program updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update program'], 500);
         }
     }
-
 
     public function get_program_semesters(Request $request)
     {
-        $semester = Program::findOrFaile($request->id)->semester;
-        return response()->json($semester);
+        $program = Program::findOrFail($request->id);
+        return response()->json([
+            'semesters' => $program->total_semesters
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
-            $program = Program::find($id);
+            $program = Program::findOrFail($id);
+            $program->delete();
 
-            if (!$program) {
-                return response()->json(['success' => false, 'message' => 'Program not found'], 404);
-            }
-
-            $program->delete(); // Use Eloquent instead of destroy()
-
-            return response()->json(['success' => true, 'message' => 'Program deleted successfully']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Program deleted successfully'
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete program: ' . $e->getMessage()
+            ], 500);
         }
     }
-
-
 }

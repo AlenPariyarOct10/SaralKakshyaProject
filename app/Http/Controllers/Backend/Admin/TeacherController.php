@@ -35,10 +35,57 @@ class TeacherController extends Controller
         return view('backend.admin.teachers.index', compact('user','teachers', 'pendingCount'));
     }
 
+    public function getAll()
+    {
+        $instituteId = Auth::user()->institute->id;
+        $teachers = Teacher::whereHas('institutes', function ($query) use ($instituteId) {
+            $query->where('institute_id', $instituteId);
+        })->orderBy('created_at', 'DESC')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'teachers' => $teachers,
+            ]
+        ]);
+    }
+
     public function generatePDF()
     {
         $fileName = 'Teachers_'.Auth::user()->institute->name.'_'.now()->format('[d M, Y]').'.xlsx';
         return Excel::download(new TeacherExport(), $fileName);
+    }
+
+
+    public function getProfile($id)
+    {
+        try {
+            $teacher = Teacher::where('id', $id)
+                ->with('attachments')
+                ->first();
+
+            if (!$teacher) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Teacher not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'teacher' => $teacher,
+
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch teacher profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function index_pending_teachers()
@@ -57,11 +104,23 @@ class TeacherController extends Controller
     public function toggle_status($id)
     {
         try {
-            $teacher = Teacher::findOrFail($id);
+            $teacher = Teacher::findOrFail($id)
+                ->whereHas('institutes', function ($query) {
+                    $query->where('institute_id', Auth::user()->institute->id);
+                })
+                ->first();
             if ($teacher->status == 1) {
                 $teacher->status = 0;
+                DB::table('institute_teacher')
+                    ->where('teacher_id', $id)
+                    ->where('institute_id', Auth::user()->institute->id)
+                    ->update(['isApproved' => 0, 'approvedAt' => null]);
             } else {
                 $teacher->status = 1;
+                DB::table('institute_teacher')
+                    ->where('teacher_id', $id)
+                    ->where('institute_id', Auth::user()->institute->id)
+                    ->update(['approvedAt' => Carbon::now(), 'isApproved' => 1]);
             }
 
             $teacher->save();
@@ -80,7 +139,7 @@ class TeacherController extends Controller
         DB::table('institute_teacher')
             ->where('teacher_id', $id)
             ->where('institute_id', $adminInstituteId)
-            ->update(['approvedAt' => Carbon::now()]);
+            ->update(['approvedAt' => Carbon::now(), 'isApproved' => 1]);
 
         $teacher = \App\Models\Teacher::findOrFail($id);
         $email = $teacher->email;
@@ -109,6 +168,8 @@ class TeacherController extends Controller
     {
         //
     }
+
+
 
     /**
      * Display the specified resource.

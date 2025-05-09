@@ -18,6 +18,9 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::post('/login', [TeacherAuthController::class, 'login'])->name('teacher.login');
         Route::get('/register', [TeacherAuthController::class, 'showRegister'])->name('teacher.register');
         Route::post('/register', [TeacherAuthController::class, 'register'])->name('teacher.register');
+
+        Route::get('teacher/register/step-2', [TeacherAuthController::class, 'showRegisterStep2Form'])->name('teacher.register.step2');
+        Route::post('teacher/register/step-2', [TeacherAuthController::class, 'registerStep2']);
     });
 
     Route::middleware(['auth:teacher'])->group(function () {
@@ -30,7 +33,7 @@ Route::group(['prefix' => 'teacher'], function () {
 
         //Profile
         Route::get('/profile', [TeacherProfileController::class, "index"])->name('teacher.profile.index');
-        Route::PUT('/profile', [TeacherProfileController::class, "store"])->name('teacher.profile.update');
+        Route::PUT('/profile/{id}', [TeacherProfileController::class, "store"])->name('teacher.profile.update');
         Route::get('/profile/show', [TeacherProfileController::class, "show"])->name('teacher.profile.show');
         Route::get('/profile/routine', [TeacherPersonalRoutineController::class, "index"])->name('teacher.profile.routine.show');
 
@@ -39,5 +42,6 @@ Route::group(['prefix' => 'teacher'], function () {
 
         Route::get('/assignment', [TeacherAssignmentController::class, "index"])->name('teacher.assignment.index');
         Route::get('/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
+
     });
 });

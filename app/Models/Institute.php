@@ -10,11 +10,14 @@ class Institute extends Model
 {
     use SoftDeletes;
     protected $table = 'institutes';
-    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by'];
+    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by', 'deleted_at'];
+
+    protected $casts = ['deleted_at' => 'datetime'];
 
     public function departments()
     {
-        return $this->hasMany(Department::class, 'institute_id', 'id');
+        return $this->hasMany(Department::class, 'institute_id', 'id')->withPivot('approved_at')
+            ->withTimestamps();
     }
 
     public function students()

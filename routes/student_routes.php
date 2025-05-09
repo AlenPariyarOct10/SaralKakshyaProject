@@ -16,6 +16,9 @@ Route::group(['prefix' => 'student'], function () {
         Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('student.login');
         Route::post('/login', [StudentAuthController::class, 'login'])->name('student.login');
         Route::get('/register', [StudentAuthController::class, 'showRegister'])->name('student.register');
+        Route::POST('/register', [StudentAuthController::class, 'register'])->name('student.register');
+        Route::get('/complete-profile', [StudentAuthController::class, 'showCompleteProfile'])->name('student.complete-profile');
+        Route::post('/complete-profile', [StudentAuthController::class, 'completeProfile'])->name('student.complete-profile.post');
     });
 
     Route::middleware(['auth:student'])->group(function () {

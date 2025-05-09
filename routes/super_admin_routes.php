@@ -30,10 +30,14 @@ Route::group(['prefix' => 'superadmin'], function () {
 
         //Institute
         Route::get('/institute', [SuperAdminInstituteController::class, "index"])->name('superadmin.institute.index');
+        Route::get('/api/institute', [SuperAdminInstituteController::class, "get_institutes"])->name('api.superadmin.institute.index');
+        Route::POST('/api/institute/toggle-status', [SuperAdminInstituteController::class, "toggleStatus"])->name('api.superadmin.institute.toggle');
 
 //        Profile
         Route::get('/profile', [SuperAdminProfileController::class, "index"])->name('superadmin.profile.index');
-
+        Route::POST('/profile/update', [SuperAdminProfileController::class, "update"])->name('superadmin.profile.update');
+        Route::POST('/profile/change-password', [SuperAdminProfileController::class, "changePassword"])->name('superadmin.profile.change-password');
+        Route::POST('/profile/update-picture', [SuperAdminProfileController::class, "updateProfilePicture"])->name('superadmin.profile.update-picture');
 
         //Setting
         Route::get('/setting', [SuperAdminSettingController::class, "index"])->name('superadmin.setting.index');

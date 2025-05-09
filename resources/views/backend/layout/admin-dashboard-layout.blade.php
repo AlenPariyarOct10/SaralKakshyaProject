@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{csrf_token()}}">
     <title>{{\App\Models\SystemSetting::all()->first()->name}} - @yield("title", "")</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="{{\App\Models\SystemSetting::all()->first()->logo}}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -150,10 +151,6 @@
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>
-                    <a href="settings.html" class="sidebar-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
                     <a href="{{ route('admin.logout') }}" class="sidebar-item text-red-500 dark:text-red-400">
                             <i class="fas fa-sign-out-alt"></i>
                             <span> Logout Now</span>
@@ -216,7 +213,8 @@
                         <!-- Profile Dropdown -->
                         <div class="relative">
                             <button id="profileBtn" class="flex items-center space-x-2">
-                                <img src="{{ $user->profile_picture ? asset($user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}"
+                                <img
+                                    src="{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=random' }}"
                                      alt="Profile" class="w-8 h-8 rounded-full">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{$user->fname." ".$user->lname}}</span>
                                 <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:block"></i>
@@ -227,9 +225,6 @@
                                 <div class="py-1">
                                     <a href="" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <i class="fas fa-user mr-2"></i> Profile
-                                    </a>
-                                    <a href="settings.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <i class="fas fa-cog mr-2"></i> Settings
                                     </a>
                                     <div class="border-t dark:border-gray-700"></div>
                                     <form action="{{route('admin.logout') }}" method="get" class="sidebar-item text-red-500 dark:text-red-400">

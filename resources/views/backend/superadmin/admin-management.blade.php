@@ -88,6 +88,10 @@
     </style>
 @endpush
 
+@section("title")
+    Admin Management
+@endsection
+
 @section('content')
     <main class="scrollable-content p-4 md:p-6">
         <!-- Admin Management Header -->

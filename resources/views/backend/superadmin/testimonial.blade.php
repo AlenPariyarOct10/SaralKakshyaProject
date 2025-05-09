@@ -1,5 +1,9 @@
 @extends('backend.layout.superadmin-dashboard-layout')
 
+@section("title")
+    Testimonial
+@endsection
+
 @section('username')
     {{$user->fname}} {{$user->lname}}
 @endsection

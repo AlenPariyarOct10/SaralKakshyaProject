@@ -92,6 +92,10 @@
     </style>
 @endpush
 
+@section("title")
+    Institute Management
+@endsection
+
 @section('content')
     <!-- Main Content Area - Made Scrollable -->
     <main class="scrollable-content p-4 md:p-6">
@@ -105,31 +109,21 @@
 
 
         <!-- Search and Filter -->
-{{--        <div class="flex flex-col md:flex-row gap-4 mb-6">--}}
-{{--            <div class="flex-1">--}}
-{{--                <div class="relative">--}}
-{{--                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">--}}
-{{--                        <i class="fas fa-search text-gray-400"></i>--}}
-{{--                    </div>--}}
-{{--                    <input type="text" id="institute-search" class="form-input pl-10" placeholder="Search institutes...">--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--            <div class="flex flex-col sm:flex-row gap-2">--}}
-{{--                <select id="type-filter" class="form-input">--}}
-{{--                    <option selected value="">All Types</option>--}}
-{{--                    <option value="university">University</option>--}}
-{{--                    <option value="college">College</option>--}}
-{{--                    <option value="school">School</option>--}}
-{{--                    <option value="training">Training Center</option>--}}
-{{--                </select>--}}
-{{--                <select id="status-filter" class="form-input">--}}
-{{--                    <option selected value="">All Status</option>--}}
-{{--                    <option value="active">Active</option>--}}
-{{--                    <option value="inactive">Inactive</option>--}}
-{{--                    <option value="pending">Pending</option>--}}
-{{--                </select>--}}
-{{--            </div>--}}
-{{--        </div>--}}
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex-1">
+                <div class="relative">
+
+                    <input type="text" id="institute-search" class="form-input pl-10" placeholder="Search institutes...">
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <select id="status-filter" class="form-input">
+                    <option selected value="">All Institutes</option>
+                    <option value="active">Active</option>
+                    <option value="deleted">Deleted</option>
+                </select>
+            </div>
+        </div>
 
         <!-- Institute List -->
         <div class="card">
@@ -143,22 +137,20 @@
                                 <i class="fas fa-sort ml-1"></i>
                             </div>
                         </th>
+
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             <div class="flex items-center">
-                                Type
-                                <i class="fas fa-sort ml-1"></i>
-                            </div>
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            <div class="flex items-center">
-                                Location
-                                <i class="fas fa-sort ml-1"></i>
+                                Description
                             </div>
                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             <div class="flex items-center">
                                 Registered at
-                                <i class="fas fa-sort ml-1"></i>
+                            </div>
+                        </th>
+             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <div class="flex items-center">
+                                Action
                             </div>
                         </th>
 
@@ -181,70 +173,345 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-500 dark:text-gray-400">Institute</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{$institute->address}}</div>
-                            </td>
 
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                 {{$institute->created_at}}
                             </td>
-
-
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($institute->deleted_at)
+                                    <button class="toggle-status-btn text-sm text-gray-500 dark:text-gray-400"
+                                            data-id="{{ $institute->id }}"
+                                            title="Activate">
+                                        <i class="fa-solid fa-circle-check text-green-500"></i> Activate
+                                    </button>
+                                @else
+                                    <button class="toggle-status-btn text-sm text-gray-500 dark:text-gray-400"
+                                            data-id="{{ $institute->id }}"
+                                            title="Disable">
+                                        <i class="fa-solid fa-circle-xmark text-red-500"></i> Disable
+                                    </button>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                     @endforelse
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
-            <div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6 mt-4">
-                <div class="flex-1 flex justify-between sm:hidden">
-                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        Previous
-                    </a>
-                    <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        Next
-                    </a>
-                </div>
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300">
-                            Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">38</span> results
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <span class="sr-only">Previous</span>
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                            <a href="#" aria-current="page" class="z-10 bg-primary-50 dark:bg-primary-900 border-primary-500 dark:border-primary-500 text-primary-600 dark:text-primary-200 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                1
-                            </a>
-                            <a href="#" class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                2
-                            </a>
-                            <a href="#" class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                3
-                            </a>
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        ...
-                                    </span>
-                            <a href="#" class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                8
-                            </a>
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <span class="sr-only">Next</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </nav>
-                    </div>
-                </div>
+            <div id="pagination-container">
             </div>
+
         </div>
         <!-- Footer -->
         @component('components.backend.dashboard-footer')
         @endcomponent
     </main>
+@endsection
+
+@section("scripts")
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event delegation for all toggle buttons
+            document.addEventListener('click', async function(e) {
+                if (e.target.closest('.toggle-status-btn')) {
+                    const button = e.target.closest('.toggle-status-btn');
+                    const instituteId = button.dataset.id;
+
+                    try {
+                        // Set loading state
+                        const originalHTML = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                        button.disabled = true;
+
+                        const response = await fetch('/superadmin/api/institute/toggle-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                            },
+                            body: JSON.stringify({ id: instituteId })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) throw new Error(data.message || 'Request failed');
+
+                        // Update UI
+                        if (data.success) {
+                            // Update button appearance
+                            if (data.data.action === 'activate') {
+                                button.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i> Disable';
+                                button.title = 'Disable';
+                                button.closest('tr').classList.remove('bg-gray-100');
+                            } else {
+                                button.innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i> Activate';
+                                button.title = 'Activate';
+                                button.closest('tr').classList.add('bg-gray-100');
+                            }
+
+                            // Show success message
+                            showToast('success', data.message);
+                        }
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('error', error.message || 'Failed to toggle status');
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+            });
+
+            // Toast notification helper
+            function showToast(type, message) {
+                const toast = document.createElement('div');
+                toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md text-white ${
+                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const searchInput = document.getElementById('institute-search');
+            const statusFilter = document.getElementById('status-filter');
+            const institutesTableBody = document.querySelector('#instituteTableBody');
+            const paginationContainer = document.getElementById('pagination-container');
+
+            // Debounce function to limit API calls during typing
+            let debounceTimer;
+            const debounceDelay = 500;
+
+            // Current state
+            let currentPage = 1;
+            let currentSearch = '';
+            let currentStatus = '';
+            let currentSort = 'created_at';
+            let currentDirection = 'desc';
+
+            // Initialize
+            fetchInstitutes();
+
+            // Event Listeners
+            searchInput.addEventListener('input', function(e) {
+                currentSearch = e.target.value;
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    fetchInstitutes();
+                }, debounceDelay);
+            });
+
+            statusFilter.addEventListener('change', function(e) {
+                currentStatus = e.target.value;
+                currentPage = 1;
+                fetchInstitutes();
+            });
+
+            // Sort handler (if you have sortable columns)
+            document.querySelectorAll('[data-sort]').forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortColumn = this.dataset.sort;
+                    if (currentSort === sortColumn) {
+                        currentDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort = sortColumn;
+                        currentDirection = 'asc';
+                    }
+                    fetchInstitutes();
+                });
+            });
+
+            // Fetch institutes from API
+            function fetchInstitutes() {
+                const url = new URL('/superadmin/api/institute', window.location.origin);
+                url.searchParams.append('page', currentPage);
+                if (currentSearch) url.searchParams.append('search', currentSearch);
+                if (currentStatus) url.searchParams.append('status', currentStatus);
+                if (currentSort) url.searchParams.append('sort', currentSort);
+                if (currentDirection) url.searchParams.append('direction', currentDirection);
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            renderInstitutes(data.data.data);
+                            renderPagination(data.data);
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load institutes: ' + error.message);
+                    });
+            }
+
+            // Render institutes in table
+            function renderInstitutes(institutes) {
+                institutesTableBody.innerHTML = '';
+
+                if (institutes.length === 0) {
+                    institutesTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-4 text-center text-gray-500">
+                        No institutes found
+                    </td>
+                </tr>
+            `;
+                    return;
+                }
+
+                institutes.forEach(institute => {
+                    const row = document.createElement('tr');
+                    row.className = institute.deleted_at ? 'bg-gray-50' : '';
+
+                    row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=${encodeURIComponent(institute.name)}&background=0D8ABC&color=fff" alt="${institute.name}">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">${institute.name}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${institute.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">${institute.admin ? institute.admin.name : 'N/A'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    ${new Date(institute.created_at).toLocaleDateString()}
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap">
+                    ${institute.deleted_at ?
+                        `<button class="toggle-status-btn text-sm text-gray-500 dark:text-gray-400" data-id="${institute.id}" title="Activate">
+                            <i class="fa-solid fa-circle-check text-green-500"></i> Activate
+                        </button>` :
+                        `<button class="toggle-status-btn text-sm text-gray-500 dark:text-gray-400" data-id="${institute.id}" title="Disable">
+                            <i class="fa-solid fa-circle-xmark text-red-500"></i> Disable
+                        </button>`}
+                </td>
+            `;
+
+                    institutesTableBody.appendChild(row);
+                });
+
+                // Re-attach event listeners to toggle buttons
+                document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+                    btn.addEventListener('click', handleToggleStatus);
+                });
+            }
+
+            // Render pagination
+            function renderPagination(pagination) {
+                paginationContainer.innerHTML = '';
+
+                if (pagination.last_page <= 1) return;
+
+                const paginationEl = document.createElement('div');
+                paginationEl.className = 'flex items-center justify-between mt-4';
+
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = `px-4 py-2 rounded-md ${pagination.current_page === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white'}`;
+                prevBtn.textContent = 'Previous';
+                prevBtn.disabled = pagination.current_page === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (pagination.current_page > 1) {
+                        currentPage = pagination.current_page - 1;
+                        fetchInstitutes();
+                    }
+                });
+
+                // Page info
+                const pageInfo = document.createElement('span');
+                pageInfo.className = 'text-sm text-gray-700';
+                pageInfo.textContent = `Page ${pagination.current_page} of ${pagination.last_page}`;
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = `px-4 py-2 rounded-md ${pagination.current_page === pagination.last_page ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white'}`;
+                nextBtn.textContent = 'Next';
+                nextBtn.disabled = pagination.current_page === pagination.last_page;
+                nextBtn.addEventListener('click', () => {
+                    if (pagination.current_page < pagination.last_page) {
+                        currentPage = pagination.current_page + 1;
+                        fetchInstitutes();
+                    }
+                });
+
+                paginationEl.appendChild(prevBtn);
+                paginationEl.appendChild(pageInfo);
+                paginationEl.appendChild(nextBtn);
+                paginationContainer.appendChild(paginationEl);
+            }
+
+            // Toggle status handler
+            function handleToggleStatus(e) {
+                const button = e.currentTarget;
+                const instituteId = button.dataset.id;
+
+                // Show loading
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                button.disabled = true;
+
+                fetch('/superadmin/api/institute/toggle-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ id: instituteId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.success) {
+                            fetchInstitutes(); // Refresh the table
+                            showToast('success', data.message);
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('error', error.message);
+                    })
+                    .finally(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalHTML;
+                    });
+            }
+
+            // Toast notification
+            function showToast(type, message) {
+                // Using SweetAlert if available, otherwise fallback to alert
+                if (typeof window.Swal !== 'undefined') {
+                    window.Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: type,
+                        title: message,
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } else {
+                    alert(`${type}: ${message}`);
+                }
+            }
+        });
+    </script>
 @endsection

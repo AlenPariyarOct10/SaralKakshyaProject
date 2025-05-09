@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Backend\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -55,6 +58,60 @@ class ProfileController extends Controller
     public function update(Request $request, string $id)
     {
         //
+    }
+
+    public function changePassword(Request $request)
+    {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|different:currentPassword',
+            'password_confirmation' => 'required|string|same:password',
+        ]);
+
+        // Get the authenticated user
+        $user = SuperAdmin::all()->first();
+
+        // Verify the current password
+        if (!Hash::check($validatedData['current_password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect'
+            ], 401);
+        }
+
+        // Update the password
+        $user->password = Hash::make($validatedData['password']);
+        $user->save();
+
+        // Return success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully'
+        ]);
+    }
+
+    public function updateProfilePicture(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old profile picture if exists and not a default URL
+        if ($user->profile_picture && Storage::exists($user->profile_picture)) {
+            Storage::delete($user->profile_picture);
+        }
+
+        // Store new profile picture
+        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+
+        // Update user model
+        $user->profile_picture = 'storage/' . $path;
+        $user->save();
+
+        return response()->json(["success"=>true]);
     }
 
     /**

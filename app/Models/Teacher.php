@@ -23,7 +23,6 @@ class Teacher extends Authenticatable
         'gender',
         'dob',
         'qualification',
-        'subject',
         'profile_picture',
         'password',
         'status'

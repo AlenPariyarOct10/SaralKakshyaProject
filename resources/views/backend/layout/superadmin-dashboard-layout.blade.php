@@ -8,9 +8,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{\App\Models\SystemSetting::all()->first()->name}} - Dashboard</title>
+    <meta name="csrf-token" content="{{csrf_token()}}">
+    <title>{{\App\Models\SystemSetting::all()->first()->name}} - @yield("title")</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="{{asset("js/sweetalert.js")}}"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -82,7 +84,7 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
         <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
-            <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">SuperAdmin Portal</h1>
+            <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">{{\App\Models\SystemSetting::all()->first()->name}}</h1>
             <button id="closeSidebar" class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                 <i class="fas fa-times"></i>
             </button>
@@ -100,7 +102,7 @@
                     <button id="openSidebar" class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
                 </div>
 
                 <div class="flex items-center space-x-4">

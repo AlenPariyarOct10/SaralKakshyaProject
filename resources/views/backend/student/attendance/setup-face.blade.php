@@ -4,231 +4,102 @@
 
 @section('styles')
     <style>
-        .camera-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            overflow: hidden;
-            border-radius: 0.5rem;
-            aspect-ratio: 4/3;
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .dark .card {
+            background: #1f2937;
+            color: #f3f4f6;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
         }
 
         #video {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror effect */
-        }
-
-        .camera-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .face-guide {
-            width: 200px;
-            height: 200px;
-            border: 2px dashed rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #000;
         }
 
         .capture-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-        }
-
-        .photo-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            object-fit: cover;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .photo-preview:hover {
-            transform: scale(1.05);
-        }
-
-        .photo-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .photo-indicator.active {
-            background-color: #0ea5e9;
-            color: white;
-        }
-
-        .photo-indicator.completed {
-            background-color: #10b981;
-            color: white;
-        }
-
-        .photo-indicator.empty {
-            background-color: #e5e7eb;
-            color: #9ca3af;
-        }
-
-        .camera-container .loading-spinner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 30;
-        }
-
-        .camera-instructions {
-            position: absolute;
-            bottom: 80px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-weight: 500;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-            z-index: 15;
-        }
-
-        .camera-feedback {
-            position: absolute;
-            top: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            padding: 6px;
-            border-radius: 4px;
-            font-weight: 500;
-            z-index: 20;
-        }
-
-        .camera-feedback.success {
-            background-color: rgba(16, 185, 129, 0.8);
-            color: white;
-        }
-
-        .camera-feedback.error {
-            background-color: rgba(239, 68, 68, 0.8);
-            color: white;
-        }
-
-        /* Animation for capture flash */
-        @keyframes captureFlash {
-            0% { background-color: rgba(255, 255, 255, 0); }
-            50% { background-color: rgba(255, 255, 255, 0.8); }
-            100% { background-color: rgba(255, 255, 255, 0); }
-        }
-
-        .capture-flash {
-            animation: captureFlash 0.5s ease-out;
-        }
-
-        /* Captured image card styles */
-        .captured-image-card {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            background-color: white;
-            margin-bottom: 16px;
-        }
-
-        .captured-image-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .captured-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .image-card-footer {
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .remove-photo-btn {
-            padding: 4px 8px;
             background-color: #ef4444;
             color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.2s;
+            font-weight: 500;
         }
 
-        .remove-photo-btn:hover {
+        .capture-btn:hover {
             background-color: #dc2626;
         }
 
-        .photo-number {
-            font-weight: 500;
-            color: #6b7280;
-            font-size: 12px;
+        #capturedPhotosContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
         }
 
-        .photos-grid {
+        #capturedPhotosContainer img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #e5e7eb;
+        }
+
+        #photoReviewContainer {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 640px) {
-            .photos-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        #photoReviewContainer img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 2px solid #e5e7eb;
         }
 
-        /* Image card entrance animation */
-        @keyframes cardEntrance {
-            from {
-                opacity: 0;
-                transform: translateY(25px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hidden {
+            display: none;
         }
 
-        .card-entrance {
-            animation: cardEntrance 0.3s ease-out forwards;
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 @endsection
@@ -236,173 +107,99 @@
 @section('content')
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-4xl mx-auto">
-            <!-- Page Title -->
+            <!-- Page Header -->
             <div class="text-center mb-8">
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Face Recognition Setup</h1>
-                <p class="text-gray-600 dark:text-gray-400">Capture 5 photos of your face to enable attendance through facial recognition</p>
-            </div>
-            <div class="overriding-warning bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-3 rounded relative"
-                 role="alert">
-                <strong class="font-bold">Alert !</strong>
-                <span class="block sm:inline">You have already configured face recognition setup. If you proceed existing setup will be overwritten.</span>
-            </div>
-            <!-- Setup Progress -->
-            <div class="card mb-8">
-
-                <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Setup Progress</h3>
-                <div class="relative">
-                    <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200 dark:bg-gray-700">
-                        <div id="progressBar" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500" style="width: 0%"></div>
-                    </div>
-                    <div class="flex justify-between mt-2">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Getting Started</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Complete</span>
-                    </div>
-                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Capture 5 photos of your face to enable attendance through facial recognition.
+                </p>
             </div>
 
-            <!-- Step 1: Instructions Card -->
-            <div id="step1" class="card mb-8">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0 mt-1">
-                        <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold">1</div>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Before You Begin</h3>
-                        <ul class="mt-4 space-y-3 text-gray-600 dark:text-gray-400">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                <span>Make sure you are in a well-lit environment</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                <span>Remove glasses, hats, or anything covering your face</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                <span>Position your face within the circular guide</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                <span>You'll need to capture 5 photos from slightly different angles</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                <span>Your browser will ask for camera permission - please allow it</span>
-                            </li>
-                        </ul>
-                        <button id="startSetupBtn" class="mt-6 btn-primary">
-                            <i class="fas fa-camera mr-2"></i> Start Camera Setup
-                        </button>
-                    </div>
-                </div>
+            <!-- Warning for Overriding -->
+            <div id="overridingWarning" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-6 rounded relative hidden" role="alert">
+                <strong class="font-bold">Alert!</strong>
+                <span class="block sm:inline">
+                    You have already configured face recognition setup. If you proceed, the existing setup will be overwritten.
+                </span>
             </div>
 
-            <!-- Step 2: Camera and Capture -->
-            <div id="step2" class="card mb-8 hidden">
-                <div class="flex items-start mb-6">
-                    <div class="flex-shrink-0 mt-1">
-                        <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold">2</div>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Capture Your Photos</h3>
-                        <p class="text-gray-600 dark:text-gray-400 mt-1">Position your face in the circle and take 5 photos</p>
-                    </div>
+            <!-- Steps and Forms -->
+            <div id="setup-steps">
+                <!-- Step 1: Instructions -->
+                <div id="step1" class="card mb-8">
+                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Instructions</h3>
+                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                        <li>Make sure you are in a well-lit environment.</li>
+                        <li>Remove glasses, hats, or coverings.</li>
+                        <li>Position your face within the guide.</li>
+                        <li>Keep a neutral expression for best results.</li>
+                        <li>Ensure your entire face is visible.</li>
+                    </ul>
+                    <button id="startSetupBtn" class="btn-primary">
+                        Start Camera Setup
+                    </button>
                 </div>
 
-                <div class="mb-6">
-                    <div class="camera-container">
+                <!-- Step 2: Capture Photos -->
+                <div id="step2" class="card mb-8 hidden">
+                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Capture Photos</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-400">Please position your face in the center of the frame.</p>
+                    <div class="relative">
                         <video id="video" autoplay playsinline muted></video>
-                        <div class="camera-overlay">
-                            <div class="face-guide"></div>
-                        </div>
-                        <div id="cameraInstructions" class="camera-instructions">
-                            Position your face in the circle
-                        </div>
-                        <div id="cameraFeedback" class="camera-feedback hidden"></div>
-                        <button id="captureBtn" class="capture-btn px-4 py-2 bg-white text-primary-600 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <i class="fas fa-camera mr-1"></i> Capture
-                        </button>
-                        <div id="loadingSpinner" class="loading-spinner hidden">
-                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-                        </div>
-                        <canvas id="canvas" class="hidden"></canvas>
-                    </div>
-                </div>
-
-                <!-- Captured Photos Container -->
-                <div class="mb-6">
-                    <h4 id="capturedPhotosCount" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Captured Photos (0/5)</h4>
-                    <div id="capturedPhotosContainer" class="photos-grid">
-                        <!-- Captured photos will be added here dynamically -->
-                    </div>
-                </div>
-
-                <div class="flex justify-between">
-                    <button id="backToStep1Btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button id="goToStep3Btn" class="btn-primary opacity-50 cursor-not-allowed" disabled>
-                        Continue <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Confirmation and Submission -->
-            <div id="step3" class="card mb-8 hidden">
-                <div class="flex items-start mb-6">
-                    <div class="flex-shrink-0 mt-1">
-                        <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold">3</div>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Review & Submit</h3>
-                        <p class="text-gray-600 dark:text-gray-400 mt-1">Review your photos and submit them for processing</p>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Your Captured Photos</h4>
-                    <div id="photoReviewContainer" class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        <!-- Photos will be inserted here dynamically -->
-                    </div>
-                </div>
-
-                <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-md mb-6">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-lg"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">What happens next?</h3>
-                            <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                                <p>Your face images will be securely processed to create a unique biometric template. This template will be used for attendance verification only and is stored securely.</p>
-                            </div>
+                        <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none">
+                            <div class="border-2 border-white rounded-full w-64 h-64 opacity-50"></div>
                         </div>
                     </div>
+                    <div class="flex items-center justify-between mt-4">
+                        <button id="captureBtn" class="capture-btn">Capture Photo</button>
+                        <span id="photoCounter" class="text-gray-600 dark:text-gray-400">0/5 photos captured</span>
+                    </div>
+                    <div id="capturedPhotosContainer" class="mt-6"></div>
+                    <button id="goToStep3Btn" class="btn-primary hidden mt-4">Continue to Review</button>
                 </div>
 
-                <div class="flex justify-between">
-                    <button id="backToStep2Btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button id="submitBtn" class="btn-primary">
-                        <i class="fas fa-check mr-2"></i> Submit Photos
-                    </button>
+                <!-- Step 3: Review and Submit -->
+                <div id="step3" class="card mb-8 hidden">
+                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Review Your Photos</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-400">Please review your captured photos before submission.</p>
+                    <div id="photoReviewContainer"></div>
+                    <div class="flex space-x-4 mt-6">
+                        <button id="backToStep2Btn" class="btn-primary bg-gray-500 hover:bg-gray-600">Retake Photos</button>
+                        <button id="submitBtn" class="btn-primary">Submit Photos</button>
+                    </div>
+                    <div id="loadingIndicator" class="mt-4 hidden">
+                        <div class="loading-spinner"></div>
+                        <p class="text-center mt-2">Processing your photos...</p>
+                    </div>
                 </div>
-            </div>
 
-
-
-            <!-- Step 4: Success -->
-            <div id="step4" class="card text-center hidden">
-                <div class="w-20 h-20 mx-auto mb-4 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                    <i class="fas fa-check text-green-500 dark:text-green-400 text-4xl"></i>
+                <!-- Step 4: Success -->
+                <div id="step4" class="card text-center hidden">
+                    <div class="mb-4 text-green-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Setup Complete!</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">
+                        You can now use facial recognition for attendance.
+                    </p>
+                    <a href="{{ route('student.dashboard') }}" class="btn-primary inline-block">Return to Dashboard</a>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Setup Complete!</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">Your face recognition setup has been successfully completed. You can now use facial recognition for attendance.</p>
-                <a href="{{ route('student.attendance.index') }}" class="btn-primary inline-block">
-                    <i class="fas fa-calendar-check mr-2"></i> View My Attendance
-                </a>
+
+                <!-- Step 5: Error -->
+                <div id="step5" class="card text-center hidden">
+                    <div class="mb-4 text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Setup Failed</h3>
+                    <p id="errorMessage" class="text-gray-600 dark:text-gray-400 mb-6">
+                        There was an error processing your photos.
+                    </p>
+                    <button id="tryAgainBtn" class="btn-primary">Try Again</button>
+                </div>
             </div>
         </div>
     </div>
@@ -411,399 +208,226 @@
 @section('scripts')
     <script>
         // Global variables
-        let currentStep = 1;
         let stream = null;
         let capturedPhotos = [];
-        let currentPhotoIndex = 0;
-        let processing = false;
         let overriding = false;
 
         // DOM elements
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const step4 = document.getElementById('step4');
-        const progressBar = document.getElementById('progressBar');
-        const startSetupBtn = document.getElementById('startSetupBtn');
-        const backToStep1Btn = document.getElementById('backToStep1Btn');
-        const backToStep2Btn = document.getElementById('backToStep2Btn');
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('captureBtn');
         const goToStep3Btn = document.getElementById('goToStep3Btn');
         const submitBtn = document.getElementById('submitBtn');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureBtn = document.getElementById('captureBtn');
-        const cameraInstructions = document.getElementById('cameraInstructions');
-        const cameraFeedback = document.getElementById('cameraFeedback');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const photoReviewContainer = document.getElementById('photoReviewContainer');
-        const capturedPhotosContainer = document.getElementById('capturedPhotosContainer');
-        const capturedPhotosCount = document.getElementById('capturedPhotosCount');
+        const backToStep2Btn = document.getElementById('backToStep2Btn');
+        const tryAgainBtn = document.getElementById('tryAgainBtn');
+        const photoCounter = document.getElementById('photoCounter');
+        const overridingWarning = document.getElementById('overridingWarning');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
 
-        // Update progress bar
-        function updateProgress(step) {
-            const progress = (step - 1) * 33.3; // 3 steps, each 33.3%
-            progressBar.style.width = `${progress}%`;
+        // Check if user already has face data
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/has-face', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_id: {{ $user->id }},
+                        institute_id: {{ $user->institute_id ?? 0 }}
+                    })
+                });
+
+                const data = await response.json();
+                if (data.exists) {
+                    overriding = true;
+                    overridingWarning.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error checking face data:', error);
+            }
+        });
+
+        // Show step function
+        function showStep(stepNumber) {
+            document.querySelectorAll('#setup-steps > div').forEach(step => {
+                step.classList.add('hidden');
+            });
+            document.getElementById(`step${stepNumber}`).classList.remove('hidden');
         }
 
-        // Show a specific step
-        function showStep(step) {
-            step1.classList.add('hidden');
-            step2.classList.add('hidden');
-            step3.classList.add('hidden');
-            step4.classList.add('hidden');
+        // Start Camera Setup
+        document.getElementById('startSetupBtn').addEventListener('click', async function() {
+            try {
+                await startCamera();
+                showStep(2);
+            } catch (error) {
+                console.error('Could not start camera:', error);
+                errorMessage.textContent = 'Could not access camera. Please check permissions.';
+                showStep(5);
+            }
+        });
 
-            if (step === 1) step1.classList.remove('hidden');
-            if (step === 2) step2.classList.remove('hidden');
-            if (step === 3) step3.classList.remove('hidden');
-            if (step === 4) step4.classList.remove('hidden');
-
-            currentStep = step;
-            updateProgress(step);
-        }
-
-        // Start camera
+        // Start Camera
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
+                        facingMode: 'user',
                         width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        facingMode: "user"
+                        height: { ideal: 720 }
                     }
                 });
                 video.srcObject = stream;
-                return true;
             } catch (err) {
-                showFeedback(`Camera error: ${err.message}`, 'error');
                 console.error('Error accessing camera:', err);
-                return false;
+                throw err;
             }
         }
 
-        // Stop camera
+        // Stop Camera
         function stopCamera() {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
                 stream = null;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://127.0.0.1:5000/has-face', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    institute_id: '{{Auth::user()->institute_id}}',
-                    student_id: '{{Auth::user()->id}}'
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        overriding = true;
-                    } else {
-                        overriding = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                });
-
-            const warnings = document.querySelectorAll('.overriding-warning');
-            warnings.forEach(warning => {
-                if (overriding == true) {
-                    warning.classList.add("hidden");
-                } else {
-                    warning.classList.remove("hidden");
-                }
-            });
-
-        });
-
-
-            // Capture photo
-        function capturePhoto() {
-            if (processing) return;
+        // Capture Photo
+        captureBtn.addEventListener('click', function() {
             if (capturedPhotos.length >= 5) {
-                showFeedback('Maximum number of photos already captured', 'error');
+                alert("You've already captured the maximum of 5 photos!");
                 return;
             }
 
-            processing = true;
-            loadingSpinner.classList.remove('hidden');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
 
-            // Create flash effect
-            const flash = document.createElement('div');
-            flash.className = 'absolute inset-0 bg-white bg-opacity-0 capture-flash';
-            document.querySelector('.camera-container').appendChild(flash);
+            // Draw the video frame to canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            setTimeout(() => {
-                flash.remove();
+            // Convert to JPEG with quality 0.8 (80%)
+            const photo = canvas.toDataURL('image/jpeg', 0.8);
+            capturedPhotos.push(photo);
 
-                // Capture from video
-                const context = canvas.getContext('2d');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Get image data
-                const imageData = canvas.toDataURL('image/jpeg');
-
-                // Simulate face detection (would be done on the server in a real app)
-                setTimeout(() => {
-                    // 80% chance of successful face detection for demo purposes
-                    const faceDetected = true;
-
-                    if (faceDetected) {
-                        // Add to captured photos array
-                        capturedPhotos.push(imageData);
-                        currentPhotoIndex = capturedPhotos.length;
-
-                        // Update UI
-                        updateCapturedPhotosUI();
-                        showFeedback('Face captured successfully!', 'success');
-
-                        // Check if all photos captured
-                        if (capturedPhotos.length === 5) {
-                            goToStep3Btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                            goToStep3Btn.disabled = false;
-                            showFeedback('All photos captured! Click Continue.', 'success');
-                        } else {
-                            // Update instructions for next photo
-                            updateCaptureInstructions();
-                        }
-                    } else {
-                        showFeedback('Face not detected clearly. Please try again.', 'error');
-                    }
-
-                    processing = false;
-                    loadingSpinner.classList.add('hidden');
-                }, 1500); // Simulate processing time
-            }, 300);
-        }
-
-        // Update capture instructions based on current photo index
-        function updateCaptureInstructions() {
-            const instructions = [
-                'Position your face in the center',
-                'Tilt your head slightly to the right',
-                'Tilt your head slightly to the left',
-                'Tilt your head slightly upward',
-                'Tilt your head slightly downward'
-            ];
-
-            cameraInstructions.textContent = instructions[currentPhotoIndex];
-        }
-
-        // Show feedback message
-        function showFeedback(message, type) {
-            cameraFeedback.textContent = message;
-            cameraFeedback.className = `camera-feedback ${type}`;
-            cameraFeedback.classList.remove('hidden');
-
-            setTimeout(() => {
-                cameraFeedback.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Remove a captured photo
-        function removePhoto(index) {
-            // Remove the photo from the array
-            capturedPhotos.splice(index, 1);
-            currentPhotoIndex = capturedPhotos.length;
-
-            // Update the UI
             updateCapturedPhotosUI();
-            updateCaptureInstructions();
+            updatePhotoCounter();
 
-            // Update button state
-            if (capturedPhotos.length < 5) {
-                goToStep3Btn.classList.add('opacity-50', 'cursor-not-allowed');
-                goToStep3Btn.disabled = true;
+            if (capturedPhotos.length === 5) {
+                goToStep3Btn.classList.remove('hidden');
             }
+        });
 
-            showFeedback('Photo removed', 'success');
-        }
-
-        // Update the UI to show captured photos
+        // Update Captured Photos UI
         function updateCapturedPhotosUI() {
-            // Update the header text
-            capturedPhotosCount.textContent = `Captured Photos (${capturedPhotos.length}/5)`;
+            const container = document.getElementById('capturedPhotosContainer');
+            container.innerHTML = '';
 
-            // Clear the container
-            capturedPhotosContainer.innerHTML = '';
-
-            // Add each captured photo as a card
             capturedPhotos.forEach((photo, index) => {
-                const photoCard = document.createElement('div');
-                photoCard.className = 'captured-image-card card-entrance';
-
-                photoCard.innerHTML = `
-                    <img src="${photo}" alt="Captured face ${index + 1}" class="captured-image">
-                    <div class="image-card-footer">
-                        <span class="photo-number">Photo ${index + 1}</span>
-                        <button class="remove-photo-btn" data-index="${index}">
-                            <i class="fas fa-trash-alt mr-1"></i> Remove
-                        </button>
-                    </div>
-                `;
-
-                capturedPhotosContainer.appendChild(photoCard);
-
-                // Add event listener to the remove button
-                const removeBtn = photoCard.querySelector('.remove-photo-btn');
-                removeBtn.addEventListener('click', function() {
-                    const photoIndex = parseInt(this.getAttribute('data-index'));
-                    removePhoto(photoIndex);
-                });
+                const img = document.createElement('img');
+                img.src = photo;
+                img.alt = `Captured Photo ${index + 1}`;
+                img.className = 'object-cover';
+                container.appendChild(img);
             });
         }
 
-        // Prepare the review screen
-        function prepareReviewScreen() {
-            photoReviewContainer.innerHTML = '';
-
-            capturedPhotos.forEach((photo, index) => {
-                const photoElement = document.createElement('div');
-                photoElement.className = 'relative';
-                photoElement.innerHTML = `
-                    <img src="${photo}" alt="Captured face ${index + 1}" class="w-full h-32 object-cover rounded-lg shadow-sm">
-                    <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold">${index + 1}</div>
-                `;
-                photoReviewContainer.appendChild(photoElement);
-            });
+        // Update photo counter
+        function updatePhotoCounter() {
+            photoCounter.textContent = `${capturedPhotos.length}/5 photos captured`;
         }
 
-        // Submit photos to the server
-        function submitPhotos() {
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        // Go to Step 3 (Review)
+        goToStep3Btn.addEventListener('click', function() {
+            const reviewContainer = document.getElementById('photoReviewContainer');
+            reviewContainer.innerHTML = '';
 
-            // Prepare the data
-            const formData = new FormData();
             capturedPhotos.forEach((photo, index) => {
-                // Convert base64 to blob
-                const byteString = atob(photo.split(',')[1]);
-                const mimeString = photo.split(',')[0].split(':')[1].split(';')[0];
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
-                }
-                const blob = new Blob([ab], { type: mimeString });
-                formData.append(`photo_${index + 1}`, blob, `photo_${index + 1}.jpg`);
+                const div = document.createElement('div');
+                div.className = 'flex flex-col items-center';
+
+                const img = document.createElement('img');
+                img.src = photo;
+                img.alt = `Review Photo ${index + 1}`;
+                img.className = 'mb-2';
+
+                const label = document.createElement('span');
+                label.textContent = `Photo ${index + 1}`;
+                label.className = 'text-sm text-gray-600 dark:text-gray-400';
+
+                div.appendChild(img);
+                div.appendChild(label);
+                reviewContainer.appendChild(div);
             });
 
-            // Add CSRF token
-            formData.append('_token', '{{ csrf_token() }}');
+            showStep(3);
+            stopCamera();
+        });
 
-            // Simulate submission for demo (uncomment and modify for actual implementation)
-            setTimeout(() => {
-                showStep(4);
-                progressBar.style.width = '100%';
-            }, 2000);
+        // Back to Step 2 (Retake photos)
+        backToStep2Btn.addEventListener('click', function() {
+            capturedPhotos = [];
+            showStep(2);
+            startCamera();
+        });
 
-            // Actual form submission (commented out for demonstration)
+        // Try again button
+        tryAgainBtn.addEventListener('click', function() {
+            capturedPhotos = [];
+            showStep(1);
+        });
 
-            if(overriding==true)
-            {
-                fetch('{{ route("student.updateFacePhotos") }}', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Show success screen
-                            showStep(4);
-                            progressBar.style.width = '100%';
-                        } else {
-                            alert('Error: ' + data.message);
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                    });
-            }else{
-                fetch('{{ route("student.saveFacePhotos") }}', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Show success screen
-                            showStep(4);
-                            progressBar.style.width = '100%';
-                        } else {
-                            alert('Error: ' + data.message);
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit Photos';
-                    });
+        // Submit Photos
+        submitBtn.addEventListener('click', async function() {
+            if (capturedPhotos.length < 5) {
+                alert('Please capture all 5 photos before submitting.');
+                return;
             }
 
+            submitBtn.disabled = true;
+            loadingIndicator.classList.remove('hidden');
 
+            try {
+                const endpoint = overriding ? 'http://127.0.0.1:5000/update-face' : 'http://127.0.0.1:5000/register-face';
 
-        }
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_id: {{ $user->id }},
+                        institute_id: {{ $user->institute_id ?? 0 }},
+                        images: capturedPhotos
+                    })
+                });
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Start setup button
-            startSetupBtn.addEventListener('click', async function() {
-                const cameraStarted = await startCamera();
-                if (cameraStarted) {
-                    showStep(2);
-                    updateCaptureInstructions();
+                const data = await response.json();
+
+                if (data.success) {
+                    showStep(4);
+                } else {
+                    errorMessage.textContent = data.error || 'Failed to submit photos. Please try again.';
+                    showStep(5);
                 }
-            });
+            } catch (err) {
+                console.error('Submission error:', err);
+                errorMessage.textContent = 'Network error. Please check your connection and try again.';
+                showStep(5);
+            } finally {
+                submitBtn.disabled = false;
+                loadingIndicator.classList.add('hidden');
+            }
+        });
 
-            // Back buttons
-            backToStep1Btn.addEventListener('click', function() {
-                showStep(1);
-                stopCamera();
-            });
-
-            backToStep2Btn.addEventListener('click', async function() {
-                const cameraStarted = await startCamera();
-                if (cameraStarted) {
-                    showStep(2);
-                    updateCaptureInstructions();
-                }
-            });
-
-            // Capture button
-            captureBtn.addEventListener('click', capturePhoto);
-
-            // Next step button
-            goToStep3Btn.addEventListener('click', function() {
-                if (capturedPhotos.length === 5) {
-                    stopCamera();
-                    showStep(3);
-                    prepareReviewScreen();
-                }
-            });
-
-            // Submit button
-            submitBtn.addEventListener('click', submitPhotos);
+        // Clean up camera when leaving the page
+        window.addEventListener('beforeunload', function() {
+            stopCamera();
         });
     </script>
 @endsection

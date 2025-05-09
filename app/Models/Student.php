@@ -54,7 +54,9 @@ class Student extends Authenticatable
 
     public function institutes()
     {
-        return $this->belongsToMany(Institute::class, 'institute_student');
+        return $this->belongsToMany(Institute::class, 'institute_student')
+            ->withPivot('approved_at')
+            ->withTimestamps();
     }
 
     public function activityLogs()

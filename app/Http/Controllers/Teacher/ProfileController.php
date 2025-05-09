@@ -23,6 +23,9 @@ class ProfileController extends Controller
         return view('backend.teacher.profile.index', compact('teacher', 'institute'));
     }
 
+
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -36,7 +39,30 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'gender' => 'required|string|max:255',
+            'dob' => 'required|date_format:Y-m-d',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|email|unique:teachers,email,' . Auth::id(),
+        ]);
+
+        $profile = Teacher::find(Auth::id());
+
+        if ($profile) {
+            $profile->update([
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'gender' => $request->gender,
+                'dob' => $request->dob,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'profile_picture' => $request->profile_picture,
+            ]);
+        }
+
+        return redirect()->route('teacher.profile.index')->with('success', 'Profile updated successfully');
     }
 
     /**

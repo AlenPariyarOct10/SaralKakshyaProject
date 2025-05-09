@@ -30,34 +30,18 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:students',
             'institute' => 'required|exists:institutes,id',
             'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required|string|min:6',
         ]);
 
-        // Create the student
-        $student = Student::create([
-            'fname'    => $request->fname,
-            'lname'    => $request->lname,
-            'email'    => $request->email,
+        // Temporarily store the basic details in the session
+        $request->session()->put('student_registration', [
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'email' => $request->email,
+            'institute' => $request->institute,
             'password' => Hash::make($request->password),
         ]);
 
-        // Attach to institute
-        $student->institutes()->attach($request->institute);
-
-        // Log registration activity
-        ActivityLog::create([
-            'user_id'     => $student->id,
-            'user_type'   => 'student',
-            'action_type' => 'register',
-            'description' => 'Student registered an account',
-            'model_type'  => get_class($student),
-            'model_id'    => $student->id,
-            'url'         => $request->fullUrl(),
-            'ip_address'  => $request->ip(),
-            'user_agent'  => $request->userAgent(),
-        ]);
-
-        return redirect()->route('student.login')->with('success', 'You have successfully registered.');
+        return redirect()->route('student.complete-profile')->with('success', 'Basic registration successful! Please complete your profile.');
     }
 
     public function showLogin()
@@ -82,6 +66,7 @@ class AuthController extends Controller
 
         // Attempt authentication
         if (!Auth::guard('student')->attempt($request->only('email', 'password'))) {
+
             return back()
                 ->withErrors(['email' => 'Invalid credentials'])
                 ->withInput($request->only('email', 'institute'));
@@ -111,6 +96,8 @@ class AuthController extends Controller
                 ])
                 ->withInput($request->only('email', 'institute'));
         }
+
+        Student::where('id', $student->id)->update(['institute_id' => $validated['institute']]);
 
         // Regenerate session for security
         $request->session()->regenerate();
@@ -148,5 +135,78 @@ class AuthController extends Controller
         Auth::guard('student')->logout();
 
         return redirect()->route('student.login');
+    }
+
+    public function showCompleteProfile(Request $request)
+    {
+        // Check if basic registration details are in the session
+        if (!$request->session()->has('student_registration')) {
+            return redirect()->route('student.register')->with('error', 'Please complete the basic registration first.');
+        }
+
+        $studentData = $request->session()->get('student_registration');
+        return view('backend.student.signup-phase2', compact('studentData'));
+    }
+
+    public function completeProfile(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:255',
+            'gender' => 'required|in:male,female,other',
+            'dob' => 'required|date',
+            'guardian_name' => 'required|string|max:255',
+            'guardian_phone' => 'required|string|max:15',
+            'roll_number' => 'required|string|max:20|unique:students',
+            'batch' => 'required|string|max:50',
+            'section' => 'required|string|max:10',
+            'admission_date' => 'required|date',
+            'profile_picture' => 'nullable|image|max:2048',
+        ]);
+
+        // Retrieve basic registration details from the session
+        $basicDetails = $request->session()->get('student_registration');
+
+        if (!$basicDetails) {
+            return redirect()->route('student.register')->with('error', 'Session expired. Please register again.');
+        }
+
+        // Create the student account
+        $student = Student::create(array_merge($basicDetails, [
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'gender' => $request->gender,
+            'dob' => $request->dob,
+            'guardian_name' => $request->guardian_name,
+            'guardian_phone' => $request->guardian_phone,
+            'roll_number' => $request->roll_number,
+            'batch' => $request->batch,
+            'section' => $request->section,
+            'admission_date' => $request->admission_date,
+            'profile_picture' => $request->file('profile_picture') ? $request->file('profile_picture')->store('profile_pictures', 'public') : null,
+            'status' => true, // Mark as active
+            'institute_id' => $request->institute, // Mark as active
+        ]));
+
+        // Attach the student to the selected institute
+        $student->institutes()->attach($basicDetails['institute']);
+
+        // Log the profile completion activity
+        ActivityLog::create([
+            'user_id'     => $student->id,
+            'user_type'   => 'student',
+            'action_type' => 'complete_profile',
+            'description' => 'Student completed their profile (Phase 2)',
+            'model_type'  => get_class($student),
+            'model_id'    => $student->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
+        // Clear the session data after successful account creation
+        $request->session()->forget('student_registration');
+
+        return redirect()->route('student.login')->with('success', 'Profile completed successfully!');
     }
 }

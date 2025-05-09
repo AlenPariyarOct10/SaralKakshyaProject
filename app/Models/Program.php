@@ -15,11 +15,17 @@ class Program extends Model
         'duration',
         'status',
         'description',
+        'institute_id',
         'created_by',
     ];
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function institute()
+    {
+        return $this->belongsTo(Institute::class);
     }
 
     public function subjects()

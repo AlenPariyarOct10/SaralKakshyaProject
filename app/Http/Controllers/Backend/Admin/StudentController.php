@@ -22,27 +22,31 @@ class StudentController extends Controller
     public function index()
     {
         $user = Auth::user(); // assuming Admin is logged in
+        $instituteId = $user->institute->id;
 
-        $instituteId = Admin::find($user->id)->institute->id;
-
-        $students = Student::where('institute_id', $instituteId)->get();
-
+        // Get students through the pivot table relationship
+        $students = Student::whereHas('institutes', function ($query) use ($instituteId) {
+            $query->where('institutes.id', $instituteId);
+        })->get();
 
         return view('backend.admin.students.index', compact('user', 'students'));
     }
 
+
     public function index_pending_students()
     {
-        $adminInstituteId = Auth::user()->institute->id;
         $user = Auth::user();
+        $adminInstituteId = $user->institute->id;
 
+        // Get students who belong to this institute and are not yet approved
         $students = Student::whereHas('institutes', function ($query) use ($adminInstituteId) {
-            $query->where('institute_id', $adminInstituteId)
-                ->whereNull('institute_student.approved_at');
-        })->orderBy('created_at', 'DESC')->get();
+            $query->where('institutes.id', $adminInstituteId)
+                ->whereNull('institute_student.approved_at'); // ← This is the correct way
+        })->orderBy('created_at', 'desc')->get();
 
         return view('backend.admin.students.unapproved', compact('students', 'user'));
     }
+
 
 
     public function generatePDF()

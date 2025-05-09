@@ -47,13 +47,15 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Subjects
         Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
+        Route::get('/subjects/getAll', [AdminSubjectController::class, 'getAll'])->name('admin.subjects.getAll');
         Route::get('/subject/create', [AdminSubjectController::class, 'create'])->name('admin.subjects.create');
         Route::post('/subject', [AdminSubjectController::class, 'store'])->name('admin.subjects.store');
         Route::get('/subject/{id}/edit', [AdminSubjectController::class, 'edit'])->name('admin.subjects.edit');
         Route::get('/subject/{id}/evaluations', [AdminSubjectController::class, 'getEvaluationFormats']);
         Route::put('/subject/{id}/edit', [AdminSubjectController::class, 'update'])->name('admin.subjects.update');
         Route::delete('/subject/{id}', [AdminSubjectController::class, 'destroy'])->name('admin.subjects.destroy');
-
+// In your web.php routes file
+        Route::get('/admin/programs/{program}/semesters', [AdminSubjectController::class, 'getSemesters'])->name('admin.programs.semesters');
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
         Route::get('/programs/{id}/edit', [AdminProgramController::class, 'edit'])->name('admin.programs.edit');
@@ -76,12 +78,14 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Announcement
         Route::get('/announcement', [AdminAnnouncementController::class, "index"])->name('admin.announcement.index');
+        Route::get('/announcement/new', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
         Route::get('/announcement/{id}', [AdminAnnouncementController::class, "show"])->name('admin.announcement.show');
+        Route::PUT('/announcement/{id}', [AdminAnnouncementController::class, "update"])->name('admin.announcement.update');
         Route::delete('/announcement/{id}', [AdminAnnouncementController::class, "destroy"])->name('admin.announcement.destroy');
         Route::put('/announcement/pin/{id}/', [AdminAnnouncementController::class, "setPin"])->name('admin.announcement.pin');
         Route::get('/announcement/{id}/edit', [AdminAnnouncementController::class, "edit"])->name('admin.announcement.edit');
-        Route::get('/announcement/create', [AdminAnnouncementController::class, "create"])->name('admin.announcement.create');
         Route::post('/announcement/store', [AdminAnnouncementController::class, "store"])->name('admin.announcement.store');
+        Route::get('/announcement/attachment/{id}', [AdminAnnouncementController::class, "deleteAttachment"])->name('admin.announcement.deleteAttachment');
 
         Route::get("/test-email", [AdminAnnouncementController::class, "email"]);
 
@@ -92,6 +96,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/student/download/excel', [AdminStudentController::class, "generatePDF"])->name('admin.student.download.excel');
         //Teacher
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
+        Route::get('/teachers/getAll', [AdminTeacherController::class, "getAll"])->name('admin.teacher.getAll');
         Route::get('/teacher/unapproved', [AdminTeacherController::class, "index_pending_teachers"])->name('admin.teacher.unapproved.index');
         Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
         Route::POST('/teacher/status/{id}', [AdminTeacherController::class, "toggle_status"])->name('admin.teacher.status');
@@ -103,6 +108,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
+        Route::PUT('/profile/change-password', [AdminProfileController::class, "changePassword"])->name("admin.profile.changePassword");
+        Route::PUT('/profile/update', [AdminProfileController::class, "store"])->name("admin.profile.update");
         Route::get('/setting', [AdminProfileController::class, "index"])->name("admin.settings");
         Route::get('/notifications', [AdminProfileController::class, "index"])->name("admin.notifications");
 
@@ -112,5 +119,16 @@ Route::group(['prefix' => 'admin'], function () {
             broadcast(new \App\Events\TestEvent);
             return 'Event has been broadcast!';
         });
+
+
+
+        /*
+         * API
+         *
+         * */
+
+        //Teacher Profile
+        Route::get('/api/teacher/{id}', [AdminTeacherController::class, "getProfile"])->name('teacher.assignment.index');
+
     });
 });

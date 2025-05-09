@@ -100,6 +100,10 @@
     </style>
 @endpush
 
+@section("title")
+    Setting
+@endsection
+
 @section('content')
 
     <!-- Main Content Area - Made Scrollable -->

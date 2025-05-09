@@ -39,11 +39,18 @@
     <div class="min-h-screen bg-gray-50 overflow-auto pb-20">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
             {{-- Page Header --}}
-            <div class="mb-8">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Availability Schedule</h1>
-                <p class="text-gray-600 mt-1">Set your weekly availability for student appointments</p>
+            <div class="flex items-center justify-between mb-6">
+                <div class="mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Availability Schedule</h1>
+                    <p class="text-gray-600 mt-1">Set your weekly availability for classes</p>
+                </div>
+                <div class="mb-8">
+                    <a class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 inline-flex items-center">
+                        <i class="fa-solid fa-arrow-left pr-2"></i>
+                        Go Back
+                    </a>
+                </div>
             </div>
-
             {{-- Availability Card --}}
             <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md mb-8">
                 {{-- Card Header --}}
@@ -56,7 +63,7 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold">Weekly Schedule</h2>
-                            <p class="text-white/80 text-sm mt-1">Configure which days and times you're available to meet with students</p>
+                            <p class="text-white/80 text-sm mt-1">Configure which days and times you're available.</p>
                         </div>
                     </div>
 

@@ -120,7 +120,7 @@
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
                                         <img class="h-10 w-10 rounded-full object-cover"
-                                             src="{{ $teacher->profile_picture ?? 'https://ui-avatars.com/api/?name='.urlencode($teacher->fname.' '.$teacher->lname) }}"
+                                             src="{{ ($teacher->profile_picture) ? asset('storage/' . $teacher->profile_picture) : 'https://ui-avatars.com/api/?name='.urlencode($teacher->fname.' '.$teacher->lname) }}"
                                              alt="{{ $teacher->fname }} {{ $teacher->lname }}">
                                     </div>
                                     <div class="ml-4">
@@ -133,13 +133,13 @@
                             <td class="table-cell">{{ $teacher->email }}</td>
                             <td class="table-cell">{{ ($teacher->phone)?$teacher->phone:'Not given' }}</td>
                             <td class="table-cell">
-                                @if($teacher->status)
+                                @if($teacher->status=="active")
                                     <span id="status-badge-{{$teacher->id}}" class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                         Active
                                     </span>
                                 @else
                                     <span id="status-badge-{{$teacher->id}}" class="badge bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
-                                        Blocked
+                                        Inactive
                                     </span>
                                 @endif
                             </td>
@@ -150,7 +150,7 @@
                                             title="View Profile">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    @if($teacher->status)
+                                    @if($teacher->status=="active")
                                         <button class="block-teacher-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                                                 data-id="{{ $teacher->id }}"
                                                 title="Block Teacher">
@@ -159,7 +159,7 @@
                                     @else
                                         <button class="unblock-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
                                                 data-id="{{ $teacher->id }}"
-                                                title="Unblock Teacher">
+                                                title="Activate Teacher">
                                             <i class="fas fa-check-circle"></i>
                                         </button>
                                     @endif
@@ -216,6 +216,15 @@
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Joining Date</p>
                                 <p id="teacherJoiningDate" class="font-medium"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                                <p id="teacherStatus" class="font-medium"></p>
+                            </div>
+                            <!-- Optional: Department -->
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                                <p id="teacherDepartment" class="font-medium"></p>
                             </div>
                         </div>
                     </div>
@@ -282,29 +291,103 @@
         const searchInput = document.getElementById('searchTeachers');
 
         // View Profile
+        // JavaScript for Handling the Teacher Profile Modal
         document.querySelectorAll('.view-profile-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const teacherId = button.getAttribute('data-id');
+                const modal = document.getElementById('teacherProfileModal');
+
+                // Show loading state
+                button.disabled = true;
+                button.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading...
+        `;
+
                 try {
-                    const response = await fetch(`/api/teachers/${teacherId}`);
-                    const teacher = await response.json();
+                    const response = await fetch(`/admin/api/teacher/${teacherId}`);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Validate response structure
+                    if (data.status !== 'success' || !data.data || !data.data.teacher) {
+                        throw new Error('Invalid response structure');
+                    }
+
+                    const teacher = data.data.teacher;
+
+                    console.log("Teacher data:", teacher);
+
+                    document.getElementById("teacherQualification").innerText = teacher.qualification;
 
                     // Populate modal with teacher data
-                    document.getElementById('teacherProfilePicture').src = teacher.profile_picture;
-                    document.getElementById('teacherName').textContent = `${teacher.fname} ${teacher.lname}`;
-                    document.getElementById('teacherEmail').textContent = teacher.email;
-                    document.getElementById('teacherPhone').textContent = teacher.phone;
-                    document.getElementById('teacherAddress').textContent = teacher.address;
-                    document.getElementById('teacherJoiningDate').textContent = new Date(teacher.created_at).toLocaleDateString();
-                    document.getElementById('teacherStatus').textContent = teacher.status;
+                    document.getElementById('teacherProfilePicture').src =
+                        teacher.profile_picture
+                            ? `/storage/${teacher.profile_picture}` // Correctly prepend storage path
+                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                `${teacher.fname} ${teacher.lname}`
+                            )}&background=random`;
 
-                    teacherProfileModal.classList.remove('hidden');
+                    document.getElementById('teacherName').textContent =
+                        `${teacher.fname} ${teacher.lname}`;
+                    document.getElementById('teacherEmail').textContent =
+                        teacher.email || 'Not provided';
+                    document.getElementById('teacherPhone').textContent =
+                        teacher.phone || 'Not provided';
+                    document.getElementById('teacherAddress').textContent =
+                        teacher.address || 'Not provided';
+                    document.getElementById('teacherJoiningDate').textContent =
+                        teacher.created_at ? new Date(teacher.created_at).toLocaleDateString() : 'Unknown';
+                    document.getElementById('teacherStatus').textContent =
+                        teacher.status || 'Unknown';
+
+                    // Optional: Remove the department field if it's not provided in API
+                    if (teacher.department) {
+                        document.getElementById('teacherDepartment').textContent = teacher.department.name;
+                    } else {
+                        document.getElementById('teacherDepartment').textContent = 'Not assigned';
+                    }
+
+                    // Show modal
+                    modal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+
                 } catch (error) {
                     console.error('Error fetching teacher data:', error);
-                    alert('Failed to load teacher profile');
+
+                    // Show error to user
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
+                    toast.textContent = 'Failed to load teacher profile';
+                    document.body.appendChild(toast);
+
+                    // Remove toast after 3 seconds
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                } finally {
+                    // Reset button state
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-eye"></i>';
                 }
             });
         });
+
+        // Modal close functionality
+        const modalCloseBtn = document.getElementById('closeTeacherModal');
+        if (modalCloseBtn) {
+            modalCloseBtn.addEventListener('click', () => {
+                document.getElementById('teacherProfileModal').classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+        }
 
         // Block/Unblock Teacher
         document.querySelectorAll('.block-teacher-btn, .unblock-teacher-btn').forEach(button => {

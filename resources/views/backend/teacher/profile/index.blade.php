@@ -32,6 +32,9 @@
             <div class="mb-8">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">My Profile</h1>
                 <p class="text-gray-600 mt-1">Manage your personal information and account settings</p>
+                <a href="{{route('teacher.profile.routine.show')}}" class="inline-flex items-center px-6 py-1 mt-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Setup My Routine
+                </a>
             </div>
 
             {{-- Profile Card --}}
@@ -56,9 +59,7 @@
                         <div class="flex-1">
                             <h1 class="text-3xl font-bold mb-1">{{ $teacher->fname }} {{ $teacher->lname }}</h1>
                             <div class="flex flex-wrap gap-x-6 gap-y-3 mt-3 text-white/90">
-                                <div class="flex items-center gap-2">
-                                    📚 {{ $teacher->subject }}
-                                </div>
+
                                 <div class="flex items-center gap-2">
                                     ✉️ {{ $teacher->email }}
                                 </div>
@@ -66,7 +67,7 @@
                                     📞 {{ $teacher->phone }}
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    📅 Joined {{ $teacher->created_at->format('F Y') }}
+                                    📅 Joined {{ $teacher->created_at->format('F, Y') }}
                                 </div>
                             </div>
                         </div>
@@ -80,7 +81,7 @@
                         <p class="text-gray-600 text-sm mt-1">Update your personal details below</p>
                     </div>
 
-                    <form action="{{ route('teacher.profile.update', $teacher) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                    <form action="{{ route('teacher.profile.update', $teacher->id) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                         @csrf
                         @method('PUT')
 
@@ -129,12 +130,32 @@
                                 @error('phone') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            {{-- Subject --}}
+                            {{-- Email --}}
                             <div>
-                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                                <input type="text" name="subject" id="subject" value="{{ old('subject', $teacher->subject) }}"
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="text" name="email" id="email" value="{{ old('email', $teacher->email) }}"
                                        class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('subject') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                @error('email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Address --}}
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <input type="text" name="address" id="address" value="{{ old('address', $teacher->address) }}"
+                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Eg. Nepal"
+                                >
+                                @error('address') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Qualification --}}
+                            <div>
+                                <label for="qualification" class="block text-sm font-medium text-gray-700 mb-1">Qualification</label>
+                                <input type="text" name="email" id="email" value="{{ old('qualification', $teacher->qualification) }}"
+                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="MCA, M.Tech, CSIT"
+                                >
+                                @error('qualification') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Upload Picture --}}
@@ -164,7 +185,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
 
                         {{-- Submit Button --}}

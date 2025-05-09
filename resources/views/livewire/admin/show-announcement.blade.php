@@ -75,12 +75,12 @@
                                     </span>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-md font-medium text-gray-800 dark:text-white">Library Hours Extended</h4>
+                                <h4 class="text-md font-medium text-gray-800 dark:text-white">{{$pinned->title}}</h4>
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                    The library will remain open until 10 PM during exam week. Additional study rooms have been made available for group study sessions.
+                                    {{$pinned->content}}
                                 </p>
                                 <div class="flex items-center justify-between mt-2">
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Posted by Library • May 8, 2023</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Posted by {{ ucfirst($pinned->creator_type)}} •   {{$pinned->created_at->diffForHumans()}}</span>
                                     <button class="text-primary-600 hover:text-primary-800 text-sm">
                                         <i class="fas fa-thumbtack"></i>
                                     </button>
@@ -124,7 +124,7 @@
         <div class="space-y-4">
             @foreach($allAnnouncements as $announcement)
                 <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-md">
-                    <a href="{{route("admin.announcement.show", $pinned->id)}}" class="flex items-start">
+                    <a href="{{route("admin.announcement.show", $announcement->id)}}" class="flex items-start">
                         <div class="flex-shrink-0 mr-3">
                                     <span class="flex items-center justify-center h-10 w-10 rounded-full bg-green-100 dark:bg-green-800">
                                         <i class="fa fa-bullhorn text-gray-500 dark:text-gray-400" aria-hidden="true"></i>

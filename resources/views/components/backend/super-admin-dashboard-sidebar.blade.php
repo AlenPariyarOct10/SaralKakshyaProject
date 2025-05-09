@@ -15,11 +15,6 @@
         <i class="fas fa-university"></i>
         <span>Institute Management</span>
     </a>
-    <a href="reports.html" class="sidebar-item">
-        <i class="fas fa-chart-bar"></i>
-        <span>Reports & Analytics</span>
-    </a>
-
     <a href="{{route("superadmin.setting.index")}}" class="sidebar-item {{(Route::is('superadmin.setting.index')?'active':'')}}">
         <i class="fas fa-cog"></i>
         <span>Settings</span>

@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Backend\Admin;
-
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Models\Institute;
-use App\Models\Student;
 use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,11 +14,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-
     public function showRegister()
     {
         $system_info = SystemSetting::first();
-
         return view('backend.admin.signup', compact('system_info'));
     }
     public function register(Request $request)
@@ -60,15 +56,12 @@ class AuthController extends Controller
         }
     }
 
-
     public function showLogin()
     {
        $admins = DB::table('admins')
             ->whereNotIn('id', function ($query) {
                 $query->select('created_by')->from('institutes');
             })->delete();
-
-
 
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
@@ -95,30 +88,14 @@ class AuthController extends Controller
         }
 
         $credentials = $request->only('email', 'password');
-        if ($admin && $admin->id == $institute->created_by && Auth::guard('student')->attempt($credentials)) {
+        if ($admin && $admin->id == $institute->created_by && Auth::guard('admin')->attempt($credentials)) {
             Auth::guard('admin')->login($admin);
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard');
         }
 
-        // Log registration activity
-        ActivityLog::create([
-            'user_id'     => $admin->id,
-            'user_type'   => 'student',
-            'action_type' => 'login',
-            'description' => 'Admin logged in',
-            'model_type'  => get_class($admin),
-            'model_id'    => $admin->id,
-            'url'         => $request->fullUrl(),
-            'ip_address'  => $request->ip(),
-            'user_agent'  => $request->userAgent(),
-        ]);
-
         return back()->withErrors(['email' => 'Invalid credentials or institute'])->withInput();
     }
-
-
-
 
     public function logout(Request $request)
     {
@@ -134,6 +111,7 @@ class AuthController extends Controller
             'ip_address'  => $request->ip(),
             'user_agent'  => $request->userAgent(),
         ]);
+        session()->forget('institute_id');
 
         Auth::guard('admin')->logout();
         return redirect()->route('admin.login');
