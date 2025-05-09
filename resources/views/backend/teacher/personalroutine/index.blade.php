@@ -36,25 +36,25 @@
 @endsection
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 overflow-auto pb-20">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-auto pb-20">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
             {{-- Page Header --}}
             <div class="flex items-center justify-between mb-6">
                 <div class="mb-8">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Availability Schedule</h1>
-                    <p class="text-gray-600 mt-1">Set your weekly availability for classes</p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Availability Schedule</h1>
+                    <p class="text-gray-600 mt-1 dark:text-gray-400">Set your weekly availability for classes</p>
                 </div>
                 <div class="mb-8">
-                    <a class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 inline-flex items-center">
+                    <a href="{{route('teacher.profile.index')}}" class="px-5 py-2.5 bg-blue-600 text-white dark:text-white font-medium rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 inline-flex items-center">
                         <i class="fa-solid fa-arrow-left pr-2"></i>
                         Go Back
                     </a>
                 </div>
             </div>
             {{-- Availability Card --}}
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg overflow-hidden transition-all duration-300 hover:shadow-md dark:hover:shadow-xl mb-8">
                 {{-- Card Header --}}
-                <div class="relative bg-gradient-to-r from-blue-700 to-indigo-600 text-white p-6">
+                <div class="relative bg-gradient-to-r from-blue-700 to-indigo-600 text-white p-6 dark:from-blue-600 dark:to-indigo-500">
                     <div class="flex items-center gap-4">
                         <div class="p-3 bg-white/20 rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,13 +62,13 @@
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold">Weekly Schedule</h2>
-                            <p class="text-white/80 text-sm mt-1">Configure which days and times you're available.</p>
+                            <h2 class="text-xl font-bold dark:text-white">Weekly Schedule</h2>
+                            <p class="text-white/80 text-sm mt-1 dark:text-white/70">Configure which days and times you're available.</p>
                         </div>
                     </div>
 
                     {{-- Decorative Element --}}
-                    <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <div class="absolute right-0 bottom-0 opacity-10 dark:opacity-20 transform translate-x-1/4 translate-y-1/4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
@@ -77,18 +77,12 @@
                 </div>
 
                 {{-- Availability Form --}}
-                <div class="p-6 md:p-8">
+                <div class="p-6 md:p-8 dark:text-gray-300">
                     <div class="mb-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-800">Set Your Availability</h3>
-                                <p class="text-gray-600 text-sm mt-1">Select the days and times when you're available</p>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    <span class="mr-1.5 h-2 w-2 rounded-full bg-blue-500"></span>
-                                    Auto-saves as you change
-                                </span>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Set Your Availability</h3>
+                                <p class="text-gray-600 text-sm mt-1 dark:text-gray-400">Select the days and times when you're available</p>
                             </div>
                         </div>
                     </div>
@@ -106,18 +100,18 @@
                                      data-day-enabled="{{ $availabilityByDay[$day]->count() > 0 ? 'true' : 'false' }}">
 
                                     {{-- Day Header --}}
-                                    <div class="day-header flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200">
+                                    <div class="day-header flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                                         <div class="flex items-center space-x-3">
                                             <label class="flex items-center">
                                                 <input type="checkbox" name="enabled_days[]" value="{{ $day }}"
                                                        class="day-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 transition-colors"
                                                     {{ $availabilityByDay[$day]->count() > 0 ? 'checked' : '' }}>
-                                                <span class="ml-2 text-gray-700 font-medium">{{ $day }}</span>
+                                                <span class="ml-2 text-gray-700 dark:text-gray-300 font-medium">{{ $day }}</span>
                                             </label>
                                         </div>
-                                        <div class="flex items-center">
+                                        <div class="flex items-center dark:text-gray-300">
                                             <button type="button"
-                                                    class="add-time-slot text-sm px-3 py-1.5 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-1 {{ $availabilityByDay[$day]->count() > 0 ? '' : 'opacity-50 pointer-events-none' }}">
+                                                    class="add-time-slot text-sm px-3 py-1.5 rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-200 flex items-center space-x-1 {{ $availabilityByDay[$day]->count() > 0 ? '' : 'opacity-50 pointer-events-none' }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                 </svg>
@@ -127,7 +121,7 @@
                                     </div>
 
                                     {{-- Time Slots Container --}}
-                                    <div class="time-slots-container p-4 space-y-3 {{ $availabilityByDay[$day]->count() > 0 ? '' : 'hidden' }}">
+                                    <div class="time-slots-container p-4 space-y-3 {{ $availabilityByDay[$day]->count() > 0 ? '' : 'hidden' }} dark:text-gray-300">
                                         @if($availabilityByDay[$day]->count() > 0)
                                             @foreach($availabilityByDay[$day] as $slot)
                                                 <div class="time-slot-row flex flex-wrap md:flex-nowrap items-end gap-3 group animate-fade-in">
@@ -136,17 +130,17 @@
                                                         <input type="time"
                                                                name="availability[{{ $day }}][{{ $loop->index }}][start_time]"
                                                                value="{{ $slot->start_time }}"
-                                                               class="time-input start-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
+                                                               class="time-input start-time block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
                                                     </div>
                                                     <div class="w-full md:w-5/12">
                                                         <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
                                                         <input type="time"
                                                                name="availability[{{ $day }}][{{ $loop->index }}][end_time]"
                                                                value="{{ $slot->end_time }}"
-                                                               class="time-input end-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
+                                                               class="time-input end-time block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
                                                     </div>
                                                     <div class="w-full md:w-2/12 flex justify-end md:justify-center">
-                                                        <button type="button" class="remove-time-slot p-2.5 text-gray-500 hover:text-red-500 transition-colors">
+                                                        <button type="button" class="remove-time-slot p-2.5 text-gray-500 dark:text-gray-300 hover:text-red-500 transition-colors">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
@@ -160,18 +154,18 @@
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
                                                     <input type="time"
                                                            name="availability[{{ $day }}][0][start_time]"
-                                                           value="09:00"
-                                                           class="time-input start-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
+                                                           value="10:00"
+                                                           class="time-input start-time block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
                                                 </div>
                                                 <div class="w-full md:w-5/12">
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
                                                     <input type="time"
                                                            name="availability[{{ $day }}][0][end_time]"
-                                                           value="17:00"
-                                                           class="time-input end-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
+                                                           value="15:30"
+                                                           class="time-input end-time block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
                                                 </div>
                                                 <div class="w-full md:w-2/12 flex justify-end md:justify-center">
-                                                    <button type="button" class="remove-time-slot p-2.5 text-gray-500 hover:text-red-500 transition-colors">
+                                                    <button type="button" class="remove-time-slot p-2.5 text-gray-500 dark:text-gray-300 hover:text-red-500 transition-colors">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
@@ -182,14 +176,14 @@
                                     </div>
 
                                     {{-- Empty State --}}
-                                    <div class="empty-state p-6 flex justify-center {{ $availabilityByDay[$day]->count() > 0 ? 'hidden' : '' }}">
-                                        <div class="text-center text-gray-500">
-                                            <div class="inline-flex items-center justify-center p-3 bg-gray-100 rounded-full mb-3">
+                                    <div class="empty-state p-6 flex justify-center dark:text-gray-400 {{ $availabilityByDay[$day]->count() > 0 ? 'hidden' : '' }}">
+                                        <div class="text-center text-gray-500 dark:text-gray-400">
+                                            <div class="inline-flex items-center justify-center p-3 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                             </div>
-                                            <p class="text-sm">Not available on {{ $day }}s</p>
+                                            <p class="text-sm dark:text-gray-300">Not available on {{ $day }}s</p>
                                         </div>
                                     </div>
                                 </div>
@@ -199,11 +193,11 @@
                         {{-- Save Button --}}
                         <div class="flex justify-end pt-4">
                             <div class="inline-flex items-center">
-                                <span id="save-status" class="text-sm text-gray-500 mr-3 opacity-0 transition-opacity duration-300">
+                                <span id="save-status" class="text-sm text-gray-500 dark:text-gray-400 mr-3 opacity-0 transition-opacity duration-300">
                                     Changes saved successfully
                                 </span>
                                 <button type="submit" id="save-button"
-                                        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 inline-flex items-center">
+                                        class="px-5 py-2.5 bg-blue-600 dark:bg-blue-700 text-white font-medium rounded-lg shadow hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 inline-flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                     </svg>
@@ -216,7 +210,7 @@
             </div>
 
             {{-- Help Card --}}
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-6">
+            <div class="bg-blue-50 dark:bg-gray-800 border border-blue-100 dark:border-gray-700 rounded-xl p-6">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <div class="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 text-blue-600">
@@ -351,14 +345,14 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
                             <input type="time"
                                    name="availability[${day}][${timeSlotCount}][start_time]"
-                                   value="09:00"
+                                   value="10:00"
                                    class="time-input start-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
                         </div>
                         <div class="w-full md:w-5/12">
                             <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
                             <input type="time"
                                    name="availability[${day}][${timeSlotCount}][end_time]"
-                                   value="17:00"
+                                   value="15:30"
                                    class="time-input end-time block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700">
                         </div>
                         <div class="w-full md:w-2/12 flex justify-end md:justify-center">

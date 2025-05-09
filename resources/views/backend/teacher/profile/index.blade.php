@@ -26,19 +26,19 @@
 @endsection
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 overflow-auto pb-20">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-auto pb-20">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
             {{-- Page Header --}}
             <div class="mb-8">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">My Profile</h1>
-                <p class="text-gray-600 mt-1">Manage your personal information and account settings</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">My Profile</h1>
+                <p class="text-gray-600 dark:text-gray-300 mt-1">Manage your personal information and account settings</p>
                 <a href="{{route('teacher.profile.routine.show')}}" class="inline-flex items-center px-6 py-1 mt-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Setup My Routine
                 </a>
             </div>
 
             {{-- Profile Card --}}
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md dark:hover:shadow-lg">
                 {{-- Profile Header --}}
                 <div class="relative bg-gradient-to-r from-blue-700 to-indigo-600 text-white p-6 md:p-8">
                     <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -75,10 +75,10 @@
                 </div>
 
                 {{-- Profile Edit Form --}}
-                <div class="p-6 md:p-8">
+                <div class="p-6 md:p-8 dark:bg-gray-800">
                     <div class="mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Edit Profile Information</h2>
-                        <p class="text-gray-600 text-sm mt-1">Update your personal details below</p>
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Edit Profile Information</h2>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mt-1">Update your personal details below</p>
                     </div>
 
                     <form action="{{ route('teacher.profile.update', $teacher->id) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
@@ -88,88 +88,89 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {{-- First Name --}}
                             <div>
-                                <label for="fname" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <label for="fname" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
                                 <input type="text" name="fname" id="fname" value="{{ old('fname', $teacher->fname) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('fname') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                       class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                @error('fname') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Last Name --}}
                             <div>
-                                <label for="lname" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <label for="lname" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
                                 <input type="text" name="lname" id="lname" value="{{ old('lname', $teacher->lname) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('lname') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                       class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                @error('lname') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Gender --}}
                             <div>
-                                <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
                                 <select name="gender" id="gender"
-                                        class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                        class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                                     <option value="male" {{ old('gender', $teacher->gender) === 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('gender', $teacher->gender) === 'female' ? 'selected' : '' }}>Female</option>
                                     <option value="other" {{ old('gender', $teacher->gender) === 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
-                                @error('gender') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                @error('gender') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- DOB --}}
                             <div>
-                                <label for="dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
                                 <input type="date" name="dob" id="dob" value="{{ old('dob', $teacher->dob) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('dob') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                       class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                @error('dob') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Phone --}}
                             <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                                 <input type="text" name="phone" id="phone" value="{{ old('phone', $teacher->phone) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('phone') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                       class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                @error('phone') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Email --}}
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                 <input type="text" name="email" id="email" value="{{ old('email', $teacher->email) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                @error('email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                       class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                @error('email') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Address --}}
                             <div>
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
                                 <input type="text" name="address" id="address" value="{{ old('address', $teacher->address) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                                 placeholder="Eg. Nepal"
                                 >
-                                @error('address') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                @error('address') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Qualification --}}
                             <div>
-                                <label for="qualification" class="block text-sm font-medium text-gray-700 mb-1">Qualification</label>
+                                <label for="qualification" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qualification</label>
                                 <input type="text" name="email" id="email" value="{{ old('qualification', $teacher->qualification) }}"
-                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                       class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                                 placeholder="MCA, M.Tech, CSIT"
                                 >
-                                @error('qualification') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                                @error('qualification') <p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Upload Picture --}}
                             <div class="md:col-span-2">
-                                <label for="profile_picture" class="block text-sm font-medium text-gray-700 mb-3">Upload New Picture</label>
+                                <label for="profile_picture" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Upload New Picture</label>
                                 <div class="flex items-center space-x-6">
                                     <div class="shrink-0">
-                                        <div class="h-16 w-16 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+                                        <div class="h-16 w-16 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                                             @if($teacher?->profile_picture)
                                                 <img id="preview-image" src="{{ asset('storage/' . $teacher->profile_picture) }}" class="h-full w-full object-cover" alt="Profile preview">
                                             @else
-                                                <div id="preview-placeholder" class="h-full w-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                                <div id="preview-placeholder" class="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-300">
                                                     <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path d="M16 7a4 4..."/>
+                                                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                        <path d="M8 15a6 6 0 006 6v-3a4 4 0 00-8 0v3a4 4 0 106 0v-3a4 4 0 00-8 0v3a4 4 0 106 0z" />
                                                     </svg>
                                                 </div>
                                                 <img id="preview-image" class="h-full w-full object-cover hidden" alt="Profile preview">
@@ -180,7 +181,7 @@
                                         <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
                                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
                                                 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition">
-                                        <p class="mt-1 text-xs text-gray-500">PNG, JPG or GIF up to 2MB</p>
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">PNG, JPG or GIF up to 2MB</p>
                                         @error('profile_picture') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                                     </div>
                                 </div>
@@ -190,7 +191,7 @@
                         {{-- Submit Button --}}
                         <div class="pt-4">
                             <button type="submit"
-                                    class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800">
                                 Save Changes
                             </button>
                         </div>
