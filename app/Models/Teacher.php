@@ -46,6 +46,16 @@ class Teacher extends Authenticatable
         return "{$this->fname} {$this->lname}";
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(TeacherAvailability::class);
+    }
+
     public function institutes()
     {
         return $this->belongsToMany(Institute::class, 'institute_teacher')->withTimestamps();

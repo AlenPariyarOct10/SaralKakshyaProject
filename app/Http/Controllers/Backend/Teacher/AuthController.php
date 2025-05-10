@@ -53,7 +53,7 @@ class AuthController extends Controller
                 ->exists();
 
             if ($isApproved) {
-                session(["institute_id" => $instituteId]);
+                Session::put('institute_id', $instituteId);
                 return redirect()->intended(route('teacher.dashboard'));
             } else {
                 Auth::guard('teacher')->logout();
@@ -92,9 +92,6 @@ class AuthController extends Controller
             'status' => 'inactive',
         ]);
         $teacher->institutes()->attach($request->institute);
-
-        // Store the teacher ID in session for Phase 2
-        $request->session()->put('teacher_id', $teacher->id);
 
         // Redirect to Phase 2
         return redirect()->route('teacher.register.step2');
@@ -151,7 +148,7 @@ class AuthController extends Controller
         ]);
 
         // Clear session
-        $request->session()->forget('teacher_id');
+        Session::forget('teacher_id');
 
         // Redirect to login with success message
         return redirect()->route('teacher.login')->with('success', 'Registration completed successfully. You can now log in.');
