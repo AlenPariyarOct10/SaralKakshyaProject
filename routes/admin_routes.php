@@ -116,7 +116,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::GET('/subject-teacher/mapping', [AdminSubjectTeacherMappingController::class, "index"])->name('admin.subject-teacher.mapping.index');
         Route::delete('/subject-teacher/{id}/mapping', [AdminSubjectTeacherMappingController::class, "destroy"])->name('admin.subject-teacher.mapping.destroy');
 
-
+        //RoutinePlanner
+        Route::get('/routine-planner', [AdminSubjectTeacherController::class, "index"])->name('admin.routine-planner.index');
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
         Route::PUT('/profile/change-password', [AdminProfileController::class, "changePassword"])->name("admin.profile.changePassword");
