@@ -26,4 +26,9 @@ class SubjectTeacherMapping extends Model
         return $this->belongsTo(Subject::class);
     }
 
+    public function assignedBy()
+    {
+        return $this->belongsTo(Admin::class, 'assigned_by');
+    }
+
 }

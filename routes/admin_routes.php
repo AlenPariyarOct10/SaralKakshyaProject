@@ -16,6 +16,7 @@ use App\Http\Controllers\Backend\Admin\SubjectController as AdminSubjectControll
 use App\Http\Controllers\Backend\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Backend\Admin\SubjectTeacherController as AdminSubjectTeacherController;
 use App\Http\Controllers\Backend\Admin\BatchController as AdminBatchController;
+use App\Http\Controllers\Backend\Admin\SubjectTeacherMappingController as AdminSubjectTeacherMappingController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -110,6 +111,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         //SubjectTeacher
         Route::get('/subject-teacher', [AdminSubjectTeacherController::class, "index"])->name('admin.subject-teacher.index');
+        Route::POST('/subject-teacher', [AdminSubjectTeacherMappingController::class, "store"])->name('admin.subject-teacher.store');
+        Route::PUT('/subject-teacher/{id}', [AdminSubjectTeacherMappingController::class, "update"])->name('admin.subject-teacher.update');
+        Route::GET('/subject-teacher/mapping', [AdminSubjectTeacherMappingController::class, "index"])->name('admin.subject-teacher.mapping.index');
+        Route::delete('/subject-teacher/{id}/mapping', [AdminSubjectTeacherMappingController::class, "destroy"])->name('admin.subject-teacher.mapping.destroy');
 
 
 

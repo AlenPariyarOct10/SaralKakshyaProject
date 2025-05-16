@@ -165,50 +165,31 @@
                 <form id="teacherSubjectForm">
                     <input type="hidden" id="MappingId" value="">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <!-- Teacher Selection -->
                         <div>
                             <label for="teacherId" class="form-label">Select Teacher <span class="text-red-500">*</span></label>
                             <select id="teacherId" name="teacherId" class="form-select" required>
                                 <option value="">Select Teacher</option>
-                                <!-- Will be populated via JavaScript -->
                             </select>
                             <div id="teacherIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
-
                         <!-- Department Selection -->
                         <div>
                             <label for="departmentId" class="form-label">Select Department <span class="text-red-500">*</span></label>
                             <select id="departmentId" name="departmentId" class="form-select" required>
                                 <option value="">Select Department</option>
-                                <!-- Will be populated via JavaScript -->
                             </select>
                             <div id="departmentIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <!-- Subject Selection (Filtered by Department) -->
                         <div>
                             <label for="subjectId" class="form-label">Select Subject <span class="text-red-500">*</span></label>
                             <select id="subjectId" name="subjectId" class="form-select" required>
                                 <option value="">Select Subject</option>
-                                <!-- Will be populated via JavaScript based on department -->
                             </select>
                             <div id="subjectIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
-                        <!-- Status -->
-                        <div>
-                            <label for="status" class="form-label">Status</label>
-                            <select id="status" name="status" class="form-select">
-                                <option value="1" selected>Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div>
                     </div>
-
-
-
-
 
                     <div class="flex justify-end gap-2">
                         <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
@@ -229,8 +210,6 @@
                         <th scope="col" class="table-header">Subject Code</th>
                         <th scope="col" class="table-header">Department</th>
                         <th scope="col" class="table-header">Sections</th>
-                        <th scope="col" class="table-header">Time</th>
-                        <th scope="col" class="table-header">Status</th>
                         <th scope="col" class="table-header">Action</th>
                     </tr>
                     </thead>
@@ -292,7 +271,6 @@
         const teacherId = document.getElementById('teacherId');
         const departmentId = document.getElementById('departmentId');
         const subjectId = document.getElementById('subjectId');
-        const status = document.getElementById('status');
 
         // Error elements
         const teacherIdError = document.getElementById('teacherIdError');
@@ -335,8 +313,6 @@
             // Clear subject dropdown
             subjectId.innerHTML = '<option value="">Select Subject</option>';
 
-            // Clear section dropdown
-
             if (!selectedDepartmentId) return;
 
             // Fetch subjects for the selected department
@@ -354,12 +330,20 @@
                         data.forEach(subject => {
                             subjectId.innerHTML += `<option value="${subject.id}">${subject.name} (${subject.code})</option>`;
                         });
+
+                        // If in edit mode and we have a saved subject ID, set it after populating
+                        if (isEditMode && window.tempSubjectId) {
+                            subjectId.value = window.tempSubjectId;
+                            // Clear the temp storage
+                            window.tempSubjectId = null;
+                        }
                     } else if (data.message) {
                         console.error('No subjects found:', data.message);
                     }
                 })
                 .catch(error => console.error('Error loading subjects:', error));
         }
+
         // Show add form
         function showAddForm() {
             resetForm();
@@ -381,30 +365,38 @@
 
             // Find the Mapping by ID
             const Mapping = Mappings.find(a => a.id === id);
-            if (!Mapping) return;
+            if (!Mapping) {
+                console.error(`No mapping found with ID: ${id}`);
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Error: Mapping not found',
+                });
+                return;
+            }
+
+            console.log("Editing mapping:", Mapping);
 
             // Fill the form with data
             MappingId.value = Mapping.id;
-            teacherId.value = Mapping.teacher_id;
+
+            // Set teacher id - using the nested object structure
+            if (Mapping.teacher && Mapping.teacher.id) {
+                teacherId.value = Mapping.teacher.id;
+            }
+
+            // Save subject id for later use
+            if (Mapping.subject && Mapping.subject.id) {
+                window.tempSubjectId = Mapping.subject.id;
+            }
 
             // Set department and trigger change event to load subjects
-            departmentId.value = Mapping.department_id;
-            const departmentChangeEvent = new Event('change');
-            departmentId.dispatchEvent(departmentChangeEvent);
+            if (Mapping.department && Mapping.department.id) {
+                departmentId.value = Mapping.department.id;
 
-            // Set subject after a short delay to ensure subjects are loaded
-            setTimeout(() => {
-                subjectId.value = Mapping.subject_id;
-
-                // Trigger subject change to load sections
-                const subjectChangeEvent = new Event('change');
-                subjectId.dispatchEvent(subjectChangeEvent);
-
-            }, 300);
-
-            startTime.value = Mapping.start_time;
-            endTime.value = Mapping.end_time;
-            status.value = Mapping.status;
+                // Dispatch change event to load subjects
+                const departmentChangeEvent = new Event('change');
+                departmentId.dispatchEvent(departmentChangeEvent);
+            }
 
             // Show the form
             MappingFormCard.classList.remove('hidden');
@@ -423,6 +415,7 @@
         function resetForm() {
             teacherSubjectForm.reset();
             MappingId.value = '';
+            window.tempSubjectId = null;
             hideAllErrors();
         }
 
@@ -431,7 +424,6 @@
             teacherIdError.classList.add('hidden');
             departmentIdError.classList.add('hidden');
             subjectIdError.classList.add('hidden');
-
         }
 
         // Show validation errors
@@ -452,7 +444,6 @@
                 subjectIdError.textContent = errors.subjectId;
                 subjectIdError.classList.remove('hidden');
             }
-
         }
 
         // Handle form submission
@@ -463,9 +454,7 @@
             // Validate form
             const formData = {
                 teacher_id: teacherId.value,
-                department_id: departmentId.value,
                 subject_id: subjectId.value,
-                status: status.value
             };
 
             const errors = validateForm(formData);
@@ -490,66 +479,64 @@
                 errors.teacherId = 'Please select a teacher';
             }
 
-            if (!data.department_id) {
-                errors.departmentId = 'Please select a department';
-            }
-
             if (!data.subject_id) {
                 errors.subjectId = 'Please select a subject';
             }
-
 
             return errors;
         }
 
         // Create a new Mapping
-        function createMapping(data) {
+        async function createMapping(data) {
             // Show loading state
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-            // API call to create Mapping
-            fetch('/admin/subject-teacher', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{csrf_token()}}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(async data => {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Save Mapping';
+            try {
+                const response = await fetch('/admin/subject-teacher', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{csrf_token()}}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
 
-                    if (data.status === 'success') {
-                        hideForm();
-                        loadMappings();
-                        await Toast.fire({
-                            icon: 'success',
-                            title: 'Mapping created successfully',
-                        });
-                    } else {
-                        if (data.errors) {
-                            showValidationErrors(data.errors);
-                        } else {
-                            await Toast.fire({
-                                icon: 'error',
-                                title: 'Failed to create Mapping',
-                            });
-                        }
+                const result = await response.json();
+
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save Mapping';
+
+                if (!response.ok) {
+                    // Handle HTTP errors (4xx, 5xx)
+                    throw new Error(result.message || 'Failed to create mapping');
+                }
+
+                if (result.status === 'success') {
+                    hideForm();
+                    loadMappings();
+                    await Toast.fire({
+                        icon: 'success',
+                        title: result.message || 'Mapping created successfully',
+                    });
+                } else {
+                    if (result.errors) {
+                        showValidationErrors(result.errors);
                     }
-                })
-                .catch(async error => {
-                    console.error('Error:', error);
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Save Mapping';
                     await Toast.fire({
                         icon: 'error',
-                        title: 'An error occurred',
+                        title: result.message || 'Failed to create mapping',
                     });
+                }
+            } catch (error) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save Mapping';
+                await Toast.fire({
+                    icon: 'error',
+                    title: error.message || 'An unexpected error occurred',
                 });
+            }
         }
 
         // Update an existing Mapping
@@ -557,6 +544,8 @@
             // Show loading state
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
+
+            console.log(`Updating mapping ${id} with data:`, data);
 
             // API call to update Mapping
             fetch(`/admin/subject-teacher/${id}`, {
@@ -621,7 +610,7 @@
 
         // Delete an Mapping
         function deleteMapping(id) {
-            fetch(`/admin/subject-teacher/${id}`, {
+            fetch(`/admin/subject-teacher/${id}/mapping`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': '{{csrf_token()}}',
@@ -705,19 +694,21 @@
         }
 
         // Load subjects for dropdown
-        function loadSubjects() {
-            fetch('/admin/subjects/getAll')
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        subjects = data.data.subjects;
-                    }
-                })
-                .catch(error => console.error('Error loading subjects:', error));
+        async function loadSubjects() {
+            try {
+                const response = await fetch('/admin/subjects/getAll');
+                const data = await response.json();
+                if (data) {
+                    subjects = data.data.subjects;
+                }
+                console.log("Subjects loaded:", subjects);
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
         }
 
         // Load Mappings with pagination
-        function loadMappings() {
+        async function loadMappings() {
             // Show loading state
             MappingsTableBody.innerHTML = `
                 <tr>
@@ -730,57 +721,60 @@
                 </tr>
             `;
 
-            // Build query parameters
-            const params = new URLSearchParams();
-            params.append('page', currentPage);
+            try {
+                // Build query parameters
+                const params = new URLSearchParams();
+                params.append('page', currentPage);
 
-            // Add search term if provided
-            if (searchInput.value.trim()) {
-                params.append('search', searchInput.value.trim());
-            }
+                // Add search term if provided
+                if (searchInput.value.trim()) {
+                    params.append('search', searchInput.value.trim());
+                }
 
-            // Add department filter if selected
-            if (departmentFilter.value) {
-                params.append('department_id', departmentFilter.value);
-            }
+                // Add department filter if selected
+                if (departmentFilter.value) {
+                    params.append('department_id', departmentFilter.value);
+                }
 
-            // API call to get Mappings
-            fetch(`/admin/subject-teacher?${params.toString()}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        Mappings = data.data;
-                        totalPages = data.meta.last_page;
-                        currentPage = data.meta.current_page;
+                const response = await fetch(`/admin/subject-teacher/mapping?${params.toString()}`);
+                const data = await response.json();
 
-                        // Load subjects if not already loaded
-                        if (subjects.length === 0) {
-                            loadSubjects();
-                        }
+                console.log("Loaded mappings:", data);
 
-                        // Render Mappings and pagination
-                        renderMappings();
-                        renderPagination(data.meta);
-                    } else {
-                        MappingsTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
-                                    Failed to load Mappings
-                                </td>
-                            </tr>
-                        `;
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to load mappings');
+                }
+
+                if (data.status === 'success') {
+                    Mappings = data.data;
+                    totalPages = data.meta.last_page;
+                    currentPage = data.meta.current_page;
+
+                    // Load subjects if not already loaded
+                    if (subjects.length === 0) {
+                        await loadSubjects();
                     }
-                })
-                .catch(error => {
-                    console.error('Error loading Mappings:', error);
-                    MappingsTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
-                                An error occurred while loading Mappings
-                            </td>
-                        </tr>
-                    `;
+
+                    // Render Mappings and pagination
+                    renderMappings();
+                    renderPagination(data.meta);
+                } else {
+                    throw new Error(data.message || 'Failed to load mappings');
+                }
+            } catch (error) {
+                console.error('Error loading Mappings:', error);
+                MappingsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
+                            Failed to load mappings
+                        </td>
+                    </tr>
+                `;
+                await Toast.fire({
+                    icon: 'error',
+                    title: error.message || 'An error occurred while loading mappings',
                 });
+            }
         }
 
         // Render Mappings table
@@ -799,27 +793,21 @@
             let html = '';
             Mappings.forEach(Mapping => {
                 // Find teacher and subject details
-                const teacher = teachers.find(t => t.id === Mapping.teacher_id) || { fname: 'Unknown', lname: 'Teacher' };
-                const subject = subjects.find(s => s.id === Mapping.subject_id) || { name: 'Unknown Subject', code: 'N/A' };
+                const teacher = Mapping.teacher || { fname: 'Unknown', lname: 'Teacher' };
+                const subject = Mapping.subject || { name: 'Unknown Subject', code: 'N/A' };
 
                 // Get department from subject
-                const departmentName = subject.department ? subject.department.name : 'N/A';
+                const departmentName = Mapping.department ? Mapping.department.name : 'N/A';
 
                 // Format sections
-                const sectionsList = Mapping.sections ? Mapping.sections.map(s => s.name).join(', ') : 'N/A';
+                const sectionsList = Mapping.program && Mapping.program.sections
+                    ? Mapping.program.sections.map(s => s.section_name).join(', ')
+                    : 'N/A';
 
                 // Format time
                 const timeDisplay = Mapping.start_time && Mapping.end_time
                     ? `${Mapping.start_time} - ${Mapping.end_time}`
                     : 'N/A';
-
-                // Create status badge
-                let statusBadge = '';
-                if (Mapping.status === 1) {
-                    statusBadge = '<span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>';
-                } else {
-                    statusBadge = '<span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>';
-                }
 
                 html += `
                     <tr id="Mapping-row-${Mapping.id}">
@@ -828,8 +816,6 @@
                         <td class="table-cell">${subject.code}</td>
                         <td class="table-cell">${departmentName}</td>
                         <td class="table-cell">${sectionsList}</td>
-                        <td class="table-cell">${timeDisplay}</td>
-                        <td class="table-cell">${statusBadge}</td>
                         <td class="table-cell">
                             <div class="flex items-center space-x-2">
                                 <button onclick="showEditForm(${Mapping.id})" class="p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" aria-label="Edit Mapping">
