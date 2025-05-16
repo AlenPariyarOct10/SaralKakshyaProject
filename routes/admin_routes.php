@@ -44,6 +44,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/department/get_department/{id}', [AdminDepartmentController::class, "get_department"])->name('admin.department.get_department');
         Route::get('/department/get_department_programs', [AdminDepartmentController::class, 'get_department_programs'])->name('admin.department.get_department_programs');
         Route::get('/department/getAllDepartments', [AdminDepartmentController::class, 'getAllDepartments']);
+        Route::get('/department/getSubjects', [AdminDepartmentController::class, 'getSubjects']);
+        Route::post('/department/section', [AdminDepartmentController::class, 'storeSection'])->name('admin.section.store');
+
+        //Section
+        Route::get('/sections/getBySubject/{id}', [AdminDepartmentController::class, 'getBySubject'])->name('admin.section.getBySubject');
 
         //Subjects
         Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
@@ -101,6 +106,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
         Route::POST('/teacher/status/{id}', [AdminTeacherController::class, "toggle_status"])->name('admin.teacher.status');
         Route::get('/teacher/download/excel', [AdminTeacherController::class, "generatePDF"])->name('admin.teacher.download.excel');
+        Route::get('/teacher/{id}/getTiming', [AdminTeacherController::class, "getTiming"])->name('admin.subject-teacher.getTiming');
 
         //SubjectTeacher
         Route::get('/subject-teacher', [AdminSubjectTeacherController::class, "index"])->name('admin.subject-teacher.index');

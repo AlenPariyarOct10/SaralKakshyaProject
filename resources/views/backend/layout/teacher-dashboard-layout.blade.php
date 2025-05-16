@@ -5,69 +5,22 @@
     <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">w
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{$system_name}} - @yield("title") </title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    @vite(['resources/js/app.js'])
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                    }
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .btn-primary {
-                @apply px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors;
-            }
-
-            .card {
-                @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
-            }
-
-            .sidebar-item {
-                @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors;
-            }
-
-            .sidebar-item.active {
-                @apply bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-medium;
-            }
-
-            /* Add scrollable content styles */
-            .scrollable-content {
-                @apply overflow-y-auto;
-                height: calc(100vh - 64px); /* Adjust based on header height */
-            }
-        }
-    </style>
+    <!-- Tailwind is already configured in tailwind.config.js -->
+    <!-- These utility classes should be moved to app.css for better organization -->
     @stack("styles")
 </head>
 @section("content")
-    <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200 antialiased">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <aside id="sidebar"
-               class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
+               class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto border-r border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
                 <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">{{\App\Models\SystemSetting::all()->first()->name}}</h1>
                 <button id="closeSidebar"
@@ -119,7 +72,7 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64 flex flex-col h-screen">
             <!-- Top Navbar -->
-            <header class="bg-white dark:bg-gray-800 shadow-sm">
+            <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center">
                         <button id="openSidebar"
@@ -129,10 +82,10 @@
                         <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
                     </div>
 
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-4 ml-auto">
                         <!-- Dark Mode Toggle -->
                         <button id="darkModeToggle"
-                                class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500">
                             <i class="fas fa-moon dark:hidden"></i>
                             <i class="fas fa-sun hidden dark:block"></i>
                         </button>

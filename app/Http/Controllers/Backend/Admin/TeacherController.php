@@ -56,6 +56,55 @@ class TeacherController extends Controller
         return Excel::download(new TeacherExport(), $fileName);
     }
 
+    public function getTiming($id)
+    {
+        $teacher = Teacher::find($id);
+
+        if (!$teacher) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Teacher not found'
+            ], 404);
+        }
+
+        // Get availability grouped by day
+        $availability = \App\Models\TeacherAvailability::where('teacher_id', $id)
+            ->get()
+            ->groupBy('day_of_week')
+            ->map(function ($slots) {
+                return $slots->map(function ($slot) {
+                    return [
+                        'start_time' => $slot->start_time,
+                        'end_time' => $slot->end_time
+                    ];
+                });
+            });
+
+        // Get existing mappings grouped by day
+        $mappings = \App\Models\SubjectTeacherMapping::where('teacher_id', $id)
+            ->with('subject')
+            ->get()
+            ->groupBy('day_of_week')
+            ->map(function ($dayMappings) {
+                return $dayMappings->map(function ($mapping) {
+                    return [
+                        'subject_id' => $mapping->subject_id,
+                        'subject_name' => optional($mapping->subject)->name,
+                        'start_time' => $mapping->start_time,
+                        'end_time' => $mapping->end_time,
+                    ];
+                });
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'availability' => $availability,
+                'mappings' => $mappings,
+            ]
+        ]);
+    }
+
 
     public function getProfile($id)
     {

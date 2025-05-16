@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Institute;
 use App\Models\Program;
+use App\Models\ProgramSection;
+use App\Models\Subject;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,9 +42,17 @@ class DepartmentController extends Controller
 
     public function get_department_programs(Request $request)
     {
-        $programs = Program::where('department_id', $request->department_id)->get();
+        $request->validate([
+            'department_id' => 'required|exists:departments,id'
+        ]);
+
+        $programs = Program::where('department_id', $request->department_id)
+            ->select('id', 'name')
+            ->get();
+
         return response()->json($programs);
     }
+
 
     public function getAllDepartments()
     {
@@ -50,6 +60,58 @@ class DepartmentController extends Controller
         $departments = Department::where('institute_id', $institutes->id)->get();
         return response()->json($departments?$departments:[]);
     }
+
+    public function storeSection(Request $request)
+    {
+        $validated = $request->validate([
+            'program_id' => 'required|exists:programs,id',
+            'sections' => 'required|array|min:1',
+            'sections.*.name' => 'required|string|max:100|unique:program_sections,section_name,NULL,id,program_id,'.$request->program_id
+        ]);
+
+        try {
+            $sections = array_map(function($section) use ($request) {
+                return [
+                    'program_id' => $request->program_id,
+                    'section_name' => $section['name'],
+                    'status' => true,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }, $request->sections);
+
+            ProgramSection::insert($sections);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sections created successfully',
+                'sections' => $sections
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create sections',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSubjects(Request $request)
+    {
+        $departmentId = $request->department_id;
+
+        $subjects = Subject::whereHas('program', function ($query) use ($departmentId) {
+            $query->where('department_id', $departmentId);
+        })->get();
+
+        if ($subjects->isEmpty()) {
+            return response()->json(['message' => 'No subjects found for this department'], 404);
+        }
+
+        return response()->json($subjects);
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -138,5 +200,18 @@ class DepartmentController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+
+    public function getBySubject($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $program = Program::findOrFail($subject->program_id);
+        $sections = ProgramSection::where('program_id', $program->id)->get();
+        return response()->json([
+            'subject' => $subject,
+            'program' => $program,
+            'sections' => $sections
+        ]);
     }
 }

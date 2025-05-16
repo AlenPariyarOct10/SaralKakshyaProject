@@ -72,4 +72,9 @@ class Teacher extends Authenticatable
         return $this->morphMany(SeenStatus::class, 'user');
     }
 
+    public function subjectTeacherMappings()
+    {
+        return $this->hasMany(SubjectTeacherMapping::class);
+    }
+
 }

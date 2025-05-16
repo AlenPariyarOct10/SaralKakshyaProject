@@ -54,7 +54,7 @@ class AuthController extends Controller
 
             if ($isApproved) {
                 Session::put('institute_id', $instituteId);
-                return redirect()->intended(route('teacher.dashboard'));
+                return redirect()->route('teacher.dashboard');
             } else {
                 Auth::guard('teacher')->logout();
                 return redirect()->route('teacher.login')->withErrors([

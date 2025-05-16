@@ -93,7 +93,7 @@
 @endpush
 
 @section("title")
-    Manage Teacher-Subject Assignments
+    Manage Teacher-Subject Mappings
 @endsection
 
 @section('content')
@@ -101,7 +101,7 @@
         <!-- Page Header -->
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Teacher-Subject Management</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Assign teachers to subjects and manage existing assignments</p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Assign teachers to subjects and manage existing Mappings</p>
         </div>
 
         <!-- Action Bar -->
@@ -141,33 +141,33 @@
                         <i class="fas fa-arrow-left mr-2"></i> Back to Subjects
                     </a>
                 </div>
-                <!-- Add Assignment Button -->
+                <!-- Add Mapping Button -->
                 <div class="flex justify-end">
                     <button
-                        id="addAssignmentBtn"
+                        id="addMappingBtn"
                         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
-                        <i class="fas fa-plus mr-2"></i> New Assignment
+                        <i class="fas fa-plus mr-2"></i> New Mapping
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Assignment Form Card (Hidden by default) -->
-        <div id="assignmentFormCard" class="card mb-6 hidden">
+        <!-- Mapping Form Card (Hidden by default) -->
+        <div id="MappingFormCard" class="card mb-6 hidden">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white" id="formTitle">New Teacher-Subject Assignment</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white" id="formTitle">New Teacher-Subject Mapping</h2>
                     <button id="closeFormBtn" class="text-gray-400 hover:text-gray-500">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
 
                 <form id="teacherSubjectForm">
-                    <input type="hidden" id="assignmentId" value="">
+                    <input type="hidden" id="MappingId" value="">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <!-- Teacher Selection -->
                         <div>
-                            <label for="teacherId" class="form-label">Teacher <span class="text-red-500">*</span></label>
+                            <label for="teacherId" class="form-label">Select Teacher <span class="text-red-500">*</span></label>
                             <select id="teacherId" name="teacherId" class="form-select" required>
                                 <option value="">Select Teacher</option>
                                 <!-- Will be populated via JavaScript -->
@@ -175,35 +175,27 @@
                             <div id="teacherIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
 
-                        <!-- Subject Selection -->
+                        <!-- Department Selection -->
                         <div>
-                            <label for="subjectId" class="form-label">Subject <span class="text-red-500">*</span></label>
-                            <select id="subjectId" name="subjectId" class="form-select" required>
-                                <option value="">Select Subject</option>
+                            <label for="departmentId" class="form-label">Select Department <span class="text-red-500">*</span></label>
+                            <select id="departmentId" name="departmentId" class="form-select" required>
+                                <option value="">Select Department</option>
                                 <!-- Will be populated via JavaScript -->
                             </select>
-                            <div id="subjectIdError" class="text-red-500 text-xs mt-1 hidden"></div>
+                            <div id="departmentIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <!-- Academic Year -->
+                        <!-- Subject Selection (Filtered by Department) -->
                         <div>
-                            <label for="academicYear" class="form-label">Academic Year <span class="text-red-500">*</span></label>
-                            <select id="academicYear" name="academicYear" class="form-select" required>
-                                <option value="">Select Academic Year</option>
-                                <!-- Generate last 3 years plus current and next year -->
-                                @php
-                                    $currentYear = date('Y');
-                                    for($i = $currentYear-2; $i <= $currentYear+1; $i++) {
-                                        $yearLabel = $i . '-' . ($i+1);
-                                        echo "<option value=\"{$yearLabel}\">{$yearLabel}</option>";
-                                    }
-                                @endphp
+                            <label for="subjectId" class="form-label">Select Subject <span class="text-red-500">*</span></label>
+                            <select id="subjectId" name="subjectId" class="form-select" required>
+                                <option value="">Select Subject</option>
+                                <!-- Will be populated via JavaScript based on department -->
                             </select>
-                            <div id="academicYearError" class="text-red-500 text-xs mt-1 hidden"></div>
+                            <div id="subjectIdError" class="text-red-500 text-xs mt-1 hidden"></div>
                         </div>
-
                         <!-- Status -->
                         <div>
                             <label for="status" class="form-label">Status</label>
@@ -214,21 +206,19 @@
                         </div>
                     </div>
 
-                    <!-- Notes -->
-                    <div class="mb-4">
-                        <label for="notes" class="form-label">Notes (Optional)</label>
-                        <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="Add any additional information about this assignment"></textarea>
-                    </div>
+
+
+
 
                     <div class="flex justify-end gap-2">
                         <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" id="saveBtn" class="btn-primary">Save Assignment</button>
+                        <button type="submit" id="saveBtn" class="btn-primary">Save Mapping</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Assignments Table -->
+        <!-- Mappings Table -->
         <div class="card">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -238,18 +228,19 @@
                         <th scope="col" class="table-header">Subject</th>
                         <th scope="col" class="table-header">Subject Code</th>
                         <th scope="col" class="table-header">Department</th>
-                        <th scope="col" class="table-header">Academic Year</th>
+                        <th scope="col" class="table-header">Sections</th>
+                        <th scope="col" class="table-header">Time</th>
                         <th scope="col" class="table-header">Status</th>
                         <th scope="col" class="table-header">Action</th>
                     </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="assignmentsTableBody">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="MappingsTableBody">
                     <!-- Table content will be loaded via JavaScript -->
                     <tr>
-                        <td colspan="7" class="table-cell text-center py-8">
+                        <td colspan="8" class="table-cell text-center py-8">
                             <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
-                                <span>Loading assignments...</span>
+                                <span>Loading Mappings...</span>
                             </div>
                         </td>
                     </tr>
@@ -278,43 +269,42 @@
         let teachers = [];
         let subjects = [];
         let departments = [];
-        let assignments = [];
+        let sections = [];
+        let Mappings = [];
         let isEditMode = false;
 
         // DOM elements
         const searchInput = document.getElementById('searchInput');
         const departmentFilter = document.getElementById('departmentFilter');
-        const assignmentFormCard = document.getElementById('assignmentFormCard');
+        const MappingFormCard = document.getElementById('MappingFormCard');
         const teacherSubjectForm = document.getElementById('teacherSubjectForm');
-        const addAssignmentBtn = document.getElementById('addAssignmentBtn');
+        const addMappingBtn = document.getElementById('addMappingBtn');
         const closeFormBtn = document.getElementById('closeFormBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const formTitle = document.getElementById('formTitle');
         const saveBtn = document.getElementById('saveBtn');
-        const assignmentsTableBody = document.getElementById('assignmentsTableBody');
+        const MappingsTableBody = document.getElementById('MappingsTableBody');
         const paginationInfo = document.getElementById('paginationInfo');
         const paginationControls = document.getElementById('paginationControls');
 
         // Form fields
-        const assignmentId = document.getElementById('assignmentId');
+        const MappingId = document.getElementById('MappingId');
         const teacherId = document.getElementById('teacherId');
+        const departmentId = document.getElementById('departmentId');
         const subjectId = document.getElementById('subjectId');
-        const academicYear = document.getElementById('academicYear');
         const status = document.getElementById('status');
-        const notes = document.getElementById('notes');
 
         // Error elements
         const teacherIdError = document.getElementById('teacherIdError');
+        const departmentIdError = document.getElementById('departmentIdError');
         const subjectIdError = document.getElementById('subjectIdError');
-        const academicYearError = document.getElementById('academicYearError');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             // Load initial data
             loadDepartments();
             loadTeachers();
-            loadSubjects();
-            loadAssignments();
+            loadMappings();
 
             // Set up event listeners
             setupEventListeners();
@@ -323,74 +313,125 @@
         // Event listeners setup
         function setupEventListeners() {
             // Form toggle buttons
-            addAssignmentBtn.addEventListener('click', showAddForm);
+            addMappingBtn.addEventListener('click', showAddForm);
             closeFormBtn.addEventListener('click', hideForm);
             cancelBtn.addEventListener('click', hideForm);
+
+            // Cascading dropdowns
+            departmentId.addEventListener('change', loadSubjectsByDepartment);
 
             // Form submission
             teacherSubjectForm.addEventListener('submit', handleFormSubmit);
 
             // Search and filter
-            searchInput.addEventListener('input', debounce(loadAssignments, 300));
-            departmentFilter.addEventListener('change', loadAssignments);
+            searchInput.addEventListener('input', debounce(loadMappings, 300));
+            departmentFilter.addEventListener('change', loadMappings);
         }
 
+        // Load subjects based on selected department
+        function loadSubjectsByDepartment() {
+            const selectedDepartmentId = departmentId.value;
+
+            // Clear subject dropdown
+            subjectId.innerHTML = '<option value="">Select Subject</option>';
+
+            // Clear section dropdown
+
+            if (!selectedDepartmentId) return;
+
+            // Fetch subjects for the selected department
+            fetch(`/admin/department/getSubjects?department_id=${selectedDepartmentId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Check if data is an array (success case) or an object with message (error case)
+                    if (Array.isArray(data)) {
+                        // Populate subject dropdown
+                        data.forEach(subject => {
+                            subjectId.innerHTML += `<option value="${subject.id}">${subject.name} (${subject.code})</option>`;
+                        });
+                    } else if (data.message) {
+                        console.error('No subjects found:', data.message);
+                    }
+                })
+                .catch(error => console.error('Error loading subjects:', error));
+        }
         // Show add form
         function showAddForm() {
             resetForm();
             isEditMode = false;
-            formTitle.textContent = 'New Teacher-Subject Assignment';
-            saveBtn.textContent = 'Save Assignment';
-            assignmentFormCard.classList.remove('hidden');
+            formTitle.textContent = 'New Teacher-Subject Mapping';
+            saveBtn.textContent = 'Save Mapping';
+            MappingFormCard.classList.remove('hidden');
 
             // Smooth scroll to form
-            assignmentFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            MappingFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // Show edit form
         function showEditForm(id) {
             resetForm();
             isEditMode = true;
-            formTitle.textContent = 'Edit Teacher-Subject Assignment';
-            saveBtn.textContent = 'Update Assignment';
+            formTitle.textContent = 'Edit Teacher-Subject Mapping';
+            saveBtn.textContent = 'Update Mapping';
 
-            // Find the assignment by ID
-            const assignment = assignments.find(a => a.id === id);
-            if (!assignment) return;
+            // Find the Mapping by ID
+            const Mapping = Mappings.find(a => a.id === id);
+            if (!Mapping) return;
 
             // Fill the form with data
-            assignmentId.value = assignment.id;
-            teacherId.value = assignment.teacher_id;
-            subjectId.value = assignment.subject_id;
-            academicYear.value = assignment.academic_year;
-            status.value = assignment.status;
-            notes.value = assignment.notes || '';
+            MappingId.value = Mapping.id;
+            teacherId.value = Mapping.teacher_id;
+
+            // Set department and trigger change event to load subjects
+            departmentId.value = Mapping.department_id;
+            const departmentChangeEvent = new Event('change');
+            departmentId.dispatchEvent(departmentChangeEvent);
+
+            // Set subject after a short delay to ensure subjects are loaded
+            setTimeout(() => {
+                subjectId.value = Mapping.subject_id;
+
+                // Trigger subject change to load sections
+                const subjectChangeEvent = new Event('change');
+                subjectId.dispatchEvent(subjectChangeEvent);
+
+            }, 300);
+
+            startTime.value = Mapping.start_time;
+            endTime.value = Mapping.end_time;
+            status.value = Mapping.status;
 
             // Show the form
-            assignmentFormCard.classList.remove('hidden');
+            MappingFormCard.classList.remove('hidden');
 
             // Smooth scroll to form
-            assignmentFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            MappingFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // Hide form
         function hideForm() {
-            assignmentFormCard.classList.add('hidden');
+            MappingFormCard.classList.add('hidden');
             resetForm();
         }
 
         // Reset form
         function resetForm() {
             teacherSubjectForm.reset();
-            assignmentId.value = '';
+            MappingId.value = '';
             hideAllErrors();
         }
 
         // Hide all error messages
         function hideAllErrors() {
             teacherIdError.classList.add('hidden');
+            departmentIdError.classList.add('hidden');
             subjectIdError.classList.add('hidden');
-            academicYearError.classList.add('hidden');
+
         }
 
         // Show validation errors
@@ -402,15 +443,16 @@
                 teacherIdError.classList.remove('hidden');
             }
 
+            if (errors.departmentId) {
+                departmentIdError.textContent = errors.departmentId;
+                departmentIdError.classList.remove('hidden');
+            }
+
             if (errors.subjectId) {
                 subjectIdError.textContent = errors.subjectId;
                 subjectIdError.classList.remove('hidden');
             }
 
-            if (errors.academicYear) {
-                academicYearError.textContent = errors.academicYear;
-                academicYearError.classList.remove('hidden');
-            }
         }
 
         // Handle form submission
@@ -421,10 +463,9 @@
             // Validate form
             const formData = {
                 teacher_id: teacherId.value,
+                department_id: departmentId.value,
                 subject_id: subjectId.value,
-                academic_year: academicYear.value,
-                status: status.value,
-                notes: notes.value
+                status: status.value
             };
 
             const errors = validateForm(formData);
@@ -435,9 +476,9 @@
 
             // Submit form based on mode (add or edit)
             if (isEditMode) {
-                updateAssignment(assignmentId.value, formData);
+                updateMapping(MappingId.value, formData);
             } else {
-                createAssignment(formData);
+                createMapping(formData);
             }
         }
 
@@ -449,24 +490,25 @@
                 errors.teacherId = 'Please select a teacher';
             }
 
+            if (!data.department_id) {
+                errors.departmentId = 'Please select a department';
+            }
+
             if (!data.subject_id) {
                 errors.subjectId = 'Please select a subject';
             }
 
-            if (!data.academic_year) {
-                errors.academicYear = 'Please select an academic year';
-            }
 
             return errors;
         }
 
-        // Create a new assignment
-        function createAssignment(data) {
+        // Create a new Mapping
+        function createMapping(data) {
             // Show loading state
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-            // API call to create assignment
+            // API call to create Mapping
             fetch('/admin/subject-teacher', {
                 method: 'POST',
                 headers: {
@@ -479,14 +521,14 @@
                 .then(response => response.json())
                 .then(async data => {
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Save Assignment';
+                    saveBtn.innerHTML = 'Save Mapping';
 
                     if (data.status === 'success') {
                         hideForm();
-                        loadAssignments();
+                        loadMappings();
                         await Toast.fire({
                             icon: 'success',
-                            title: 'Assignment created successfully',
+                            title: 'Mapping created successfully',
                         });
                     } else {
                         if (data.errors) {
@@ -494,7 +536,7 @@
                         } else {
                             await Toast.fire({
                                 icon: 'error',
-                                title: 'Failed to create assignment',
+                                title: 'Failed to create Mapping',
                             });
                         }
                     }
@@ -502,7 +544,7 @@
                 .catch(async error => {
                     console.error('Error:', error);
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Save Assignment';
+                    saveBtn.innerHTML = 'Save Mapping';
                     await Toast.fire({
                         icon: 'error',
                         title: 'An error occurred',
@@ -510,13 +552,13 @@
                 });
         }
 
-        // Update an existing assignment
-        function updateAssignment(id, data) {
+        // Update an existing Mapping
+        function updateMapping(id, data) {
             // Show loading state
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
 
-            // API call to update assignment
+            // API call to update Mapping
             fetch(`/admin/subject-teacher/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -529,14 +571,14 @@
                 .then(response => response.json())
                 .then(async data => {
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Update Assignment';
+                    saveBtn.innerHTML = 'Update Mapping';
 
                     if (data.status === 'success') {
                         hideForm();
-                        loadAssignments();
+                        loadMappings();
                         await Toast.fire({
                             icon: 'success',
-                            title: 'Assignment updated successfully',
+                            title: 'Mapping updated successfully',
                         });
                     } else {
                         if (data.errors) {
@@ -544,7 +586,7 @@
                         } else {
                             await Toast.fire({
                                 icon: 'error',
-                                title: 'Failed to update assignment',
+                                title: 'Failed to update Mapping',
                             });
                         }
                     }
@@ -552,7 +594,7 @@
                 .catch(async error => {
                     console.error('Error:', error);
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Update Assignment';
+                    saveBtn.innerHTML = 'Update Mapping';
                     await Toast.fire({
                         icon: 'error',
                         title: 'An error occurred',
@@ -560,7 +602,7 @@
                 });
         }
 
-        // Delete an assignment
+        // Delete an Mapping
         function confirmDelete(id, teacherName, subjectName) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -572,13 +614,13 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    deleteAssignment(id);
+                    deleteMapping(id);
                 }
             });
         }
 
-        // Delete an assignment
-        function deleteAssignment(id) {
+        // Delete an Mapping
+        function deleteMapping(id) {
             fetch(`/admin/subject-teacher/${id}`, {
                 method: 'DELETE',
                 headers: {
@@ -590,15 +632,15 @@
                 .then(response => response.json())
                 .then(async data => {
                     if (data.status === 'success') {
-                        loadAssignments();
+                        loadMappings();
                         await Toast.fire({
                             icon: 'success',
-                            title: 'Assignment deleted successfully',
+                            title: 'Mapping deleted successfully',
                         });
                     } else {
                         await Toast.fire({
                             icon: 'error',
-                            title: 'Failed to delete assignment',
+                            title: 'Failed to delete Mapping',
                         });
                     }
                 })
@@ -619,6 +661,7 @@
                     if (data) {
                         departments = data;
                         renderDepartmentFilter();
+                        renderDepartmentDropdown();
                     }
                 })
                 .catch(error => console.error('Error loading departments:', error));
@@ -632,6 +675,14 @@
             });
         }
 
+        // Render department dropdown in form
+        function renderDepartmentDropdown() {
+            departmentId.innerHTML = '<option value="">Select Department</option>';
+            departments.forEach(dept => {
+                departmentId.innerHTML += `<option value="${dept.id}">${dept.name}</option>`;
+            });
+        }
+
         // Load teachers for dropdown
         function loadTeachers() {
             fetch('/admin/teachers/getAll')
@@ -639,7 +690,6 @@
                 .then(data => {
                     if (data) {
                         teachers = data.data.teachers;
-
                         renderTeacherDropdown();
                     }
                 })
@@ -649,8 +699,6 @@
         // Render teacher dropdown options
         function renderTeacherDropdown() {
             teacherId.innerHTML = '<option value="">Select Teacher</option>';
-            console.log("tachers : ", teachers);
-
             teachers.forEach(teacher => {
                 teacherId.innerHTML += `<option value="${teacher.id}">${teacher.fname} ${teacher.lname}</option>`;
             });
@@ -663,29 +711,20 @@
                 .then(data => {
                     if (data) {
                         subjects = data.data.subjects;
-                        renderSubjectDropdown();
                     }
                 })
                 .catch(error => console.error('Error loading subjects:', error));
         }
 
-        // Render subject dropdown options
-        function renderSubjectDropdown() {
-            subjectId.innerHTML = '<option value="">Select Subject</option>';
-            subjects.forEach(subject => {
-                subjectId.innerHTML += `<option value="${subject.id}">${subject.name} (${subject.code})</option>`;
-            });
-        }
-
-        // Load assignments with pagination
-        function loadAssignments() {
+        // Load Mappings with pagination
+        function loadMappings() {
             // Show loading state
-            assignmentsTableBody.innerHTML = `
+            MappingsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="table-cell text-center py-8">
+                    <td colspan="8" class="table-cell text-center py-8">
                         <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
                             <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
-                            <span>Loading assignments...</span>
+                            <span>Loading mappings...</span>
                         </div>
                     </td>
                 </tr>
@@ -705,47 +744,52 @@
                 params.append('department_id', departmentFilter.value);
             }
 
-            // API call to get assignments
+            // API call to get Mappings
             fetch(`/admin/subject-teacher?${params.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        assignments = data.data;
+                        Mappings = data.data;
                         totalPages = data.meta.last_page;
                         currentPage = data.meta.current_page;
 
-                        // Render assignments and pagination
-                        renderAssignments();
+                        // Load subjects if not already loaded
+                        if (subjects.length === 0) {
+                            loadSubjects();
+                        }
+
+                        // Render Mappings and pagination
+                        renderMappings();
                         renderPagination(data.meta);
                     } else {
-                        assignmentsTableBody.innerHTML = `
+                        MappingsTableBody.innerHTML = `
                             <tr>
-                                <td colspan="7" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
-                                    Failed to load assignments
+                                <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
+                                    Failed to load Mappings
                                 </td>
                             </tr>
                         `;
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading assignments:', error);
-                    assignmentsTableBody.innerHTML = `
+                    console.error('Error loading Mappings:', error);
+                    MappingsTableBody.innerHTML = `
                         <tr>
-                            <td colspan="7" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
-                                An error occurred while loading assignments
+                            <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
+                                An error occurred while loading Mappings
                             </td>
                         </tr>
                     `;
                 });
         }
 
-        // Render assignments table
-        function renderAssignments() {
-            if (!assignments || assignments.length === 0) {
-                assignmentsTableBody.innerHTML = `
+        // Render Mappings table
+        function renderMappings() {
+            if (!Mappings || Mappings.length === 0) {
+                MappingsTableBody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
-                            No assignments found
+                        <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
+                            No Mappings found
                         </td>
                     </tr>
                 `;
@@ -753,36 +797,45 @@
             }
 
             let html = '';
-            assignments.forEach(assignment => {
+            Mappings.forEach(Mapping => {
                 // Find teacher and subject details
-                const teacher = teachers.find(t => t.id === assignment.teacher_id) || { fname: 'Unknown', lname: 'Teacher' };
-                const subject = subjects.find(s => s.id === assignment.subject_id) || { name: 'Unknown Subject', code: 'N/A' };
+                const teacher = teachers.find(t => t.id === Mapping.teacher_id) || { fname: 'Unknown', lname: 'Teacher' };
+                const subject = subjects.find(s => s.id === Mapping.subject_id) || { name: 'Unknown Subject', code: 'N/A' };
 
                 // Get department from subject
                 const departmentName = subject.department ? subject.department.name : 'N/A';
 
+                // Format sections
+                const sectionsList = Mapping.sections ? Mapping.sections.map(s => s.name).join(', ') : 'N/A';
+
+                // Format time
+                const timeDisplay = Mapping.start_time && Mapping.end_time
+                    ? `${Mapping.start_time} - ${Mapping.end_time}`
+                    : 'N/A';
+
                 // Create status badge
                 let statusBadge = '';
-                if (assignment.status === 1) {
+                if (Mapping.status === 1) {
                     statusBadge = '<span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>';
                 } else {
                     statusBadge = '<span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>';
                 }
 
                 html += `
-                    <tr id="assignment-row-${assignment.id}">
+                    <tr id="Mapping-row-${Mapping.id}">
                         <td class="table-cell font-medium">${teacher.title || ''} ${teacher.fname} ${teacher.lname}</td>
                         <td class="table-cell">${subject.name}</td>
                         <td class="table-cell">${subject.code}</td>
                         <td class="table-cell">${departmentName}</td>
-                        <td class="table-cell">${assignment.academic_year}</td>
+                        <td class="table-cell">${sectionsList}</td>
+                        <td class="table-cell">${timeDisplay}</td>
                         <td class="table-cell">${statusBadge}</td>
                         <td class="table-cell">
                             <div class="flex items-center space-x-2">
-                                <button onclick="showEditForm(${assignment.id})" class="p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" aria-label="Edit assignment">
+                                <button onclick="showEditForm(${Mapping.id})" class="p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" aria-label="Edit Mapping">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="confirmDelete(${assignment.id}, '${teacher.fname} ${teacher.lname}', '${subject.name}')" class="p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" aria-label="Delete assignment">
+                                <button onclick="confirmDelete(${Mapping.id}, '${teacher.fname} ${teacher.lname}', '${subject.name}')" class="p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" aria-label="Delete Mapping">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -791,13 +844,13 @@
                 `;
             });
 
-            assignmentsTableBody.innerHTML = html;
+            MappingsTableBody.innerHTML = html;
         }
 
         // Render pagination controls
         function renderPagination(meta) {
             // Update pagination info text
-            paginationInfo.textContent = `Showing ${meta.from || 0} to ${meta.to || 0} of ${meta.total} assignments`;
+            paginationInfo.textContent = `Showing ${meta.from || 0} to ${meta.to || 0} of ${meta.total} Mappings`;
 
             // Generate pagination buttons
             let paginationHTML = '';
@@ -858,7 +911,7 @@
         function changePage(page) {
             if (page < 1 || page > totalPages) return;
             currentPage = page;
-            loadAssignments();
+            loadMappings();
 
             // Scroll to top of table
             document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });

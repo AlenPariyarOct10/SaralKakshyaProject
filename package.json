@@ -7,7 +7,6 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.25.1",
-        "@tailwindcss/vite": "^4.0.0",
         "autoprefixer": "^10.4.21",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -17,11 +16,29 @@
         "laravel-vite-plugin": "^1.2.0",
         "postcss": "^8.5.3",
         "pusher-js": "^8.4.0",
-        "tailwindcss": "^4.0.14",
+        "tailwindcss": "^3.4.1",
         "vite": "^6.0.11"
     },
     "dependencies": {
         "alpinejs": "^3.14.9",
-        "sweetalert2": "^11.21.0"
-    }
+        "sweetalert2": "^11.6.13"
+    },
+    "name": "saralkakshyaproject",
+    "version": "1.0.0",
+    "description": "<img src=\"https://github.com/user-attachments/assets/ec39543e-bec8-40b9-b7d4-9d49aa0a1363\" width=\"200\" alt=\"logo\">",
+    "main": "eslint.config.js",
+    "directories": {
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AlenPariyarOct10/SaralKakshyaProject.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AlenPariyarOct10/SaralKakshyaProject/issues"
+    },
+    "homepage": "https://github.com/AlenPariyarOct10/SaralKakshyaProject#readme"
 }

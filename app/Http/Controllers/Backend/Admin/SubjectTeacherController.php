@@ -13,6 +13,7 @@ class SubjectTeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
         $allSubjects = Subject::where('created_by', Auth::id())->get();

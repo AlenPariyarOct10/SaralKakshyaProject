@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin.approved' => \App\Http\Middleware\AdminAllowedMiddleware::class,
+            'auth' => \App\Http\Middleware\CustomAuthenticate::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

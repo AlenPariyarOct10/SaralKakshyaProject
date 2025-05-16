@@ -122,6 +122,9 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
+                <button id="manageSectionBtn" class="bg-yellow-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-yellow-600">
+                    <i class="fas fa-plus mr-2"></i> Manage Sections
+                </button>
                 <button id="manageBatchBtn" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
                     <i class="fas fa-plus mr-2"></i> Manage Batch
                 </button>
@@ -341,6 +344,80 @@
             </div>
         </div>
     </div>
+    <!-- Manage Section Modal -->
+    <div id="manageSectionModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Manage Sections</h3>
+                    <button id="closeManageSectionModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <form id="manageSectionForm">
+                    <!-- Select Department -->
+                    <div class="mb-4">
+                        <label for="sectionDepartment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+                        <select id="sectionDepartment" name="department_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required>
+                            <option value="">Select Department</option>
+                            @forelse($allDepartments as $department)
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @empty
+                                <option value="">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <!-- Select Program (based on Department) -->
+                    <div class="mb-4">
+                        <label for="sectionProgram" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program</label>
+                        <select id="sectionProgram" name="program_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required disabled>
+                            <option value="">Select Department First</option>
+                        </select>
+                    </div>
+
+                    <!-- Add Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="md:col-span-2">
+                            <label for="sectionName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section Name</label>
+                            <input type="text" id="sectionName" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="e.g. A, B, C">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" id="addSectionButton" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                                Add Section
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- List of Added Sections -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Added Sections</label>
+                        <div id="sectionList" class="border border-gray-300 dark:border-gray-600 rounded-md p-2 min-h-20 max-h-40 overflow-y-auto dark:bg-gray-700">
+                            <p id="noSectionsMessage" class="text-gray-500 dark:text-gray-400 text-sm">No sections added yet</p>
+                            <!-- Sections will be added here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Hidden input for storing sections data -->
+                    <input type="hidden" name="sections" id="sectionsData">
+
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                            Save Sections
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!--Edit Program Modal -->
     <div id="editProgramModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -434,6 +511,169 @@
 
 @section("scripts")
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('manageSectionModal');
+            const closeBtn = document.getElementById('closeManageSectionModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const departmentSelect = document.getElementById('sectionDepartment');
+            const programSelect = document.getElementById('sectionProgram');
+            const sectionNameInput = document.getElementById('sectionName');
+            const addSectionBtn = document.getElementById('addSectionButton');
+            const sectionList = document.getElementById('sectionList');
+            const noSectionsMessage = document.getElementById('noSectionsMessage');
+            const sectionsData = document.getElementById('sectionsData');
+            const form = document.getElementById('manageSectionForm');
+
+            let sections = [];
+
+            // Open/close modal logic
+            window.openManageSectionModal = function() {
+                modal.classList.remove('hidden');
+            };
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                resetForm();
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Department change handler
+            departmentSelect.addEventListener('change', function() {
+                const departmentId = this.value;
+                programSelect.disabled = !departmentId;
+
+                if (!departmentId) {
+                    programSelect.innerHTML = '<option value="">Select Department First</option>';
+                    return;
+                }
+
+                // Fetch programs for selected department
+                fetch(`/admin/department/get_department_programs?department_id=${departmentId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        programSelect.innerHTML = '<option value="">Select Program</option>';
+                        data.forEach(program => {
+                            programSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`;
+                        });
+                    })
+                    .catch(error => console.error('Error loading programs:', error));
+            });
+
+            // Add section handler
+            addSectionBtn.addEventListener('click', function() {
+                const sectionName = sectionNameInput.value.trim();
+                const programId = programSelect.value;
+
+                if (!sectionName) {
+                    alert('Please enter a section name');
+                    return;
+                }
+
+                if (!programId) {
+                    alert('Please select a program first');
+                    return;
+                }
+
+                // Add section to list
+                sections.push({
+                    name: sectionName,
+                    program_id: programId
+                });
+
+                updateSectionList();
+                sectionNameInput.value = '';
+                sectionNameInput.focus();
+            });
+
+            // Update section list display
+            function updateSectionList() {
+                if (sections.length === 0) {
+                    noSectionsMessage.classList.remove('hidden');
+                    sectionList.innerHTML = '';
+                    return;
+                }
+
+                noSectionsMessage.classList.add('hidden');
+                sectionList.innerHTML = '';
+
+                sections.forEach((section, index) => {
+                    const sectionItem = document.createElement('div');
+                    sectionItem.className = 'flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0';
+                    sectionItem.innerHTML = `
+                <span>${section.name}</span>
+                <button type="button" class="text-red-500 hover:text-red-700" data-index="${index}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            `;
+                    sectionList.appendChild(sectionItem);
+                });
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('#sectionList button').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        sections.splice(index, 1);
+                        updateSectionList();
+                    });
+                });
+
+                // Update hidden input with sections data
+                sectionsData.value = JSON.stringify(sections);
+            }
+
+            // Form submission handler
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                if (sections.length === 0) {
+                    alert('Please add at least one section');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/admin/department/section', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            program_id: programSelect.value,
+                            sections: sections
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        alert('Sections saved successfully!');
+                        closeModal();
+                        // Optional: Refresh sections list in parent page
+                        if (typeof window.refreshSections === 'function') {
+                            window.refreshSections();
+                        }
+                    } else {
+                        throw new Error(result.message || 'Failed to save sections');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error saving sections: ' + error.message);
+                }
+            });
+
+            // Reset form
+            function resetForm() {
+                form.reset();
+                sections = [];
+                programSelect.innerHTML = '<option value="">Select Department First</option>';
+                programSelect.disabled = true;
+                updateSectionList();
+            }
+        });
         // Program Modal
         const programModal = document.getElementById('programModal');
         const addProgramBtn = document.getElementById('addProgramBtn');
@@ -455,14 +695,13 @@
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-
         $('#editProgramForm').on('submit', function (e) {
             e.preventDefault();
 
             let programId = $('#programId').val();
 
             $.ajax({
-                url: `/programs/${programId}`, // Adjust if using a route prefix
+                url: `/admin/programs/${programId}`, // Adjust if using a route prefix
                 method: 'PUT', // Or 'PATCH'
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -556,6 +795,18 @@
                 for (let i = 1; i <= totalSemesters; i++) {
                     semesterDropdown.append(`<option value="${i}">Semester ${i}</option>`);
                 }
+            });
+
+            $("#manageSectionBtn").click(function ()
+            {
+                manageSectionModal.classList.remove("hidden");
+
+            });
+
+            $("#closeManageSectionModal").click(function ()
+            {
+                manageSectionModal.classList.add("hidden");
+
             });
 
             $("#addBatchButton").click(function () {
