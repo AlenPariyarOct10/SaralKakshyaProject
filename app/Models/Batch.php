@@ -13,4 +13,10 @@ class Batch extends Model
     {
         return $this->belongsTo(Program::class);
     }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class, 'program_id', 'program_id')
+            ->where('semester', $this->semester);
+    }
 }

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AssignmentController extends Controller
 {
@@ -20,7 +23,11 @@ class AssignmentController extends Controller
      */
     public function create()
     {
-        //
+        $teacher = Teacher::where('id', Auth::guard('teacher')->user()->id)->first();
+        $batches = $teacher->teachingBatches();
+
+        $subjects = $teacher->subjectTeacherMappings()->with('subject')->get();
+        return view('backend.teacher.assignment.create', compact('batches', 'subjects'));
     }
 
     /**

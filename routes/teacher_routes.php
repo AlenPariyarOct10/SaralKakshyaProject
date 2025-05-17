@@ -45,7 +45,12 @@ Route::group(['prefix' => 'teacher'], function () {
         // Setting
         Route::get('/setting', [TeacherSettingController::class, "index"])->name('teacher.setting.index');
 
+        //Assignment
         Route::get('/assignment', [TeacherAssignmentController::class, "index"])->name('teacher.assignment.index');
+        Route::get('/assignment/create', [TeacherAssignmentController::class, "create"])->name('teacher.assignment.create');
+        Route::POST('/assignment', [TeacherAssignmentController::class, "store"])->name('teacher.assignment.store');
+
+
         Route::get('/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
     });
 });
