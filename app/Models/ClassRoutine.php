@@ -14,8 +14,10 @@ class ClassRoutine extends Model
         'notes',
     ];
 
+// In ClassRoutine.php model
     public function subjectTeacherMapping()
     {
-        return $this->belongsTo(SubjectTeacherMapping::class);
+        return $this->belongsTo(SubjectTeacherMapping::class, 'subject_teacher_mappings_id', 'id');
+
     }
 }

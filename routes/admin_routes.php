@@ -17,6 +17,7 @@ use App\Http\Controllers\Backend\Admin\ProfileController as AdminProfileControll
 use App\Http\Controllers\Backend\Admin\SubjectTeacherController as AdminSubjectTeacherController;
 use App\Http\Controllers\Backend\Admin\BatchController as AdminBatchController;
 use App\Http\Controllers\Backend\Admin\SubjectTeacherMappingController as AdminSubjectTeacherMappingController;
+use App\Http\Controllers\Backend\Admin\ClassRoutineController as AdminClassRoutineController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -47,6 +48,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/department/getAllDepartments', [AdminDepartmentController::class, 'getAllDepartments']);
         Route::get('/department/getSubjects', [AdminDepartmentController::class, 'getSubjects']);
         Route::post('/department/section', [AdminDepartmentController::class, 'storeSection'])->name('admin.section.store');
+        Route::get('/department/{id}/mappings', [AdminDepartmentController::class, 'getTeacherMappings'])->name('admin.department.mappings.index');
 
         //Section
         Route::get('/sections/getBySubject/{id}', [AdminDepartmentController::class, 'getBySubject'])->name('admin.section.getBySubject');
@@ -72,7 +74,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/programs/{id}/semesters', [AdminProgramController::class, 'getSemesters']);
         Route::get('/programs/{id}/subjects', [AdminProgramController::class, 'getSubjects']);
 
-        //Program Bacth Controller
+        //Program Batch Controller
         Route::POST('/program/batch', [AdminBatchController::class, 'store'])->name('admin.program.batch');
 
         //Testimonial
@@ -116,8 +118,19 @@ Route::group(['prefix' => 'admin'], function () {
         Route::GET('/subject-teacher/mapping', [AdminSubjectTeacherMappingController::class, "index"])->name('admin.subject-teacher.mapping.index');
         Route::delete('/subject-teacher/{id}/mapping', [AdminSubjectTeacherMappingController::class, "destroy"])->name('admin.subject-teacher.mapping.destroy');
 
+        //SubjectTeacher Mapping
+        Route::get('/mapping/{selectedMappingId}/timing', [AdminSubjectTeacherMappingController::class, "getTiming"])->name('admin.subject-teacher.mapping.getTiming');
+
         //RoutinePlanner
-        Route::get('/routine-planner', [AdminSubjectTeacherController::class, "index"])->name('admin.routine-planner.index');
+        Route::get('/routine-planner', [AdminClassRoutineController::class, "index"])->name('admin.routine-planner.index');
+        Route::POST('/routine-planner', [AdminClassRoutineController::class, "store"])->name('admin.routine-planner.store');
+
+        //Routine
+        Route::get('/routines', [AdminClassRoutineController::class, "getRoutines"])->name('admin.routines.index');
+        Route::post('/routines', [AdminClassRoutineController::class, "store"])->name('admin.routines.store');
+        Route::put('/routines/{id}', [AdminClassRoutineController::class, "update"])->name('admin.routines.update');
+        Route::delete('/routines/{id}', [AdminClassRoutineController::class, "destroy"])->name('admin.routines.destroy');
+        Route::get('/routines/{id}', [AdminClassRoutineController::class, "show"])->name('admin.routines.show');
 
         Route::get('/profile', [AdminProfileController::class, "index"])->name("admin.profile.index");
         Route::PUT('/profile/change-password', [AdminProfileController::class, "changePassword"])->name("admin.profile.changePassword");

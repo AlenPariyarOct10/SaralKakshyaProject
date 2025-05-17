@@ -19,6 +19,18 @@ class Department extends Model
         return $this->hasMany(Program::class);
     }
 
+    public function mappings()
+    {
+        return $this->hasManyThrough(
+            SubjectTeacherMapping::class,
+            Subject::class,
+            'department_id', // Foreign key on subjects table
+            'subject_id',    // Foreign key on mappings table
+            'id',
+            'id'
+        );
+    }
+
     function institute()
     {
         return $this->belongsTo(Institute::class);

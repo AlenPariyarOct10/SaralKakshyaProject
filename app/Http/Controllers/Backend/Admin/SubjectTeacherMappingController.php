@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassRoutine;
 use App\Models\SubjectTeacherMapping;
+use App\Models\TeacherAvailability;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -86,6 +88,65 @@ class SubjectTeacherMappingController extends Controller
             ], 500);
         }
     }
+
+    public function getAvailableDays(Request $request)
+    {
+        $days = TeacherAvailability::where('teacher_id', $request->teacher_id)
+            ->where('institute_id', $request->institute_id)->all();
+
+        return response()->json([
+            'status' => 'success',
+            'days' => $days
+        ]);
+    }
+
+    public function getTiming($mappingId)
+    {
+        // 1. Get the mapping record with relationships
+        $mapping = SubjectTeacherMapping::with(['teacher', 'subject'])
+            ->findOrFail($mappingId);
+
+        // 2. Get teacher's available time slots
+        $teacherAvailabilities = TeacherAvailability::where('teacher_id', $mapping->teacher_id)
+            ->where('is_available', true)
+            ->get();
+
+        // 3. Get already assigned class times for this teacher
+        $assignedTimes = ClassRoutine::whereHas('subjectTeacherMapping', function($query) use ($mapping) {
+            $query->where('teacher_id', $mapping->teacher_id);
+        })
+            ->get();
+
+        // 4. Filter out available slots that don't overlap with assigned times
+        $availableSlots = $teacherAvailabilities->filter(function($availability) use ($assignedTimes) {
+            foreach ($assignedTimes as $assigned) {
+                // Check if availability overlaps with any assigned time
+                if ($this->timeOverlap(
+                    $availability->start_time,
+                    $availability->end_time,
+                    $assigned->start_time,
+                    $assigned->end_time
+                )) {
+                    return false; // Slot is occupied
+                }
+            }
+            return true; // Slot is available
+        });
+
+        return response()->json([
+            'status'=>'success',
+            'teacher' => $mapping->teacher,
+            'subject' => $mapping->subject,
+            'available_slots' => $availableSlots->values(),
+            'assigned_times' => $assignedTimes
+        ]);
+    }
+
+    private function timeOverlap($start1, $end1, $start2, $end2)
+    {
+        return ($start1 < $end2) && ($end1 > $start2);
+    }
+
 
     /**
      * Show the form for creating a new resource.

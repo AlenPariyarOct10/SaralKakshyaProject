@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{csrf_token()}}">
+
     <title>{{\App\Models\SystemSetting::all()->first()->name}} - @yield("title", "")</title>
     <link rel="shortcut icon" href="{{\App\Models\SystemSetting::all()->first()->logo}}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,8 +19,7 @@
     <script src="{{asset('js/swiper.js')}}"></script>
     <script src="{{asset('js/jquery.js')}}"></script>
     <script src="{{asset('js/alpine.js')}}"></script>
-    <script src="{{asset('js/toastify.js')}}"></script>
-    <script src="{{asset('css/toastify.css')}}"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -123,6 +123,10 @@
                 <a href="{{route("admin.department.index")}}" class="sidebar-item  {{Route::is("admin.department.index")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>
+                </a>
+                <a href="{{route("admin.routine-planner.index")}}" class="sidebar-item  {{Route::is("admin.routine-planner.index")? "active":""}}">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Class Routine</span>
                 </a>
                 <a href="{{route("admin.subjects.index")}}" class="sidebar-item  {{Route::is("admin.subjects.index")? "active":""}}">
                     <i class="fa-solid fa-building"></i>

@@ -8,6 +8,7 @@ use App\Models\Institute;
 use App\Models\Program;
 use App\Models\ProgramSection;
 use App\Models\Subject;
+use App\Models\SubjectTeacherMapping;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +61,22 @@ class DepartmentController extends Controller
         $departments = Department::where('institute_id', $institutes->id)->get();
         return response()->json($departments?$departments:[]);
     }
+
+    public function getTeacherMappings($id)
+    {
+        $mappings = SubjectTeacherMapping::with([
+            'teacher',
+            'subject.program.department' // Follow the relationship chain
+        ])
+            ->whereHas('subject.program', function($query) use ($id) {
+                $query->where('department_id', $id);
+            })
+            ->get();
+
+        // Return the collection directly as JSON array
+        return response()->json($mappings);
+    }
+
 
     public function storeSection(Request $request)
     {
