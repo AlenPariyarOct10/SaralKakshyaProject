@@ -297,6 +297,7 @@
 
 @section("scripts")
     <script>
+
         $(document).ready(function () {
 
             // Add more evaluation format fields

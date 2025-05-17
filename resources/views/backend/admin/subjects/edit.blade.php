@@ -110,11 +110,130 @@
             </ul>
         </div>
         @livewire('admin.edit-subject-form', compact('programs', 'currentSubjectEvaluation','currentSubject'))
+
+        <!-- Chapters and Sub-chapters -->
+        <div class="card mb-6">
+            <form action="">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Chapters Structure</h2>
+
+                <div id="chapters-container" class="space-y-4">
+                    <!-- Chapter template will be added here -->
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" id="add-chapter" class="btn-secondary flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Chapter
+                    </button>
+                </div>
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i> Save Chapters
+                    </button>
+                </div>
+            </form>
+        </div>
     </main>
 @endsection
 
 @section("scripts")
     <script>
+        //Handling chapter and sub-chapter addition/removal
+        $(document).ready(function () {
+
+            // Chapters functionality
+            let chapterCount = 0;
+
+            $('#add-chapter').on('click', function() {
+                addNewChapter();
+            });
+
+            function addNewChapter(parentId = null, level = 1, title = '', description = '', chapterNumber = '') {
+                chapterCount++;
+                const chapterId = `chapter_${chapterCount}`;
+                const isSubchapter = parentId !== null;
+                const indentClass = isSubchapter ? 'ml-8 border-l-2 border-gray-300 dark:border-gray-600 pl-4' : '';
+
+                const chapterHtml = `
+                    <div class="chapter-item ${indentClass} bg-gray-50 dark:bg-gray-700 p-4 rounded-lg" data-level="${level}" id="${chapterId}" data-chapter-id="${chapterCount}">
+                        <input type="hidden" name="chapters[${chapterCount}][parent_id]" value="${parentId || ''}">
+                        <input type="hidden" name="chapters[${chapterCount}][level]" value="${level}">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                            <div>
+                                <label class="form-label">Chapter Number</label>
+                                <input type="text" name="chapters[${chapterCount}][chapter_number]"
+                                       class="form-input" placeholder="e.g. ${chapterCount}.${level}" value="${chapterNumber}" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label">Chapter Title</label>
+                                <input type="text" name="chapters[${chapterCount}][title]"
+                                       class="form-input" placeholder="Chapter title" value="${title}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="chapters[${chapterCount}][description]"
+                                      class="form-input" rows="2" placeholder="Chapter description">${description}</textarea>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <div>
+                                <button type="button" class="btn-secondary add-subchapter" data-chapter-id="${chapterCount}">
+                                    <i class="fas fa-level-down-alt mr-2"></i> Add Sub-chapter
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn-danger remove-chapter">
+                                    <i class="fas fa-trash mr-2"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (isSubchapter) {
+                    $(`#chapter_${parentId}`).after(chapterHtml);
+                } else {
+                    $('#chapters-container').append(chapterHtml);
+                }
+            }
+
+            // Initialize with one empty chapter
+            addNewChapter();
+
+            // Event delegation for dynamically added buttons
+            $(document).on('click', '.add-subchapter', function() {
+                const parentChapterId = $(this).data('chapter-id');
+                const parentLevel = $(this).closest('.chapter-item').data('level');
+
+                if (parentLevel >= 3) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: 'Maximum nesting level reached (3 levels max)'
+                    });
+                    return;
+                }
+
+                addNewChapter(parentChapterId, parseInt(parentLevel) + 1);
+            });
+
+            $(document).on('click', '.remove-chapter', function() {
+                const chapterItem = $(this).closest('.chapter-item');
+                const chapterId = chapterItem.data('chapter-id');
+
+                // Remove all subchapters of this chapter
+                $(`.chapter-item input[name^="chapters["][name$="[parent_id]"]`).each(function() {
+                    if ($(this).val() == chapterId) {
+                        $(this).closest('.chapter-item').remove();
+                    }
+                });
+
+                chapterItem.remove();
+            });
+
+        });
+        //-------------------------------------
         $(document).ready(function() {
             let evaluationFormatItems = document.getElementById("evaluation-formats");
 
