@@ -238,9 +238,10 @@
         let routines = [];
         let isEditMode = false;
         let itemsPerPage = 10;
+        let isLoading = false;
 
         // Days of week
-        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', ];
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         // DOM elements
         const searchInput = document.getElementById('searchInput');
@@ -260,14 +261,12 @@
         const routineId = document.getElementById('routineId');
         const departmentId = document.getElementById('departmentId');
         const mappingId = document.getElementById('mappingId');
-        const startTime = document.getElementById('startTime');
-        const endTime = document.getElementById('endTime');
-        const note = document.getElementById('note');
+        const daysTableBody = document.getElementById('daysTableBody');
+        const daysError = document.getElementById('daysError');
 
         // Error elements
         const departmentIdError = document.getElementById('departmentIdError');
         const mappingIdError = document.getElementById('mappingIdError');
-
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
@@ -278,47 +277,46 @@
 
         // Populate days table
         function populateDaysTable(availableSlots = []) {
-            const daysTableBody = document.getElementById('daysTableBody');
             daysTableBody.innerHTML = '';
 
             daysOfWeek.forEach(day => {
                 // Find if this day has available slots
                 const daySlot = availableSlots.find(slot => slot.day_of_week === day.toLowerCase());
 
-                const row = document.createElement('tr');
-                row.className = 'day-row';
-                row.dataset.day = day;
-
                 if(daySlot) {
+                    const row = document.createElement('tr');
+                    row.className = 'day-row';
+                    row.dataset.day = day;
+
                     row.innerHTML = `
-                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    ${day}
-                </td>
-                <td class="px-4 py-2 whitespace-nowrap">
-                    <input type="time" name="startTimes[]" data-day="${day}"
-                        class="day-start-time form-input"
-                        value="${daySlot ? formatTimeForInput(daySlot.start_time) : ''}"
-                        min="${formatTimeForInput(daySlot.start_time)}"
-                        max="${formatTimeForInput(daySlot.end_time)}"
-                        onchange="validateTimeSlot(this)">
-                    <div class="time-error text-red-500 text-xs mt-1 hidden"></div>
-                </td>
-                <td class="px-4 py-2 whitespace-nowrap">
-                    <input type="time" name="endTimes[]" data-day="${day}"
-                        class="day-end-time form-input"
-                        value="${daySlot ? formatTimeForInput(daySlot.end_time) : ''}"
-                        min="${formatTimeForInput(daySlot.start_time)}"
-                        max="${formatTimeForInput(daySlot.end_time)}"
-                        onchange="validateTimeSlot(this)">
-                    <div class="time-error text-red-500 text-xs mt-1 hidden"></div>
-                </td>
-                <td class="px-4 py-2 whitespace-nowrap">
-                    <input type="text" name="dayNotes[]" data-day="${day}"
-                        class="day-note form-input"
-                        placeholder="Notes for ${day}"
-                        value="">
-                </td>
-            `;
+                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            ${day}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap">
+                            <input type="time" name="startTimes[]" data-day="${day}"
+                                class="day-start-time form-input"
+                                value="${daySlot ? formatTimeForInput(daySlot.start_time) : ''}"
+                                min="${formatTimeForInput(daySlot.start_time)}"
+                                max="${formatTimeForInput(daySlot.end_time)}"
+                                onchange="validateTimeSlot(this)">
+                            <div class="time-error text-red-500 text-xs mt-1 hidden"></div>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap">
+                            <input type="time" name="endTimes[]" data-day="${day}"
+                                class="day-end-time form-input"
+                                value="${daySlot ? formatTimeForInput(daySlot.end_time) : ''}"
+                                min="${formatTimeForInput(daySlot.start_time)}"
+                                max="${formatTimeForInput(daySlot.end_time)}"
+                                onchange="validateTimeSlot(this)">
+                            <div class="time-error text-red-500 text-xs mt-1 hidden"></div>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap">
+                            <input type="text" name="dayNotes[]" data-day="${day}"
+                                class="day-note form-input"
+                                placeholder="Notes for ${day}"
+                                value="">
+                        </td>
+                    `;
 
                     daysTableBody.appendChild(row);
                 }
@@ -337,6 +335,7 @@
                 el.textContent = '';
                 el.classList.add('hidden');
             });
+            input.classList.remove('border-red-500');
 
             const minTime = input.min;
             const maxTime = input.max;
@@ -346,7 +345,7 @@
             if (selectedTime && (selectedTime < minTime || selectedTime > maxTime)) {
                 input.classList.add('border-red-500');
                 const errorElement = input.nextElementSibling;
-                errorElement.textContent = `Time must be between ${minTime} and ${maxTime}`;
+                errorElement.textContent = `Time must be between ${formatTimeForDisplay(minTime)} and ${formatTimeForDisplay(maxTime)}`;
                 errorElement.classList.remove('hidden');
                 return false;
             }
@@ -360,11 +359,10 @@
                 return false;
             }
 
-            // If valid, remove error styling
-            input.classList.remove('border-red-500');
             return true;
         }
         window.validateTimeSlot = validateTimeSlot;
+
         // Helper to format time for input field
         function formatTimeForInput(timeString) {
             if (!timeString) return '';
@@ -382,6 +380,19 @@
             }).slice(0, 5);
         }
 
+        // Helper to format time for display
+        function formatTimeForDisplay(timeString) {
+            if (!timeString) return '';
+            const time = new Date(`1970-01-01T${timeString}`);
+            if (isNaN(time)) return timeString;
+
+            return time.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
         // Event listeners setup
         function setupEventListeners() {
             addRoutineBtn.addEventListener('click', showAddForm);
@@ -393,7 +404,6 @@
             departmentFilter.addEventListener('change', loadRoutines);
             mappingId.addEventListener('change', loadTiming);
             mappingId.addEventListener('change', loadDays);
-            document.addEventListener('DOMContentLoaded', loadRoutines);
         }
 
         function loadDays() {
@@ -445,41 +455,6 @@
                     Swal.close(); // Close loading indicator
                     console.error('Error loading routine days:', error);
                     showSweetAlert('Error', 'Failed to load scheduled days', 'error');
-                });            fetch(`/admin/routines?subject_teacher_mapping_id=${selectedMappingId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("data", data);
-                    Swal.close(); // Close loading indicator
-
-                    if (data.status === 'success') {
-                        if (data.data && data.data.length > 0) {
-                            // Extract unique days already scheduled for this mapping
-                            const scheduledDays = [...new Set(data.data.map(routine => routine.day))];
-                            console.log("Scheduled days for this mapping:", scheduledDays);
-
-                            // Disable these days in the date picker
-                            disableDaysInDatePicker(scheduledDays);
-
-                            // Show warning if current selection is in scheduled days
-                            checkCurrentSelection(scheduledDays);
-                        } else {
-                            console.log("No routines found for this mapping");
-                            // Enable all days if no schedules exist
-                            enableAllDays();
-                        }
-                    } else {
-                        throw new Error(data.message || 'Failed to fetch routines');
-                    }
-                })
-                .catch(error => {
-                    Swal.close(); // Close loading indicator
-                    console.error('Error loading routine days:', error);
-                    showSweetAlert('Error', 'Failed to load scheduled days', 'error');
                 });
         }
 
@@ -497,7 +472,7 @@
             }
 
             // For jQuery UI Datepicker
-            if ($().datepicker) {
+            if (typeof $ !== 'undefined' && $.fn.datepicker) {
                 $('#day-picker').datepicker('option', 'beforeShowDay', function(date) {
                     const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
                     const isScheduled = scheduledDays.includes(dayName);
@@ -512,7 +487,7 @@
                 window.datePicker.set('disable', []);
             }
 
-            if ($().datepicker) {
+            if (typeof $ !== 'undefined' && $.fn.datepicker) {
                 $('#day-picker').datepicker('option', 'beforeShowDay', function(date) {
                     return [true, ''];
                 });
@@ -521,8 +496,8 @@
 
         // Check if current selection is in scheduled days
         function checkCurrentSelection(scheduledDays) {
-            const currentDay = document.getElementById('day-select').value;
-            if (currentDay && scheduledDays.includes(currentDay)) {
+            const daySelect = document.getElementById('day-select');
+            if (daySelect && daySelect.value && scheduledDays.includes(daySelect.value)) {
                 showSweetAlert(
                     'Warning',
                     'This day is already scheduled for the selected teacher/subject combination',
@@ -531,22 +506,16 @@
             }
         }
 
-        // Show SweetAlert toast/notification
-        function showSweetAlert(title, text, icon) {
+        function showSweetAlert(title, message, icon) {
             Swal.fire({
                 title: title,
-                text: text,
+                text: message,
                 icon: icon,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
+                confirmButtonText: 'OK'
             });
         }
 
-        //load timing based on selected mapping
-        // Modify loadTiming function
+        // Load timing based on selected mapping
         function loadTiming() {
             const selectedMappingId = mappingId.value;
             if (!selectedMappingId) {
@@ -571,43 +540,76 @@
         }
 
         // Load mappings based on selected department
-        function loadMappingsByDepartment() {
-            const selectedDepartmentId = departmentId.value;
-            mappingId.innerHTML = '<option value="">Select Teacher-Subject</option>';
-
-            if (!selectedDepartmentId) return;
-
-            fetch(`/admin/department/${selectedDepartmentId}/mappings`)
-                .then(response => response.json())
-                .then(data => {
-                    if (Array.isArray(data)) {
-                        mappings = data;
-                        data.forEach(mapping => {
-                            const teacherName = `${mapping.teacher.fname} ${mapping.teacher.lname}`;
-                            const subjectName = mapping.subject.name;
-                            mappingId.innerHTML += `
-                                <option value="${mapping.id}">
-                                    ${teacherName} - ${subjectName}
-                                </option>
-                            `;
-                        });
-                    }
-                })
-                .catch(error => console.error('Error loading mappings:', error));
+        async function loadMappingsByDepartment() {
+            const deptId = departmentId.value;
+            mappingId.innerHTML = '<option value="">Loading...</option>';
+            try {
+                const response = await fetch(`/admin/mappings?department_id=${deptId}`);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    mappings = data.data;
+                    populateSelect(mappingId, mappings.map(m => ({
+                        id: m.id,
+                        name: `${m.teacher.name} - ${m.subject.name}`
+                    })), 'Select Teacher-Subject');
+                }
+            } catch (error) {
+                console.error("Error loading mappings:", error);
+            }
         }
+
 
         // Show add form
         function showAddForm() {
             resetForm();
             isEditMode = false;
             formTitle.textContent = 'New Class Routine';
-            saveBtn.textContent = 'Save Routine';
             routineFormCard.classList.remove('hidden');
-            routineFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updateTable(routines) {
+            routinesTableBody.innerHTML = '';
+            if (!routines.length) {
+                routinesTableBody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500">No routines found.</td></tr>';
+                return;
+            }
+
+            routines.forEach(routine => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="table-cell">${routine.department.name}</td>
+                <td class="table-cell">${routine.teacher.name}</td>
+                <td class="table-cell">${routine.subject.name}</td>
+                <td class="table-cell">${routine.day}</td>
+                <td class="table-cell">${formatTimeForDisplay(routine.start_time)}</td>
+                <td class="table-cell">${formatTimeForDisplay(routine.end_time)}</td>
+                <td class="table-cell">${routine.notes || '-'}</td>
+                <td class="table-cell">
+                    <button class="btn-sm btn-primary mr-2" onclick="editRoutine(${routine.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn-sm btn-danger" onclick="deleteRoutine(${routine.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+                routinesTableBody.appendChild(row);
+            });
+        }
+
+        function updatePagination(meta) {
+            paginationInfo.textContent = `Showing ${meta.from ?? 0}-${meta.to ?? 0} of ${meta.total} routines`;
+            paginationControls.innerHTML = '';
+
+            for (let i = 1; i <= meta.last_page; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = `px-3 py-1 rounded ${i === meta.current_page ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'}`;
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    loadRoutines();
+                });
+                paginationControls.appendChild(btn);
+            }
         }
 
         // Show edit form
-        // Update showEditForm to populate days when editing
         function showEditForm(id) {
             resetForm();
             isEditMode = true;
@@ -637,21 +639,34 @@
         // Hide form
         function hideForm() {
             routineFormCard.classList.add('hidden');
-            resetForm();
         }
 
         // Reset form
         function resetForm() {
             routineForm.reset();
             routineId.value = '';
-            hideAllErrors();
+            departmentIdError.classList.add('hidden');
+            mappingIdError.classList.add('hidden');
+            daysError.classList.add('hidden');
+            daysTableBody.innerHTML = '';
         }
 
         // Hide all error messages
         function hideAllErrors() {
             departmentIdError.classList.add('hidden');
             mappingIdError.classList.add('hidden');
+            daysError.classList.add('hidden');
 
+            // Clear all time errors
+            document.querySelectorAll('.time-error').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+
+            // Remove red borders
+            document.querySelectorAll('.border-red-500').forEach(el => {
+                el.classList.remove('border-red-500');
+            });
         }
 
         // Show validation errors
@@ -668,113 +683,101 @@
                 mappingIdError.classList.remove('hidden');
             }
 
+            if (errors.days) {
+                daysError.textContent = errors.days;
+                daysError.classList.remove('hidden');
+            }
+
+            // Handle day-specific errors
+            Object.keys(errors).forEach(key => {
+                if (key.startsWith('day_')) {
+                    const day = key.replace('day_', '');
+                    const dayRow = document.querySelector(`.day-row[data-day="${day}"]`);
+                    if (dayRow) {
+                        const errorElement = dayRow.querySelector('.time-error');
+                        if (errorElement) {
+                            errorElement.textContent = errors[key];
+                            errorElement.classList.remove('hidden');
+                        }
+                    }
+                }
+            });
         }
 
         // Handle form submission
-        // Update handleFormSubmit to collect day data
-        function handleFormSubmit(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
-            hideAllErrors();
 
-            // Validate all time slots first
+            const payload = {
+                id: routineId.value,
+                department_id: departmentId.value,
+                mapping_id: mappingId.value,
+                days: [],
+            };
+
             let isValid = true;
-            document.querySelectorAll('.day-start-time, .day-end-time').forEach(input => {
-                if (!validateTimeSlot(input)) {
-                    isValid = false;
-                }
-            });
 
-            if (!isValid) {
-                showSweetAlert('Error', 'Please correct the time slot errors', 'error');
-                return;
-            }
-
-            const dayRows = document.querySelectorAll('.day-row');
-            const daySchedules = [];
-
-            dayRows.forEach(row => {
+            document.querySelectorAll('.day-row').forEach(row => {
                 const day = row.dataset.day;
-                const startTime = row.querySelector('.day-start-time').value;
-                const endTime = row.querySelector('.day-end-time').value;
+                const start = row.querySelector('.day-start-time').value;
+                const end = row.querySelector('.day-end-time').value;
                 const note = row.querySelector('.day-note').value;
 
-                if (startTime && endTime) {
-                    daySchedules.push({
-                        day,
-                        start_time: startTime,
-                        end_time: endTime,
-                        note
+                if (start && end) {
+                    payload.days.push({
+                        day, start_time: start, end_time: end, notes: note
                     });
                 }
             });
 
-            // Check if at least one day schedule is added
-            if (daySchedules.length === 0) {
-                showSweetAlert('Error', 'Please add at least one day schedule', 'error');
-                return;
+            if (!payload.department_id) {
+                departmentIdError.textContent = 'Department is required.';
+                departmentIdError.classList.remove('hidden');
+                isValid = false;
             }
 
-            const formData = {
-                department_id: departmentId.value,
-                subject_teacher_mappings_id: mappingId.value,
-                mapping_id: mappingId.value,
-                day_schedules: daySchedules
-            };
-
-            console.log('Submitting form data:', formData); // Debug log
-
-            if (isEditMode) {
-                updateRoutine(routineId.value, formData);
-            } else {
-                createRoutine(formData);
+            if (!payload.mapping_id) {
+                mappingIdError.textContent = 'Teacher-Subject is required.';
+                mappingIdError.classList.remove('hidden');
+                isValid = false;
             }
-        }
 
-        // Validate form
-        function validateForm(data) {
-            const errors = {};
-            const dayRows = document.querySelectorAll('.day-row');
-            let hasAtLeastOneTime = false;
-            dayRows.forEach(row => {
-                const day = row.dataset.day;
-                const startTime = row.querySelector('.day-start-time').value;
-                const endTime = row.querySelector('.day-end-time').value;
+            if (payload.days.length === 0) {
+                daysError.textContent = 'At least one valid day schedule is required.';
+                daysError.classList.remove('hidden');
+                isValid = false;
+            }
 
-                if (startTime && endTime) {
-                    hasAtLeastOneTime = true;
+            if (!isValid) return;
 
-                    if (startTime >= endTime) {
-                        errors[`day_${day}`] = `End time must be after start time for ${day}`;
-                    }
+            try {
+                const url = isEditMode ? `/admin/routines/${payload.id}` : `/admin/routines`;
+                const method = isEditMode ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showSweetAlert('Success', data.message, 'success');
+                    hideForm();
+                    loadRoutines();
+                } else {
+                    showSweetAlert('Error', data.message || 'Something went wrong', 'error');
                 }
-            });
-
-            if (!hasAtLeastOneTime) {
-                errors.days = 'Please set at least one day schedule';
+            } catch (error) {
+                console.error("Routine save error:", error);
+                showSweetAlert('Error', 'Failed to save routine', 'error');
             }
-
-            if (!data.department_id) {
-                errors.departmentId = 'Please select a department';
-            }
-
-            if (!data.mapping_id) {
-                errors.mappingId = 'Please select a teacher-subject mapping';
-            }
-
-            if (!data.start_time) {
-                errors.startTime = 'Please select a start time';
-            }
-
-            if (!data.end_time) {
-                errors.endTime = 'Please select an end time';
-            }
-
-            if (data.start_time && data.end_time && data.start_time >= data.end_time) {
-                errors.endTime = 'End time must be after start time';
-            }
-
-            return errors;
         }
+
 
         // Create a new routine
         async function createRoutine(data) {
@@ -820,7 +823,7 @@
                 });
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = isEditMode ? 'Update Routine' : 'Save Routine';
+                saveBtn.innerHTML = 'Save Routine';
             }
         }
 
@@ -833,7 +836,7 @@
                 const response = await fetch(`/admin/routines/${id}`, {
                     method: 'PUT',
                     headers: {
-                        'X-CSRF-TOKEN': '{{csrf_token()}}',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
@@ -886,49 +889,53 @@
             });
         }
 
-        function deleteRoutine(id) {
-            fetch(`/admin/routines/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{csrf_token()}}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        loadRoutines();
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Routine deleted successfully'
-                        });
-                    } else {
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Failed to delete routine'
-                        });
+        async function deleteRoutine(id) {
+            const confirmed = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'This will permanently delete the routine.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e3342f',
+                confirmButtonText: 'Yes, delete it!'
+            });
+
+            if (!confirmed.isConfirmed) return;
+
+            try {
+                const response = await fetch(`/admin/routines/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     }
-                })
-                .catch(error => {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'An error occurred'
-                    });
                 });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    showSweetAlert('Deleted!', data.message, 'success');
+                    loadRoutines();
+                } else {
+                    showSweetAlert('Error', data.message || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                console.error("Error deleting routine:", error);
+            }
         }
 
         // Load departments
-        function loadDepartments() {
-            fetch('/admin/department/getAllDepartments')
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        departments = data;
-                        renderDepartmentOptions();
-                    }
-                })
-                .catch(error => console.error('Error loading departments:', error));
+        async function loadDepartments() {
+            try {
+                const response = await fetch('/admin/department/getAllDepartments');
+                const data = await response.json();
+                if (data) {
+
+                    departments = data;
+                    console.log(departments);
+                    populateSelect(departmentId, departments, 'Select Department');
+                    populateSelect(departmentFilter, [{ id: '', name: 'All Departments' }, ...departments]);
+                }
+            } catch (error) {
+                console.error("Error loading departments:", error);
+            }
         }
 
         // Render department options
@@ -943,37 +950,27 @@
 
         // Load routines
         async function loadRoutines() {
+            if (isLoading) return;
+            isLoading = true;
+
+            const query = new URLSearchParams({
+                page: currentPage,
+                search: searchInput.value,
+                department: departmentFilter.value,
+            });
+
             try {
-                isLoading = true; // Add loading state if needed
-
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    per_page: itemsPerPage, // Add this variable somewhere in your code
-                    search: searchInput.value.trim(),
-                    department_id: departmentFilter.value
-                });
-
-                const response = await fetch(`/admin/routines?${params}`);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch(`/admin/routines?${query.toString()}`);
                 const data = await response.json();
-
                 if (data.status === 'success') {
                     routines = data.data;
-                    renderRoutines();
-                    renderPagination(data.meta);
-                } else {
-                    throw new Error(data.message || 'Unknown error occurred');
+                    totalPages = data.meta.last_page;
+                    currentPage = data.meta.current_page;
+                    updateTable(data.data);
+                    updatePagination(data.meta);
                 }
             } catch (error) {
-                console.error('Error loading routines:', error);
-                Toast.fire({
-                    icon: 'error',
-                    title: error.message || 'Failed to load routines'
-                });
+                console.error("Error loading routines:", error);
             } finally {
                 isLoading = false;
             }
@@ -981,7 +978,7 @@
 
         // Render routines table
         function renderRoutines() {
-            if (!routines || routines.length === 0) {
+            if (!Array.isArray(routines) || routines.length === 0) {
                 routinesTableBody.innerHTML = `
             <tr>
                 <td colspan="8" class="table-cell text-center py-8 text-gray-500 dark:text-gray-400">
@@ -992,58 +989,64 @@
                 return;
             }
 
-            // Group routines by mapping (department + teacher + subject)
+            let html = '';
+
+            // Group routines by mapping_id
             const groupedRoutines = routines.reduce((groups, routine) => {
-                const key = `${routine.department_id}-${routine.mapping_id}`;
-
+                const key = routine?.mapping_id || 'unknown';
                 if (!groups[key]) {
-                    groups[key] = [];
+                    groups[key] = {
+                        department: routine?.department || null,
+                        mapping: routine?.mapping || null,
+                        schedules: []
+                    };
                 }
-
-                groups[key].push(routine);
+                groups[key].schedules.push(routine);
                 return groups;
             }, {});
 
-            let html = '';
-
             // Process each group
             Object.values(groupedRoutines).forEach(group => {
-                const firstRoutine = group[0];
-                const departmentName = firstRoutine.department.name;
-                const teacherName = `${firstRoutine.mapping.teacher.fname} ${firstRoutine.mapping.teacher.lname}`;
-                const subjectName = firstRoutine.mapping.subject.name;
+                if (!group || !Array.isArray(group.schedules) || group.schedules.length === 0) return;
+                console.log("group", group);
+                const departmentName = group.department?.name || 'Unknown Department';
+                const teacher = group.mapping?.teacher || {};
+                const teacherName = `${teacher.fname || ''} ${teacher.lname || ''}`.trim() || 'Unknown Teacher';
+                const subjectName = group.mapping?.subject?.name || 'Unknown Subject';
 
-                // Create main row with core information
-                html += `
-            <tr class="group-header">
-                <td class="table-cell">${departmentName}</td>
-                <td class="table-cell">${teacherName}</td>
-                <td class="table-cell">${subjectName}</td>
-                <td colspan="5"></td>
-            </tr>
-        `;
+                group.schedules.forEach(schedule => {
+                    if (!schedule) return;
 
-                // Add schedule rows for each day
-                group.forEach(routine => {
-                    routine.days.forEach(day => {
+                    const days = Array.isArray(schedule.days)
+                        ? schedule.days
+                        : [{
+                            day: schedule.day,
+                            start_time: schedule.start_time,
+                            end_time: schedule.end_time,
+                            note: schedule.note
+                        }];
+
+                    days.forEach(day => {
+                        if (!day) return;
+
                         html += `
-                    <tr class="group-detail">
-                        <td></td> <!-- Empty department cell -->
-                        <td></td> <!-- Empty teacher cell -->
-                        <td></td> <!-- Empty subject cell -->
-                        <td class="table-cell">${day.day}</td>
+                    <tr>
+                        <td class="table-cell">${departmentName}</td>
+                        <td class="table-cell">${teacherName}</td>
+                        <td class="table-cell">${subjectName}</td>
+                        <td class="table-cell">${day.day || '-'}</td>
                         <td class="table-cell">${formatTime(day.start_time)}</td>
                         <td class="table-cell">${formatTime(day.end_time)}</td>
                         <td class="table-cell">${day.note || '-'}</td>
                         <td class="table-cell">
                             <div class="flex items-center space-x-2">
-                                <button onclick="showEditForm(${routine.id})"
+                                <button onclick="showEditForm(${schedule.id})"
                                         class="p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400
                                                dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20
                                                rounded-full">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="confirmDelete(${routine.id})"
+                                <button onclick="confirmDelete(${schedule.id})"
                                         class="p-1.5 text-red-600 hover:text-red-800 dark:text-red-400
                                                dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20
                                                rounded-full">
@@ -1060,20 +1063,62 @@
             routinesTableBody.innerHTML = html;
         }
 
+        async function editRoutine(id) {
+            try {
+                const response = await fetch(`/admin/routines/${id}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const routine = data.data;
+                    isEditMode = true;
+                    showAddForm();
+                    formTitle.textContent = 'Edit Routine';
+                    routineId.value = routine.id;
+                    departmentId.value = routine.department_id;
+
+                    await loadMappingsByDepartment();
+                    mappingId.value = routine.subject_teacher_mapping_id;
+
+                    populateDaysTable([routine]); // assuming single day per routine
+                }
+            } catch (error) {
+                console.error("Error loading routine for edit:", error);
+            }
+        }
+
+        function populateSelect(selectElement, items, defaultText = 'Select') {
+            selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                selectElement.appendChild(option);
+            });
+        }
+
         // Helper function to format time display
         function formatTime(timeString) {
             if (!timeString) return '-';
-            const time = new Date(`1970-01-01T${timeString}`);
-            return time.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            }).slice(0, 5);
+            try {
+                const time = new Date(`1970-01-01T${timeString}`);
+                if (isNaN(time)) return timeString;
+
+                return time.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                return timeString;
+            }
         }
 
         // Render pagination
         function renderPagination(meta) {
+            if (!meta) return;
+
             paginationInfo.textContent = `Showing ${meta.from || 0} to ${meta.to || 0} of ${meta.total} routines`;
+            totalPages = meta.last_page || 1;
 
             let html = '';
 
@@ -1131,11 +1176,9 @@
         // Utility function: Debounce
         function debounce(func, delay) {
             let timeout;
-            return function() {
-                const context = this;
-                const args = arguments;
+            return function () {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
+                timeout = setTimeout(() => func.apply(this, arguments), delay);
             };
         }
 

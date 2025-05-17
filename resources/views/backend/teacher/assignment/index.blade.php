@@ -1,5 +1,7 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
+@section('title', 'List Assignments')
+
 @section('content')
 <!-- Main Content Area -->
 <main class="p-4 md:p-6">
