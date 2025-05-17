@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\Teacher\AssignmentController;
 use App\Http\Controllers\Backend\Teacher\TeacherAvailabilityController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Teacher\AuthController as TeacherAuthController;
@@ -30,6 +31,12 @@ Route::group(['prefix' => 'teacher'], function () {
         // Announcement
         Route::get('/announcements', [TeacherAnnouncementController::class, "index"])->name('teacher.announcement.index');
 
+        //Subject
+        Route::get('/subject/{id}/chapters', [TeacherAssignmentController::class, "getChapters"])->name('teacher.subject.chapters');
+        Route::get('/chapter/{chapterId}/sub-chapters', [TeacherAssignmentController::class, "getSubChapters"])->name('teacher.subject.subchapters');
+
+
+
         // Profile
         Route::get('/profile', [TeacherProfileController::class, "index"])->name('teacher.profile.index');
         Route::put('/profile/{id}', [TeacherProfileController::class, "store"])->name('teacher.profile.update');
@@ -49,7 +56,17 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/assignment', [TeacherAssignmentController::class, "index"])->name('teacher.assignment.index');
         Route::get('/assignment/create', [TeacherAssignmentController::class, "create"])->name('teacher.assignment.create');
         Route::POST('/assignment', [TeacherAssignmentController::class, "store"])->name('teacher.assignment.store');
+        Route::get('/assignment/{assignment}', [TeacherAssignmentController::class, "show"])
+            ->name('teacher.assignment.show');
+        Route::get('/assignment/{assignment}/edit', [TeacherAssignmentController::class, "edit"])
+            ->name('teacher.assignment.edit');
 
+        Route::get('assignment/{assignment}/download/{attachment}', [AssignmentController::class, 'downloadAttachment'])
+            ->name('teacher.assignment.download');
+        Route::get('subject/{id}/chapters', [AssignmentController::class, 'getChapters'])
+            ->name('teacher.subject.chapters');
+        Route::get('chapter/{id}/sub-chapters', [AssignmentController::class, 'getSubChapters'])
+            ->name('teacher.chapter.sub-chapters');
 
         Route::get('/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
     });

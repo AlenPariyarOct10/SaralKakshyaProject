@@ -19,7 +19,22 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Assignments
             </a>
         </div>
-
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Whoops!</strong>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success!</strong>
+                <p class="mt-2 text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
         <!-- Create Assignment Form -->
         <div class="card mb-8">
             <div class="p-6">
@@ -55,6 +70,57 @@
                                 >
                             </div>
 
+                            <!-- Subject Selection -->
+                            <div>
+                                <label for="subject_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Subject <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="subject_id"
+                                    name="subject_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="">Select Subject</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->subject->id }}" {{ old('subject_id') == $subject->subject->id ? 'selected' : '' }}>
+                                            {{ $subject->subject->name }} ({{ $subject->subject->code }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Chapter Selection -->
+                            <div>
+                                <label for="chapter_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Chapter <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="chapter_id"
+                                    name="chapter_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="">Select Chapter</option>
+                                    <!-- Chapters will be populated dynamically based on subject selection -->
+                                </select>
+                            </div>
+
+                            <!-- Sub-Chapter Selection -->
+                            <div>
+                                <label for="sub_chapter_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Sub-Chapter
+                                </label>
+                                <select
+                                    id="sub_chapter_id"
+                                    name="sub_chapter_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="">Select Sub-Chapter</option>
+                                    <!-- Sub-chapters will be populated dynamically based on chapter selection -->
+                                </select>
+                            </div>
+
                             <!-- Description -->
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -69,25 +135,6 @@
                                     required
                                 >{{ old('description') }}</textarea>
                             </div>
-                            <!-- Subject Selection -->
-                            <div>
-                                <label for="subject_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Subject <span class="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="subject_id"
-                                    name="subject_id"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    required
-                                >
-                                    <option value="">Select Subject</option>
-                                    @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
-                                            {{ $subject->subject->name }} ({{ $subject->subject->code }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Right Column -->
@@ -98,29 +145,61 @@
                                     Assigned Date <span class="text-red-500">*</span>
                                 </label>
                                 <input
+
                                     type="date"
                                     id="assigned_date"
                                     name="assigned_date"
                                     value="{{ old('assigned_date', date('Y-m-d')) }}"
                                     class="disabled:opacity-50 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    disabled
                                 >
                             </div>
 
-                            <!-- Due Date -->
+                            <!-- Due Date and Time -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Due Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="due_date"
+                                        name="due_date"
+                                        value="{{ old('due_date') }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        required
+                                    >
+                                    <p id="date-error" class="text-red-500 text-sm mt-1 hidden">Please select a future date.</p>
+                                </div>
+                                <div>
+                                    <label for="due_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Due Time <span class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        id="due_time"
+                                        name="due_time"
+                                        value="{{ old('due_time', '23:59') }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Full Marks -->
                             <div>
-                                <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Due Date <span class="text-red-500">*</span>
+                                <label for="full_marks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Full Marks <span class="text-red-500">* will be converted according to format</span>
                                 </label>
                                 <input
-                                    type="date"
-                                    id="due_date"
-                                    name="due_date"
-                                    value="{{ old('due_date') }}"
+                                    type="number"
+                                    id="full_marks"
+                                    name="full_marks"
+                                    value="{{ old('full_marks', '100') }}"
+                                    min="1"
+                                    max="100"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     required
                                 >
-                                <p id="date-error" class="text-red-500 text-sm mt-1 hidden">Please select a future date.</p>
                             </div>
 
                             <!-- Status -->
@@ -134,9 +213,12 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     required
                                 >
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
                                     <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published</option>
                                 </select>
+                                @error('status')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Assignment Files -->
@@ -164,9 +246,6 @@
                         <a href="{{ route('teacher.assignment.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             Cancel
                         </a>
-                        <button type="submit" name="save_draft" value="1" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-                            Save as Draft
-                        </button>
                         <button type="submit" name="publish" value="1" class="btn-primary">
                             Publish Assignment
                         </button>
@@ -181,18 +260,26 @@
     <script>
         // -------- Date Validation --------
         document.addEventListener('DOMContentLoaded', function () {
+            const assignedDateInput = document.getElementById('assigned_date');
             const dueDateInput = document.getElementById('due_date');
             const errorText = document.getElementById('date-error');
 
             dueDateInput.addEventListener('change', function () {
                 const selectedDate = new Date(this.value);
                 const today = new Date();
+                const assignedDate = new Date(assignedDateInput.value);
 
                 // Remove time part from today to compare only the date
                 today.setHours(0, 0, 0, 0);
 
                 if (selectedDate < today) {
                     errorText.classList.remove('hidden');
+                    errorText.textContent = 'Please select a future date.';
+                    this.value = ''; // Clear the invalid date
+                    this.classList.add('border-red-500');
+                } else if (selectedDate < assignedDate) {
+                    errorText.classList.remove('hidden');
+                    errorText.textContent = 'Due date cannot be earlier than assigned date.';
                     this.value = ''; // Clear the invalid date
                     this.classList.add('border-red-500');
                 } else {
@@ -200,8 +287,81 @@
                     this.classList.remove('border-red-500');
                 }
             });
+
+            assignedDateInput.addEventListener('change', function() {
+                if (dueDateInput.value) {
+                    const selectedDate = new Date(this.value);
+                    const dueDate = new Date(dueDateInput.value);
+
+                    if (dueDate < selectedDate) {
+                        dueDateInput.value = '';
+                        errorText.classList.remove('hidden');
+                        errorText.textContent = 'Due date cannot be earlier than assigned date.';
+                    }
+                }
+            });
         });
         // -------- End Date Validation --------
+
+        // -------- Chapter and Sub-Chapter Handling --------
+        document.addEventListener('DOMContentLoaded', function() {
+            const subjectSelect = document.getElementById('subject_id');
+            const chapterSelect = document.getElementById('chapter_id');
+            const subChapterSelect = document.getElementById('sub_chapter_id');
+
+            // When subject changes, update chapters
+            subjectSelect.addEventListener('change', function() {
+                const subjectId = this.value;
+
+                // Clear chapter and sub-chapter dropdowns
+                chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+                subChapterSelect.innerHTML = '<option value="">Select Sub-Chapter</option>';
+
+                if (subjectId) {
+                    // Fetch chapters for the selected subject
+                    fetch(`/teacher/subject/${subjectId}/chapters`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            if (data.length > 0) {
+                                data.forEach(chapter => {
+                                    const option = document.createElement('option');
+                                    option.value = chapter.id;
+                                    option.textContent = chapter.title;
+                                    chapterSelect.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error fetching chapters:', error));
+                }
+            });
+
+            // When chapter changes, update sub-chapters
+            chapterSelect.addEventListener('change', function() {
+                const chapterId = this.value;
+
+                // Clear sub-chapter dropdown
+                subChapterSelect.innerHTML = '<option value="">Select Sub-Chapter</option>';
+
+                if (chapterId) {
+                    // Fetch sub-chapters for the selected chapter
+                    fetch(`/teacher/chapter/${chapterId}/sub-chapters`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                data.forEach(subChapter => {
+                                    const option = document.createElement('option');
+                                    option.value = subChapter.id;
+                                    option.textContent = subChapter.title;
+                                    subChapterSelect.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error fetching sub-chapters:', error));
+                }
+            });
+        });
+        // -------- End Chapter and Sub-Chapter Handling --------
 
         // -------- File Upload Preview --------
         document.addEventListener('DOMContentLoaded', function() {
@@ -335,29 +495,6 @@
                 }
             }
 
-            // Date validation
-            const assignedDateInput = document.getElementById('assigned_date');
-            const dueDateInput = document.getElementById('due_date');
-
-            if (dueDateInput && assignedDateInput) {
-                dueDateInput.addEventListener('change', function() {
-                    if (assignedDateInput.value && this.value) {
-                        if (new Date(this.value) < new Date(assignedDateInput.value)) {
-                            showError('Due date cannot be earlier than assigned date');
-                            this.value = '';
-                        }
-                    }
-                });
-
-                assignedDateInput.addEventListener('change', function() {
-                    if (dueDateInput.value && this.value) {
-                        if (new Date(dueDateInput.value) < new Date(this.value)) {
-                            dueDateInput.value = '';
-                        }
-                    }
-                });
-            }
-
             // Form submission
             const form = document.getElementById('createAssignmentForm');
             if (form) {
@@ -365,10 +502,8 @@
                     // Additional validation can be added here if needed
 
                     // Set status based on which button was clicked
-                    if (e.submitter.name === 'save_draft') {
-                        document.getElementById('status').value = 'draft';
-                    } else if (e.submitter.name === 'publish') {
-                        document.getElementById('status').value = 'published';
+                    if (e.submitter.name === 'active') {
+                        document.getElementById('status').value = 'active';
                     }
                 });
             }

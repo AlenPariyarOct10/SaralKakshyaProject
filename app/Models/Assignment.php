@@ -15,11 +15,34 @@ class Assignment extends Model
         'description',
         'assigned_date',
         'due_date',
+        'due_time',
         'status',
         'full_marks',
         'semester',
-        'chapter_name',
+        'chapter_id',
+        'sub_chapter_id',
+
     ];
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'parent');
+    }
+
+    public function chapter()
+    {
+        return $this->belongsTo(Chapter::class);
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
+    }
+
+    public function subChapter()
+    {
+        return $this->belongsTo(Chapter::class, 'sub_chapter_id');
+    }
 
     public function teacher()
     {
