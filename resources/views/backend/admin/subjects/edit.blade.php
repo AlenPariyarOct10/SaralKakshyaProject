@@ -113,11 +113,18 @@
 
         <!-- Chapters and Sub-chapters -->
         <div class="card mb-6">
-            <form action="">
+            <form action="{{ route('admin.subjects.chapters.store', $currentSubject->id) }}" method="POST">
+                @csrf
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Chapters Structure</h2>
 
                 <div id="chapters-container" class="space-y-4">
-                    <!-- Chapter template will be added here -->
+                    @forelse($currentSubject->chapters->where('level', 1) as $chapter)
+                        @include('backend.admin.subjects.partials.chapter-item', ['chapter' => $chapter, 'level' => 1])
+                    @empty
+                        <div class="text-gray-500 dark:text-gray-400">
+                            No chapters available. Click "Add Chapter" to create a new one.
+                        </div>
+                    @endforelse
                 </div>
 
                 <div class="mt-4">
@@ -139,47 +146,46 @@
     <script>
         //Handling chapter and sub-chapter addition/removal
         $(document).ready(function () {
-
             // Chapters functionality
-            let chapterCount = 0;
+            let chapterCount = {{ $currentSubject->chapters->count() ?? 0 }};
 
             $('#add-chapter').on('click', function() {
+                chapterCount++;
                 addNewChapter();
             });
 
-            function addNewChapter(parentId = null, level = 1, title = '', description = '', chapterNumber = '') {
-                chapterCount++;
-                const chapterId = `chapter_${chapterCount}`;
+            function addNewChapter(parentId = null, level = 1) {
+                const chapterId = `new_${chapterCount}`;
                 const isSubchapter = parentId !== null;
                 const indentClass = isSubchapter ? 'ml-8 border-l-2 border-gray-300 dark:border-gray-600 pl-4' : '';
 
                 const chapterHtml = `
-                    <div class="chapter-item ${indentClass} bg-gray-50 dark:bg-gray-700 p-4 rounded-lg" data-level="${level}" id="${chapterId}" data-chapter-id="${chapterCount}">
-                        <input type="hidden" name="chapters[${chapterCount}][parent_id]" value="${parentId || ''}">
-                        <input type="hidden" name="chapters[${chapterCount}][level]" value="${level}">
+                    <div class="chapter-item ${indentClass} bg-gray-50 dark:bg-gray-700 p-4 rounded-lg" data-level="${level}" id="${chapterId}" data-chapter-id="${chapterId}">
+                        <input type="hidden" name="chapters[${chapterId}][parent_id]" value="${parentId || ''}">
+                        <input type="hidden" name="chapters[${chapterId}][level]" value="${level}">
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                             <div>
                                 <label class="form-label">Chapter Number</label>
-                                <input type="text" name="chapters[${chapterCount}][chapter_number]"
-                                       class="form-input" placeholder="e.g. ${chapterCount}.${level}" value="${chapterNumber}" required>
+                                <input type="text" name="chapters[${chapterId}][chapter_number]"
+                                       class="form-input" placeholder="e.g. ${level}.${chapterCount}" required>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="form-label">Chapter Title</label>
-                                <input type="text" name="chapters[${chapterCount}][title]"
-                                       class="form-input" placeholder="Chapter title" value="${title}" required>
+                                <input type="text" name="chapters[${chapterId}][title]"
+                                       class="form-input" placeholder="Chapter title" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea name="chapters[${chapterCount}][description]"
-                                      class="form-input" rows="2" placeholder="Chapter description">${description}</textarea>
+                            <textarea name="chapters[${chapterId}][description]"
+                                      class="form-input" rows="2" placeholder="Chapter description"></textarea>
                         </div>
 
                         <div class="flex justify-between">
                             <div>
-                                <button type="button" class="btn-secondary add-subchapter" data-chapter-id="${chapterCount}">
+                                <button type="button" class="btn-secondary add-subchapter" data-chapter-id="${chapterId}">
                                     <i class="fas fa-level-down-alt mr-2"></i> Add Sub-chapter
                                 </button>
                             </div>
@@ -193,14 +199,11 @@
                 `;
 
                 if (isSubchapter) {
-                    $(`#chapter_${parentId}`).after(chapterHtml);
+                    $(`[data-chapter-id="${parentId}"]`).after(chapterHtml);
                 } else {
                     $('#chapters-container').append(chapterHtml);
                 }
             }
-
-            // Initialize with one empty chapter
-            addNewChapter();
 
             // Event delegation for dynamically added buttons
             $(document).on('click', '.add-subchapter', function() {
@@ -223,7 +226,7 @@
                 const chapterId = chapterItem.data('chapter-id');
 
                 // Remove all subchapters of this chapter
-                $(`.chapter-item input[name^="chapters["][name$="[parent_id]"]`).each(function() {
+                $(`[data-chapter-id^="new_"] input[name^="chapters["][name$="[parent_id]"]`).each(function() {
                     if ($(this).val() == chapterId) {
                         $(this).closest('.chapter-item').remove();
                     }
@@ -231,7 +234,6 @@
 
                 chapterItem.remove();
             });
-
         });
         //-------------------------------------
         $(document).ready(function() {

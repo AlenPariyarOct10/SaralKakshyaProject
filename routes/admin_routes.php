@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\TestEvent;
+use App\Http\Controllers\Backend\Admin\ChapterController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Backend\Admin\DashboardController as AdminDashboardController;
@@ -62,6 +63,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/subject/{id}/evaluations', [AdminSubjectController::class, 'getEvaluationFormats']);
         Route::put('/subject/{id}/edit', [AdminSubjectController::class, 'update'])->name('admin.subjects.update');
         Route::delete('/subject/{id}', [AdminSubjectController::class, 'destroy'])->name('admin.subjects.destroy');
+
+        //SubjectChapters
+        Route::post('/subjects/{subject}/chapters', [ChapterController::class, 'store'])
+            ->name('admin.subjects.chapters.store');
 // In your web.php routes file
         Route::get('/admin/programs/{program}/semesters', [AdminSubjectController::class, 'getSemesters'])->name('admin.programs.semesters');
 //        Programs

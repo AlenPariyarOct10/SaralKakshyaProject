@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Main Content Area -->
-    <main class="p-4 md:p-6">
+    <main class="p-6 md:p-6 min-h-screen overflow-y-auto pb-16">
         <!-- Page Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
@@ -21,7 +21,7 @@
         </div>
 
         <!-- Create Assignment Form -->
-        <div class="card">
+        <div class="card mb-8">
             <div class="p-6">
                 <form action="{{ route('teacher.assignment.store') }}" method="POST" enctype="multipart/form-data" id="createAssignmentForm">
                     @csrf
@@ -69,27 +69,6 @@
                                     required
                                 >{{ old('description') }}</textarea>
                             </div>
-
-                            <!-- Batch Selection -->
-                            <div>
-                                <label for="batch_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Batch <span class="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="batch_id"
-                                    name="batch_id"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    required
-                                >
-                                    <option value="">Select Batch</option>
-                                    @foreach($batches as $batch)
-                                        <option value="{{ $batch->id }}" {{ old('batch_id') == $batch->id ? 'selected' : '' }}>
-                                             ({{ $batch->batch }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
                             <!-- Subject Selection -->
                             <div>
                                 <label for="subject_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -104,7 +83,7 @@
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
-                                            {{ $subject->name }} ({{ $subject->code }})
+                                            {{ $subject->subject->name }} ({{ $subject->subject->code }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -123,8 +102,8 @@
                                     id="assigned_date"
                                     name="assigned_date"
                                     value="{{ old('assigned_date', date('Y-m-d')) }}"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    required
+                                    class="disabled:opacity-50 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    disabled
                                 >
                             </div>
 
@@ -141,6 +120,7 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     required
                                 >
+                                <p id="date-error" class="text-red-500 text-sm mt-1 hidden">Please select a future date.</p>
                             </div>
 
                             <!-- Status -->
@@ -173,14 +153,14 @@
                                     </label>
                                 </div>
 
-                                <div id="filePreview" class="mt-2 hidden">
+                                <div id="filePreview" class="mt-2 hidden max-h-40 overflow-y-auto">
                                     <!-- Files will be added here dynamically -->
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-end space-x-3">
+                    <div class="mt-8 mb-4 flex justify-end space-x-3">
                         <a href="{{ route('teacher.assignment.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             Cancel
                         </a>
@@ -199,6 +179,31 @@
 
 @section('scripts')
     <script>
+        // -------- Date Validation --------
+        document.addEventListener('DOMContentLoaded', function () {
+            const dueDateInput = document.getElementById('due_date');
+            const errorText = document.getElementById('date-error');
+
+            dueDateInput.addEventListener('change', function () {
+                const selectedDate = new Date(this.value);
+                const today = new Date();
+
+                // Remove time part from today to compare only the date
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate < today) {
+                    errorText.classList.remove('hidden');
+                    this.value = ''; // Clear the invalid date
+                    this.classList.add('border-red-500');
+                } else {
+                    errorText.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                }
+            });
+        });
+        // -------- End Date Validation --------
+
+        // -------- File Upload Preview --------
         document.addEventListener('DOMContentLoaded', function() {
             // File Upload Preview
             const attachmentsInput = document.getElementById('attachments');

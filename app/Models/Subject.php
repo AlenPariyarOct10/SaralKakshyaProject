@@ -19,4 +19,9 @@ class Subject extends Model
     {
         return $this->belongsTo(Program::class, 'program_id', 'id');
     }
+
+    public function chapters()
+    {
+        return $this->hasMany(Chapter::class, 'subject_id', 'id');
+    }
 }

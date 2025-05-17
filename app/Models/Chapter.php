@@ -22,4 +22,9 @@ class Chapter extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+
+    public function children()
+    {
+        return $this->hasMany(Chapter::class, 'parent_id')->orderBy('order');
+    }
 }
