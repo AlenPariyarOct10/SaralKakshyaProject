@@ -1,5 +1,7 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
+@section("title", "Announcement")
+
 @section('content')
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
@@ -32,7 +34,7 @@
                         <input type="text" id="searchAnnouncement" placeholder="Search announcements..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                     </div>
 
-                    <a href="{{ route('announcements.create') }}" class="btn-primary">
+                    <a href="{{ route('teacher.announcement.create') }}" class="btn-primary">
                         Create Announcement
                     </a>
                 </div>

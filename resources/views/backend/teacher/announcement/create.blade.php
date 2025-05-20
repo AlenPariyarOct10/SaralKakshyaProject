@@ -7,12 +7,12 @@
         <div class="card mb-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Create New Announcement</h3>
-                <a href="{{ route('announcements.index') }}" class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400 text-sm">
+                <a href="{{ route('teacher.announcement.index') }}" class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400 text-sm">
                     <i class="fas fa-arrow-left mr-1"></i> Back to Announcements
                 </a>
             </div>
 
-            <form action="{{ route('announcements.store') }}" method="POST">
+            <form action="{{ route('teacher.announcements.store') }}" method="POST">
                 @csrf
                 <div class="space-y-6">
                     <!-- Title -->
@@ -25,30 +25,6 @@
                     <div>
                         <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Announcement Content</label>
                         <div class="border border-gray-300 rounded-md dark:border-gray-700 overflow-hidden">
-                            <!-- Simple toolbar -->
-                            <div class="bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600 p-2 flex flex-wrap gap-2">
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-bold text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-italic text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-underline text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-list-ul text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-list-ol text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-link text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                                <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <i class="fas fa-image text-gray-700 dark:text-gray-300"></i>
-                                </button>
-                            </div>
                             <textarea id="content" name="content" rows="8" class="w-full px-4 py-2 border-0 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white" placeholder="Enter announcement content"></textarea>
                         </div>
                     </div>

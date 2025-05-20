@@ -8,7 +8,8 @@ use App\Http\Controllers\Backend\Teacher\AuthController as TeacherAuthController
 use App\Http\Controllers\Backend\Teacher\DashboardController as TeacherDashboardController;
 use App\Http\Controllers\Backend\Teacher\AttendanceController as TeacherAttendanceController;
 use App\Http\Controllers\Backend\Teacher\AssignmentController as TeacherAssignmentController;
-use App\Http\Controllers\Teacher\AnnouncementController as TeacherAnnouncementController;
+use App\Http\Controllers\Backend\Teacher\AnnouncementController as TeacherAnnouncementController;
+
 use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\SettingController as TeacherSettingController;
 use App\Http\Controllers\Backend\Teacher\PersonalRoutineController as TeacherPersonalRoutineController;
@@ -31,6 +32,8 @@ Route::group(['prefix' => 'teacher'], function () {
 
         // Announcement
         Route::get('/announcements', [TeacherAnnouncementController::class, "index"])->name('teacher.announcement.index');
+        Route::get('/announcements/create', [TeacherAnnouncementController::class, "create"])->name('teacher.announcement.create');
+        Route::POST('/announcements', [TeacherAnnouncementController::class, "store"])->name('teacher.announcements.store');
 
         //Subject
         Route::get('/subject/{id}/chapters', [TeacherAssignmentController::class, "getChapters"])->name('teacher.subject.chapters');
