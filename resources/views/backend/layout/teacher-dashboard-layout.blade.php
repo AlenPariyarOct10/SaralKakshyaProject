@@ -42,9 +42,13 @@
                 <i class="fas fa-book"></i>
                 <span>Assignments</span>
             </a>
-            <a href="{{route('teacher.announcement.index')}}" class="sidebar-item">
+            <a href="{{route('teacher.announcement.index')}}" class="sidebar-item {{(Route::is('teacher.announcement.index')?'active':'')}}">
                 <i class="fas fa-bullhorn"></i>
                 <span>Announcements</span>
+            </a>
+            <a href="{{route('teacher.resources.index')}}" class="sidebar-item {{(Route::is('teacher.resources.index')?'active':'')}}">
+                <i class="fa-solid fa-book"></i>
+                <span>Resources</span>
             </a>
 
             <div class="pt-4 mt-4 border-t dark:border-gray-700">

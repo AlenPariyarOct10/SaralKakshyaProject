@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\Teacher\AnnouncementController as TeacherAnnoun
 use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\SettingController as TeacherSettingController;
 use App\Http\Controllers\Backend\Teacher\PersonalRoutineController as TeacherPersonalRoutineController;
+use App\Http\Controllers\Backend\Teacher\ResourceController as TeacherResourceController;
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::middleware('guest:teacher')->group(function () {
@@ -39,7 +40,16 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/subject/{id}/chapters', [TeacherAssignmentController::class, "getChapters"])->name('teacher.subject.chapters');
         Route::get('/chapter/{chapterId}/sub-chapters', [TeacherAssignmentController::class, "getSubChapters"])->name('teacher.subject.subchapters');
 
-
+        //Resource
+        Route::resource('resources', TeacherResourceController::class)->names([
+            'index' => 'teacher.resources.index',
+            'create' => 'teacher.resources.create',
+            'store' => 'teacher.resources.store',
+            'show' => 'teacher.resources.show',
+            'edit' => 'teacher.resources.edit',
+            'update' => 'teacher.resources.update',
+            'destroy' => 'teacher.resources.destroy',
+        ]);
 
         // Profile
         Route::get('/profile', [TeacherProfileController::class, "index"])->name('teacher.profile.index');
