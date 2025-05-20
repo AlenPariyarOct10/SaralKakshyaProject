@@ -68,7 +68,7 @@
 
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between mb-6">
-                <a href="#" class="text-sm text-primary hover:text-secondary">Forgot password?</a>
+                <a href="{{route('admin.forgot-password')}}" class="text-sm text-primary hover:text-secondary">Forgot password?</a>
             </div>
 
             <!-- Login Button -->

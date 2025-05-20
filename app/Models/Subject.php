@@ -15,6 +15,11 @@ class Subject extends Model
         return $this->hasMany(SubjectEvaluationFormat::class, 'subject_id', 'id');
     }
 
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class, 'batch_id', 'id');
+    }
+
     public function program()
     {
         return $this->belongsTo(Program::class, 'program_id', 'id');

@@ -46,4 +46,14 @@ class Program extends Model
     {
         return $this->hasMany(ProgramSection::class, 'program_id', 'id');
     }
+
+    public function batches()
+    {
+        return $this->hasMany(Batch::class, 'program_id', 'id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'program_id', 'id');
+    }
 }

@@ -54,6 +54,16 @@ class Assignment extends Model
         return $this->belongsTo(Batch::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function assignmentSubmissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
+
     public function subject()
     {
         return $this->belongsTo(Subject::class);
@@ -61,7 +71,7 @@ class Assignment extends Model
 
     public function submissions()
     {
-        return $this->hasMany(AssignemntSubmission::class);
+        return $this->hasMany(AssignmentSubmission::class);
     }
 
     public function getStatusAttribute($value)

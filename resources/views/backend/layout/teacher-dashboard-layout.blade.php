@@ -16,236 +16,237 @@
     <!-- These utility classes should be moved to app.css for better organization -->
     @stack("styles")
 </head>
-@section("content")
-    <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200 antialiased">
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside id="sidebar"
-               class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto border-r border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
-                <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">{{\App\Models\SystemSetting::all()->first()->name}}</h1>
-                <button id="closeSidebar"
-                        class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
-                    <i class="fas fa-times"></i>
-                </button>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200 antialiased">
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+           class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto border-r border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
+            <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">{{\App\Models\SystemSetting::all()->first()->name}}</h1>
+            <button id="closeSidebar"
+                    class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="p-4 space-y-1">
+            <a href="{{route('teacher.dashboard')}}" class="sidebar-item {{(Route::is('teacher.dashboard')?'active':'')}}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{route('teacher.attendance.index')}}" class="sidebar-item {{(Route::is('teacher.attendance.index')?'active':'')}}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Attendance</span>
+            </a>
+            <a href="{{route('teacher.assignment.index')}}" class="sidebar-item {{(Route::is('teacher.assignment.index')?'active':'')}}">
+                <i class="fas fa-book"></i>
+                <span>Assignments</span>
+            </a>
+            <a href="{{route('teacher.announcement.index')}}" class="sidebar-item">
+                <i class="fas fa-bullhorn"></i>
+                <span>Announcements</span>
+            </a>
+
+            <div class="pt-4 mt-4 border-t dark:border-gray-700">
+                <a href="{{route('teacher.profile.index')}}" class="sidebar-item {{(Route::is('teacher.profile.*')?'active':'')}}">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{route('teacher.setting.index')}}" class="sidebar-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <form action="{{ route('teacher.logout') }}" method="POST"
+                      class="sidebar-item text-red-500 dark:text-red-400">
+                    @csrf
+                    <button type="submit" class="flex items-center">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout Now
+                    </button>
+                </form>
+
             </div>
+        </nav>
+    </aside>
 
-            <nav class="p-4 space-y-1">
-                <a href="{{route('teacher.dashboard')}}" class="sidebar-item {{(Route::is('teacher.dashboard')?'active':'')}}">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{route('teacher.attendance.index')}}" class="sidebar-item {{(Route::is('teacher.attendance.index')?'active':'')}}">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Attendance</span>
-                </a>
-                <a href="{{route('teacher.assignment.index')}}" class="sidebar-item {{(Route::is('teacher.assignment.index')?'active':'')}}">
-                    <i class="fas fa-book"></i>
-                    <span>Assignments</span>
-                </a>
-                <a href="{{route('teacher.announcement.index')}}" class="sidebar-item">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcements</span>
-                </a>
-
-                <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                    <a href="{{route('teacher.profile.index')}}" class="sidebar-item {{(Route::is('teacher.profile.*')?'active':'')}}">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                    <a href="{{route('teacher.setting.index')}}" class="sidebar-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                    <form action="{{ route('teacher.logout') }}" method="POST"
-                          class="sidebar-item text-red-500 dark:text-red-400">
-                        @csrf
-                        <button type="submit" class="flex items-center">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Logout Now
-                        </button>
-                    </form>
-
+    <!-- Main Content -->
+    <div class="flex-1 md:ml-64 flex flex-col h-screen">
+        <!-- Top Navbar -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center">
+                    <button id="openSidebar"
+                            class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
                 </div>
-            </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 md:ml-64 flex flex-col h-screen">
-            <!-- Top Navbar -->
-            <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center">
-                        <button id="openSidebar"
-                                class="p-2 mr-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">@yield("title")</h2>
-                    </div>
+                <div class="flex items-center space-x-4 ml-auto">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle"
+                            class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
 
-                    <div class="flex items-center space-x-4 ml-auto">
-                        <!-- Dark Mode Toggle -->
-                        <button id="darkModeToggle"
-                                class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <i class="fas fa-moon dark:hidden"></i>
-                            <i class="fas fa-sun hidden dark:block"></i>
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button id="notificationBtn"
+                                class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
 
-                        <!-- Notifications -->
-                        <div class="relative">
-                            <button id="notificationBtn"
-                                    class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-bell"></i>
-                                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-
-                            <!-- Notification Dropdown (Hidden by default) -->
-                            <div id="notificationDropdown"
-                                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
-                                <div class="p-4 border-b dark:border-gray-700">
-                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
-                                </div>
-                                <div class="max-h-96 overflow-y-auto">
-                                    <a href="#"
-                                       class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <p class="text-sm font-medium text-gray-800 dark:text-white">New assignment
-                                            posted</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 minutes ago</p>
-                                    </a>
-                                    <a href="#"
-                                       class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <p class="text-sm font-medium text-gray-800 dark:text-white">Live class
-                                            scheduled</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 hour ago</p>
-                                    </a>
-                                    <a href="#" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <p class="text-sm font-medium text-gray-800 dark:text-white">Attendance
-                                            marked</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yesterday</p>
-                                    </a>
-                                </div>
-                                <div class="p-2 text-center border-t dark:border-gray-700">
-                                    <a href="#" class="text-sm text-primary-600 hover:underline">View all
-                                        notifications</a>
-                                </div>
+                        <!-- Notification Dropdown (Hidden by default) -->
+                        <div id="notificationDropdown"
+                             class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
+                            <div class="p-4 border-b dark:border-gray-700">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto">
+                                <a href="#"
+                                   class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <p class="text-sm font-medium text-gray-800 dark:text-white">New assignment
+                                        posted</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 minutes ago</p>
+                                </a>
+                                <a href="#"
+                                   class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <p class="text-sm font-medium text-gray-800 dark:text-white">Live class
+                                        scheduled</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 hour ago</p>
+                                </a>
+                                <a href="#" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <p class="text-sm font-medium text-gray-800 dark:text-white">Attendance
+                                        marked</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yesterday</p>
+                                </a>
+                            </div>
+                            <div class="p-2 text-center border-t dark:border-gray-700">
+                                <a href="#" class="text-sm text-primary-600 hover:underline">View all
+                                    notifications</a>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Profile Dropdown -->
-                        <div class="relative">
-                            <button id="profileBtn" class="flex items-center space-x-2">
-                                <img
-                                    src="{{ Auth::user()->profile_picture ? asset('./storage/'.Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->fname." ".Auth::user()->lname) . '&background=0D8ABC&color=fff' }}"
-                                    alt="Profile" class="w-8 h-8 rounded-full">
-                                <span
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{Auth::user()->fname." ".Auth::user()->lname}}</span>
-                                <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:block"></i>
-                            </button>
+                    <!-- Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileBtn" class="flex items-center space-x-2">
+                            <img
+                                src="{{ Auth::user()->profile_picture ? asset('./storage/'.Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->fname." ".Auth::user()->lname) . '&background=0D8ABC&color=fff' }}"
+                                alt="Profile" class="w-8 h-8 rounded-full">
+                            <span
+                                class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:block">{{Auth::user()->fname." ".Auth::user()->lname}}</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:block"></i>
+                        </button>
 
-                            <!-- Profile Dropdown (Hidden by default) -->
-                            <div id="profileDropdown"
-                                 class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
-                                <div class="py-1">
-                                    <a href="profile.html"
-                                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <i class="fas fa-user mr-2"></i> Profile
-                                    </a>
-                                    <a href="settings.html"
-                                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <i class="fas fa-cog mr-2"></i> Settings
-                                    </a>
-                                    <div class="border-t dark:border-gray-700"></div>
-                                    <form action="
+                        <!-- Profile Dropdown (Hidden by default) -->
+                        <div id="profileDropdown"
+                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
+                            <div class="py-1">
+                                <a href="profile.html"
+                                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-user mr-2"></i> Profile
+                                </a>
+                                <a href="settings.html"
+                                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-cog mr-2"></i> Settings
+                                </a>
+                                <div class="border-t dark:border-gray-700"></div>
+                                <form action="
                                         @if(auth('admin')->check()) {{ route('admin.logout') }}
                                         @elseif(auth('teacher')->check()) {{ route('teacher.logout') }}
                                         @elseif(auth('student')->check()) {{ route('student.logout') }}
                                         @else '#' @endif
                                     " method="get" class="sidebar-item text-red-500 dark:text-red-400">
-                                        <button type="submit" class="flex items-center">
-                                            <i class="fas fa-sign-out-alt"></i>
-                                            Logout
-                                        </button>
-                                    </form>
+                                    <button type="submit" class="flex items-center">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        Logout
+                                    </button>
+                                </form>
 
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <!-- Main Content Area - Made Scrollable -->
+        <!-- Main Content Area - Made Scrollable -->
+        <div class="flex-1 overflow-auto">
             @yield("content")
         </div>
     </div>
+</div>
 
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.Echo) {
-                Echo.channel('notifications.teachers')
-                    .listen('.new.announcement', (e) => {
-                        console.log('Teacher-specific:', e.message);
-                    });
+<script>
+    // window.addEventListener('DOMContentLoaded', () => {
+    //     if (window.Echo) {
+    //         Echo.channel('notifications.teachers')
+    //             .listen('.new.announcement', (e) => {
+    //                 console.log('Teacher-specific:', e.message);
+    //             });
+    //
+    //         Echo.channel('notifications.all')
+    //             .listen('.new.announcement', (e) => {
+    //                 console.log('Global announcement:', e.message);
+    //             });
+    //     } else {
+    //         console.error('Echo is not loaded yet');
+    //     }
+    // });
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const openSidebar = document.getElementById('openSidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
 
-                Echo.channel('notifications.all')
-                    .listen('.new.announcement', (e) => {
-                        console.log('Global announcement:', e.message);
-                    });
-            } else {
-                console.error('Echo is not loaded yet');
-            }
-        });
-        // Sidebar Toggle
-        const sidebar = document.getElementById('sidebar');
-        const openSidebar = document.getElementById('openSidebar');
-        const closeSidebar = document.getElementById('closeSidebar');
+    openSidebar.addEventListener('click', () => {
+        sidebar.classList.remove('-translate-x-full');
+    });
 
-        openSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-        });
+    closeSidebar.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+    });
 
-        closeSidebar.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-        });
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
 
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
+    // Check for saved theme preference or use the system preference
+    if (localStorage.getItem('darkMode') === 'true' ||
+        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    }
 
-        // Check for saved theme preference or use the system preference
-        if (localStorage.getItem('darkMode') === 'true' ||
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
+    darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    });
 
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        });
+    // Dropdowns
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
 
-        // Dropdowns
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        const profileBtn = document.getElementById('profileBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
+    notificationBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle('hidden');
+        profileDropdown.classList.add('hidden');
+    });
 
-        notificationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('hidden');
-            profileDropdown.classList.add('hidden');
-        });
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('hidden');
+        notificationDropdown.classList.add('hidden');
+    });
 
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-            notificationDropdown.classList.add('hidden');
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', () => {
-            notificationDropdown.classList.add('hidden');
-            profileDropdown.classList.add('hidden');
-        });
-    </script>\
-    @yield("scripts")
-    </body>
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        notificationDropdown.classList.add('hidden');
+        profileDropdown.classList.add('hidden');
+    });
+</script>
+@yield("scripts")
+</body>
 </html>

@@ -24,7 +24,7 @@
                 <div class="card">
                     <div class="flex flex-col items-center">
                         <div class="relative mb-4">
-                            <img src="{{ $user->profile_picture ? asset('storage/profile_pictures/' . $user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}" alt="Profile" class="w-32 h-32 rounded-full">
+                            <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->fname . ' ' . $user->lname) . '&background=0D8ABC&color=fff' }}" alt="Profile" class="w-32 h-32 rounded-full">
                             <button id="openProfilePictureModal" class="absolute bottom-0 right-0 p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700">
                                 <i class="fas fa-camera"></i>
                             </button>
@@ -32,7 +32,8 @@
                         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{$user->fname}} {{$user->lname}}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Student</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                         @if ($user->roll_number){{ "ID:". $user->roll_number }}
+                         @if ($user->roll_number)
+                            {{ "ID:". $user->roll_number }}
                         @else
                             <div class="bg-red-100 border border-red-400 dark:bg-red-400 text-red-700 dark:text-red-100 rounded-xl px-3 relative">
                                 <span>Not Registered</span>
@@ -48,13 +49,13 @@
                             @if($user->phone)
                                 <div class="flex items-center">
                                     <i class="fas fa-phone text-gray-500 dark:text-gray-400 w-6"></i>
-                                    <span class="text-sm text-gray-700 dark:text-gray-300 ml-2">+1 (555) 123-4567</span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300 ml-2">{{$user->phone}}</span>
                                 </div>
                             @endif
                             @if($user->address)
                                 <div class="flex items-center">
                                     <i class="fas fa-map-marker-alt text-gray-500 dark:text-gray-400 w-6"></i>
-                                    <span class="text-sm text-gray-700 dark:text-gray-300 ml-2">New York, USA</span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300 ml-2">{{$user->address}}</span>
                                 </div>
                             @endif
                         </div>

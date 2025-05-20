@@ -19,7 +19,8 @@ use App\Http\Controllers\Backend\Admin\SubjectTeacherController as AdminSubjectT
 use App\Http\Controllers\Backend\Admin\BatchController as AdminBatchController;
 use App\Http\Controllers\Backend\Admin\SubjectTeacherMappingController as AdminSubjectTeacherMappingController;
 use App\Http\Controllers\Backend\Admin\ClassRoutineController as AdminClassRoutineController;
-
+use App\Http\Controllers\Backend\Admin\ForgotPasswordController as AdminForgotPasswordController;
+use App\Http\Controllers\Backend\Admin\ResetPasswordController as AdminResetPasswordController;
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -32,6 +33,19 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('/register/institute', [AdminAcademicInstituteController::class, 'store'])
             ->name('admin.register.institute.store');
+
+        Route::get('/forgot-password', [AdminForgotPasswordController::class, 'create'])
+            ->name('admin.forgot-password');
+
+        Route::post('/forgot-password', [AdminForgotPasswordController::class, 'store'])
+            ->name('admin.password.email');
+
+        Route::get('/reset-password/{token}', [AdminResetPasswordController::class, 'create'])
+            ->name('password.reset');
+
+        Route::post('/reset-password', [AdminResetPasswordController::class, 'store'])
+            ->name('password.update');
+
 
     });
 

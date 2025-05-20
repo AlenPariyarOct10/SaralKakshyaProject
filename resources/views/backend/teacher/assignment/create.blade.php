@@ -19,16 +19,13 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Assignments
             </a>
         </div>
-        @if ($errors->any())
+        @if (session('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
                 <strong class="font-bold">Whoops!</strong>
-                <ul class="mt-2 list-disc list-inside text-sm">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                <p class="text-sm mt-2">{{ session('error') }}</p>
             </div>
         @endif
+
         @if (session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
                 <strong class="font-bold">Success!</strong>
@@ -40,16 +37,6 @@
             <div class="p-6">
                 <form action="{{ route('teacher.assignment.store') }}" method="POST" enctype="multipart/form-data" id="createAssignmentForm">
                     @csrf
-
-                    @if ($errors->any())
-                        <div class="mb-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-md">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Left Column -->
@@ -140,17 +127,16 @@
                         <!-- Right Column -->
                         <div class="space-y-6">
                             <!-- Assigned Date -->
-                            <div>
-                                <label for="assigned_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <div class="hidden">
+                                <label for="assigned_date" class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Assigned Date <span class="text-red-500">*</span>
                                 </label>
                                 <input
-
                                     type="date"
                                     id="assigned_date"
                                     name="assigned_date"
                                     value="{{ old('assigned_date', date('Y-m-d')) }}"
-                                    class="disabled:opacity-50 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    class="hidden w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 >
                             </div>
 

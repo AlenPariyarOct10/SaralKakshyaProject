@@ -26,7 +26,8 @@ class StudentController extends Controller
 
         // Get students through the pivot table relationship
         $students = Student::whereHas('institutes', function ($query) use ($instituteId) {
-            $query->where('institutes.id', $instituteId);
+            $query->where('institutes.id', $instituteId)
+                ->whereNotNull('institute_student.approved_at'); // This is the correct way
         })->get();
 
         return view('backend.admin.students.index', compact('user', 'students'));

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\Teacher\AssignmentController;
+use App\Http\Controllers\Backend\Teacher\DepartmentController;
 use App\Http\Controllers\Backend\Teacher\TeacherAvailabilityController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Teacher\AuthController as TeacherAuthController;
@@ -53,16 +54,42 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/setting', [TeacherSettingController::class, "index"])->name('teacher.setting.index');
 
         //Assignment
+        Route::get('/assignments', [AssignmentController::class, 'filterAssignments']);
         Route::get('/assignment', [TeacherAssignmentController::class, "index"])->name('teacher.assignment.index');
         Route::get('/assignment/create', [TeacherAssignmentController::class, "create"])->name('teacher.assignment.create');
         Route::POST('/assignment', [TeacherAssignmentController::class, "store"])->name('teacher.assignment.store');
-        Route::get('/assignment/{assignment}', [TeacherAssignmentController::class, "show"])
-            ->name('teacher.assignment.show');
-        Route::get('/assignment/{assignment}/edit', [TeacherAssignmentController::class, "edit"])
-            ->name('teacher.assignment.edit');
+        Route::get('/assignment/{assignment}', [TeacherAssignmentController::class, "show"])->name('teacher.assignment.show');
 
-        Route::get('assignment/{assignment}/download/{attachment}', [AssignmentController::class, 'downloadAttachment'])
-            ->name('teacher.assignment.download');
+        Route::get('/assignment/{assignment}/edit', [TeacherAssignmentController::class, "edit"])->name('teacher.assignment.edit');
+        Route::PUT('/assignment/{assignment}', [TeacherAssignmentController::class, "update"])->name('teacher.assignment.update');
+
+        Route::delete('/assignment/{assignment}', [TeacherAssignmentController::class, "destroy"])->name('teacher.assignment.destroy');
+        Route::get('/assignment/draft', [TeacherAssignmentController::class, "draft"])->name('teacher.assignment.draft');
+        Route::get('/assignment/{id}/duplicate', [TeacherAssignmentController::class, "duplicate"])->name('teacher.assignment.duplicate');
+        Route::get('assignment/{assignment}/download/{attachment}', [AssignmentController::class, 'downloadAttachment'])->name('teacher.assignment.download');
+        Route::get('assignment/{assignment}/view/{attachment}', [AssignmentController::class, 'viewAttachment'])->name('teacher.assignment.view');
+
+        //Teacher Departments
+        Route::get('/departments', [DepartmentController::class, 'index'])
+            ->name('teacher.department.index');
+
+        //Department Programs
+        Route::get('/departments/{id}/programs', [DepartmentController::class, 'getPrograms'])
+            ->name('teacher.department.programs');
+
+        //Department Subjects
+        Route::get('/programs/{id}/subjects', [DepartmentController::class, 'getSubjects'])
+            ->name('teacher.department.subjects');
+
+        //Assignment Submission
+        Route::get('/assignment/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])
+            ->name('teacher.assignment.submissions');
+
+        //Assignment API
+        Route::get('/api/assignments', [TeacherAssignmentController::class, 'myAssignments'])
+            ->name('api.teacher.assignment.index');
+
+
         Route::get('subject/{id}/chapters', [AssignmentController::class, 'getChapters'])
             ->name('teacher.subject.chapters');
         Route::get('chapter/{id}/sub-chapters', [AssignmentController::class, 'getSubChapters'])

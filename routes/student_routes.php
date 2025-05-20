@@ -5,6 +5,7 @@ use App\Http\Controllers\Backend\Student\AuthController as StudentAuthController
 use App\Http\Controllers\Backend\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Backend\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Backend\Student\AttendanceController as StudentAttendanceController;
+use App\Http\Controllers\Backend\Student\AssignmentController as StudentAssignmentController;
 
 Route::group(['prefix' => 'student'], function () {
 
@@ -30,5 +31,22 @@ Route::group(['prefix' => 'student'], function () {
         Route::get('/attendance/setup', [StudentAttendanceController::class, 'setup_index'])->name('student.attendance.setup.index');
         Route::post('/attendance/setup', [StudentAttendanceController::class, 'saveFacePhotos'])->name('student.saveFacePhotos');
         Route::post('/attendance/setup/update', [StudentAttendanceController::class, 'updateFacePhotos'])->name('student.updateFacePhotos');
+
+        ################################# Assignment #############################################
+        Route::get('/assignment/{id}', [StudentAssignmentController::class, 'show'])->name('student.assignment.show');
+        Route::get('/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignment.index');
+        Route::POST('/assignment', [StudentAssignmentController::class, 'store'])->name('student.assignment.submit');
+        Route::get('/assignment{id}/download', [StudentAssignmentController::class, 'download'])->name('student.assignment.download');
+
+
+
+        ################################# Notification #############################################
+        Route::resource('notification', \App\Http\Controllers\Backend\Student\NotificationController::class)->only([
+            'index', 'show'
+        ])->names([
+            'index' => 'student.notification.index',
+            'show' => 'student.notification.show',
+        ]);
+
     });
 });

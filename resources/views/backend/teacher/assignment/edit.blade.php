@@ -1,344 +1,575 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
-@section('title', 'List Assignments')
+@section('title', 'Edit Assignment')
 
 @section('content')
     <!-- Main Content Area -->
-    <main class="p-4 md:p-6">
-        <!-- Assignment Filters -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="relative">
-                    <select id="courseFilter" class="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        <option value="">All Courses</option>
-                        <option value="math">Mathematics</option>
-                        <option value="physics">Physics</option>
-                        <option value="cs">Computer Science</option>
-                    </select>
-                </div>
-
-                <div class="relative">
-                    <select id="statusFilter" class="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="submitted">Submitted</option>
-                        <option value="graded">Graded</option>
-                        <option value="overdue">Overdue</option>
-                    </select>
-                </div>
+    <main class="p-6 md:p-6 min-h-screen">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-1">
+                    Edit Assignment
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Update assignment details and resources
+                </p>
             </div>
-
-            <div class="relative">
-                <div class="flex items-center border border-gray-300 rounded-md dark:border-gray-700 overflow-hidden">
-                    <input type="text" placeholder="Search assignments..." class="w-full px-4 py-2 focus:outline-none dark:bg-gray-800 dark:text-white">
-                    <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+            <div class="mt-4 md:mt-0 flex flex-col md:flex-row gap-3">
+                <a href="{{ route('teacher.assignment.show', $assignment->id) }}" class="btn-outline flex items-center justify-center">
+                    <i class="fas fa-eye mr-2"></i> View Assignment
+                </a>
+                <a href="{{ route('teacher.assignment.index') }}" class="btn-secondary flex items-center justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Assignments
+                </a>
             </div>
         </div>
 
-        <!-- Pending Assignments -->
-        <div class="card mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Assignments</h3>
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Whoops!</strong>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
 
-            <div class="space-y-4">
-                <!-- Assignment 1 -->
-                <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h4 class="text-md font-medium text-gray-800 dark:text-white">Mathematics - Linear Algebra Problem Set</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Due: May 15, 2023 (2 days left)</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Pending</span>
-                            <button id="openAssignment1" class="px-3 py-1 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success!</strong>
+                <p class="mt-2 text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
 
-                    <!-- Assignment Details (Hidden by default) -->
-                    <div id="assignment1Details" class="p-4 border-t dark:border-gray-700 hidden">
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Description</h5>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                Complete the linear algebra problem set from Chapter 5, problems 1-15. Show all your work and explain your reasoning for each step.
-                            </p>
-                        </div>
+        <!-- Edit Assignment Form -->
+        <div class="card mb-8">
+            <div class="p-6">
+                <form action="{{ route('teacher.assignment.update', $assignment->id) }}" method="POST" enctype="multipart/form-data" id="editAssignmentForm">
+                    @csrf
+                    @method('PUT')
 
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Resources</h5>
-                            <div class="flex flex-wrap gap-2">
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-pdf mr-2 text-red-500"></i> Problem_Set.pdf
-                                </a>
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-video mr-2 text-blue-500"></i> Tutorial_Video.mp4
-                                </a>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <!-- Title -->
+                            <div>
+                                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Assignment Title <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="title"
+                                    name="title"
+                                    value="{{ old('title', $assignment->title) }}"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter assignment title"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Subject Selection -->
+                            <div>
+                                <label for="subject_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Subject <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="subject_id"
+                                    name="subject_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="">Select Subject</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->subject->id }}" {{ old('subject_id', $assignment->subject_id) == $subject->subject->id ? 'selected' : '' }}>
+                                            {{ $subject->subject->name }} ({{ $subject->subject->code }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Chapter Selection -->
+                            <div>
+                                <label for="chapter_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Chapter <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="chapter_id"
+                                    name="chapter_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="">Select Chapter</option>
+                                    <!-- Chapters will be populated dynamically based on subject selection -->
+                                    @if($assignment->chapter)
+                                        <option value="{{ $assignment->chapter_id }}" selected>{{ $assignment->chapter->title }}</option>
+                                    @endif
+                                </select>
+                            </div>
+
+                            <!-- Sub-Chapter Selection -->
+                            <div>
+                                <label for="sub_chapter_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Sub-Chapter
+                                </label>
+                                <select
+                                    id="sub_chapter_id"
+                                    name="sub_chapter_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="">Select Sub-Chapter</option>
+                                    <!-- Sub-chapters will be populated dynamically based on chapter selection -->
+                                    @if($assignment->subChapter)
+                                        <option value="{{ $assignment->sub_chapter_id }}" selected>{{ $assignment->subChapter->title }}</option>
+                                    @endif
+                                </select>
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Description <span class="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    rows="6"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter assignment description"
+                                    required
+                                >{{ old('description', $assignment->description) }}</textarea>
                             </div>
                         </div>
 
-                        <div>
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Submit Assignment</h5>
-                            <div class="flex flex-col gap-4">
-                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
-                                    <input type="file" id="assignment1File" class="hidden">
-                                    <label for="assignment1File" class="cursor-pointer">
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Assigned Date -->
+                            <div class="hidden">
+                                <label for="assigned_date" class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Assigned Date <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    id="assigned_date"
+                                    name="assigned_date"
+                                    value="{{ old('assigned_date', $assignment->assigned_date ? date('Y-m-d', strtotime($assignment->assigned_date)) : date('Y-m-d')) }}"
+                                    class="hidden w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                            </div>
+
+                            <!-- Due Date and Time -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Due Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="due_date"
+                                        name="due_date"
+                                        value="{{ old('due_date', $assignment->due_date ? date('Y-m-d', strtotime($assignment->due_date)) : '') }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        required
+                                    >
+                                    <p id="date-error" class="text-red-500 text-sm mt-1 hidden">Please select a future date.</p>
+                                </div>
+                                <div>
+                                    <label for="due_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Due Time <span class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        id="due_time"
+                                        name="due_time"
+                                        value="{{ old('due_time', $assignment->due_time ? date('H:i', strtotime($assignment->due_time)) : '23:59') }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Full Marks -->
+                            <div>
+                                <label for="full_marks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Full Marks <span class="text-red-500">* will be converted according to format</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    id="full_marks"
+                                    name="full_marks"
+                                    value="{{ old('full_marks', $assignment->full_marks) }}"
+                                    min="1"
+                                    max="100"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Status <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="status"
+                                    name="status"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="active" {{ old('status', $assignment->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="draft" {{ old('status', $assignment->status) == 'draft' ? 'selected' : '' }}>Draft</option>
+                                </select>
+                                @error('status')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Existing Attachments -->
+                            @if($assignment->attachments && count($assignment->attachments) > 0)
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Existing Resources
+                                    </label>
+                                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                                        @foreach($assignment->attachments as $attachment)
+                                            <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-between">
+                                                <div class="flex items-center overflow-hidden">
+                                                    @php
+                                                        $icon = 'fa-file';
+                                                        if (Str::contains($attachment->file_type ?? '', 'pdf')) $icon = 'fa-file-pdf text-red-500';
+                                                        elseif (Str::contains($attachment->file_type ?? '', 'word')) $icon = 'fa-file-word text-blue-500';
+                                                        elseif (Str::contains($attachment->file_type ?? '', 'image')) $icon = 'fa-file-image text-green-500';
+                                                        elseif (Str::contains($attachment->file_type ?? '', 'zip')) $icon = 'fa-file-archive text-yellow-500';
+                                                    @endphp
+                                                    <i class="fas {{ $icon }} mr-2 flex-shrink-0"></i>
+                                                    <span class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ $attachment->title ?? $attachment->original_filename }}</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <a href="{{ route('teacher.assignment.download', [$assignment->id, $attachment->id]) }}" class="text-primary-600 hover:text-primary-800">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <div class="flex items-center">
+                                                        <input type="checkbox" id="delete_attachment_{{ $attachment->id }}" name="delete_attachments[]" value="{{ $attachment->id }}" class="mr-2">
+                                                        <label for="delete_attachment_{{ $attachment->id }}" class="text-red-500 text-sm">Remove</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- New Assignment Files -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Add New Resources
+                                </label>
+                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center" id="dropZone">
+                                    <input type="file" id="attachments" name="attachments[]" class="hidden" multiple>
+                                    <label for="attachments" class="cursor-pointer block">
                                         <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 dark:text-gray-500 mb-2"></i>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">Drag and drop files here or click to browse</p>
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: PDF, DOC, DOCX, JPG, PNG</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: PDF, DOC, DOCX, JPG, PNG, ZIP (Max: 10MB per file)</p>
                                     </label>
                                 </div>
 
-                                <div id="filePreview1" class="hidden p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-file-pdf text-red-500 mr-2"></i>
-                                            <span class="text-sm text-gray-700 dark:text-gray-300 file-name">filename.pdf</span>
-                                        </div>
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
+                                <div id="filePreview" class="mt-2 hidden max-h-40 overflow-y-auto">
+                                    <!-- Files will be added here dynamically -->
                                 </div>
-
-                                <button class="btn-primary">Submit Assignment</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Assignment 2 -->
-                <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h4 class="text-md font-medium text-gray-800 dark:text-white">Physics - Mechanics Lab Report</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Due: May 18, 2023 (5 days left)</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Pending</span>
-                            <button id="openAssignment2" class="px-3 py-1 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700">
-                                View Details
-                            </button>
-                        </div>
+                    <div class="mt-8 mb-4 flex justify-end space-x-3">
+                        <a href="{{ route('teacher.assignment.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            Cancel
+                        </a>
+                        <button type="submit" name="update" value="1" class="btn-primary">
+                            Update Assignment
+                        </button>
                     </div>
-
-                    <!-- Assignment Details (Hidden by default) -->
-                    <div id="assignment2Details" class="p-4 border-t dark:border-gray-700 hidden">
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Description</h5>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                Write a detailed lab report on the pendulum experiment conducted in class. Include your data, calculations, error analysis, and conclusions.
-                            </p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Resources</h5>
-                            <div class="flex flex-wrap gap-2">
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-excel mr-2 text-green-500"></i> Lab_Data.xlsx
-                                </a>
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-word mr-2 text-blue-500"></i> Report_Template.docx
-                                </a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Submit Assignment</h5>
-                            <div class="flex flex-col gap-4">
-                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
-                                    <input type="file" id="assignment2File" class="hidden">
-                                    <label for="assignment2File" class="cursor-pointer">
-                                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 dark:text-gray-500 mb-2"></i>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Drag and drop files here or click to browse</p>
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: PDF, DOC, DOCX, JPG, PNG</p>
-                                    </label>
-                                </div>
-
-                                <div id="filePreview2" class="hidden p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-file-word text-blue-500 mr-2"></i>
-                                            <span class="text-sm text-gray-700 dark:text-gray-300 file-name">filename.docx</span>
-                                        </div>
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <button class="btn-primary">Submit Assignment</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assignment 3 -->
-                <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h4 class="text-md font-medium text-gray-800 dark:text-white">Computer Science - Algorithm Implementation</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Due: May 10, 2023 (<span class="text-red-500">Overdue</span>)</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">Overdue</span>
-                            <button id="openAssignment3" class="px-3 py-1 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Assignment Details (Hidden by default) -->
-                    <div id="assignment3Details" class="p-4 border-t dark:border-gray-700 hidden">
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Description</h5>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                Implement the sorting algorithms discussed in class (Bubble Sort, Insertion Sort, and Quick Sort) and compare their performance on different input sizes.
-                            </p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Resources</h5>
-                            <div class="flex flex-wrap gap-2">
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-code mr-2 text-purple-500"></i> Starter_Code.py
-                                </a>
-                                <a href="#" class="flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500">
-                                    <i class="fas fa-file-csv mr-2 text-green-500"></i> Test_Data.csv
-                                </a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Submit Assignment</h5>
-                            <div class="flex flex-col gap-4">
-                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
-                                    <input type="file" id="assignment3File" class="hidden">
-                                    <label for="assignment3File" class="cursor-pointer">
-                                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 dark:text-gray-500 mb-2"></i>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Drag and drop files here or click to browse</p>
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: PDF, DOC, DOCX, PY, ZIP</p>
-                                    </label>
-                                </div>
-
-                                <div id="filePreview3" class="hidden p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-file-code text-purple-500 mr-2"></i>
-                                            <span class="text-sm text-gray-700 dark:text-gray-300 file-name">filename.py</span>
-                                        </div>
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="p-3 bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-md text-sm">
-                                    <i class="fas fa-exclamation-circle mr-2"></i>
-                                    This assignment is overdue. Late submissions may be subject to penalties.
-                                </div>
-
-                                <button class="btn-primary">Submit Assignment</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Submitted Assignments -->
-        <div class="card">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Submitted Assignments</h3>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Assignment</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Submitted On</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Grade</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Calculus Problem Set</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Mathematics</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 5, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">Graded</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">92/100</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-primary-600 hover:text-primary-800">
-                                <i class="fas fa-eye mr-1"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Thermodynamics Report</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Physics</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">April 28, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">Graded</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">85/100</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-primary-600 hover:text-primary-800">
-                                <i class="fas fa-eye mr-1"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Data Structures Project</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Computer Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 1, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">Submitted</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-primary-600 hover:text-primary-800">
-                                <i class="fas fa-eye mr-1"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                </form>
             </div>
         </div>
     </main>
+@endsection
 
+@section('scripts')
+    <script>
+        // -------- Date Validation --------
+        document.addEventListener('DOMContentLoaded', function () {
+            const assignedDateInput = document.getElementById('assigned_date');
+            const dueDateInput = document.getElementById('due_date');
+            const errorText = document.getElementById('date-error');
+
+            dueDateInput.addEventListener('change', function () {
+                const selectedDate = new Date(this.value);
+                const today = new Date();
+                const assignedDate = new Date(assignedDateInput.value);
+
+                // Remove time part from today to compare only the date
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate < today) {
+                    errorText.classList.remove('hidden');
+                    errorText.textContent = 'Please select a future date.';
+                    this.value = '{{ old('due_date', $assignment->due_date ? date('Y-m-d', strtotime($assignment->due_date)) : '') }}'; // Restore the original date
+                    this.classList.add('border-red-500');
+                } else if (selectedDate < assignedDate) {
+                    errorText.classList.remove('hidden');
+                    errorText.textContent = 'Due date cannot be earlier than assigned date.';
+                    this.value = '{{ old('due_date', $assignment->due_date ? date('Y-m-d', strtotime($assignment->due_date)) : '') }}'; // Restore the original date
+                    this.classList.add('border-red-500');
+                } else {
+                    errorText.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                }
+            });
+
+            assignedDateInput.addEventListener('change', function() {
+                if (dueDateInput.value) {
+                    const selectedDate = new Date(this.value);
+                    const dueDate = new Date(dueDateInput.value);
+
+                    if (dueDate < selectedDate) {
+                        dueDateInput.value = '';
+                        errorText.classList.remove('hidden');
+                        errorText.textContent = 'Due date cannot be earlier than assigned date.';
+                    }
+                }
+            });
+        });
+        // -------- End Date Validation --------
+
+        // -------- Chapter and Sub-Chapter Handling --------
+        document.addEventListener('DOMContentLoaded', function() {
+            const subjectSelect = document.getElementById('subject_id');
+            const chapterSelect = document.getElementById('chapter_id');
+            const subChapterSelect = document.getElementById('sub_chapter_id');
+
+            // Load chapters for the initially selected subject
+            if (subjectSelect.value) {
+                loadChapters(subjectSelect.value, {{ $assignment->chapter_id ?? 'null' }});
+            }
+
+            // When subject changes, update chapters
+            subjectSelect.addEventListener('change', function() {
+                const subjectId = this.value;
+                loadChapters(subjectId);
+            });
+
+            // When chapter changes, update sub-chapters
+            chapterSelect.addEventListener('change', function() {
+                const chapterId = this.value;
+                loadSubChapters(chapterId);
+            });
+
+            // Function to load chapters
+            function loadChapters(subjectId, selectedChapterId = null) {
+                // Clear chapter and sub-chapter dropdowns
+                chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+                subChapterSelect.innerHTML = '<option value="">Select Sub-Chapter</option>';
+
+                if (subjectId) {
+                    // Fetch chapters for the selected subject
+                    fetch(`/teacher/subject/${subjectId}/chapters`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                data.forEach(chapter => {
+                                    const option = document.createElement('option');
+                                    option.value = chapter.id;
+                                    option.textContent = chapter.title;
+
+                                    // Select the chapter if it matches the selected chapter ID
+                                    if (selectedChapterId && chapter.id == selectedChapterId) {
+                                        option.selected = true;
+                                    }
+
+                                    chapterSelect.appendChild(option);
+                                });
+
+                                // If a chapter is selected, load its sub-chapters
+                                if (selectedChapterId) {
+                                    loadSubChapters(selectedChapterId, {{ $assignment->sub_chapter_id ?? 'null' }});
+                                }
+                            }
+                        })
+                        .catch(error => console.error('Error fetching chapters:', error));
+                }
+            }
+
+            // Function to load sub-chapters
+            function loadSubChapters(chapterId, selectedSubChapterId = null) {
+                // Clear sub-chapter dropdown
+                subChapterSelect.innerHTML = '<option value="">Select Sub-Chapter</option>';
+
+                if (chapterId) {
+                    // Fetch sub-chapters for the selected chapter
+                    fetch(`/teacher/chapter/${chapterId}/sub-chapters`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                data.forEach(subChapter => {
+                                    const option = document.createElement('option');
+                                    option.value = subChapter.id;
+                                    option.textContent = subChapter.title;
+
+                                    // Select the sub-chapter if it matches the selected sub-chapter ID
+                                    if (selectedSubChapterId && subChapter.id == selectedSubChapterId) {
+                                        option.selected = true;
+                                    }
+
+                                    subChapterSelect.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error fetching sub-chapters:', error));
+                }
+            }
+        });
+        // -------- End Chapter and Sub-Chapter Handling --------
+
+        // -------- File Upload Preview --------
+        document.addEventListener('DOMContentLoaded', function() {
+            // File Upload Preview
+            const attachmentsInput = document.getElementById('attachments');
+            const filePreview = document.getElementById('filePreview');
+            const dropZone = document.getElementById('dropZone');
+            const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png', 'application/zip'];
+
+            // Function to handle file selection
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    filePreview.classList.remove('hidden');
+
+                    Array.from(files).forEach(file => {
+                        // Validate file type
+                        if (!allowedTypes.includes(file.type)) {
+                            showError(`File type not allowed: ${file.name}`);
+                            return;
+                        }
+
+                        // Validate file size
+                        if (file.size > maxFileSize) {
+                            showError(`File too large (max 10MB): ${file.name}`);
+                            return;
+                        }
+
+                        // Create file preview item
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'p-2 bg-gray-50 dark:bg-gray-700 rounded-md mb-2 flex items-center justify-between';
+
+                        // Determine file icon based on type
+                        let fileIcon = 'fa-file';
+                        if (file.type.includes('pdf')) fileIcon = 'fa-file-pdf text-red-500';
+                        else if (file.type.includes('word')) fileIcon = 'fa-file-word text-blue-500';
+                        else if (file.type.includes('image')) fileIcon = 'fa-file-image text-green-500';
+                        else if (file.type.includes('zip')) fileIcon = 'fa-file-archive text-yellow-500';
+
+                        fileItem.innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas ${fileIcon} mr-2"></i>
+                                <div>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">${file.name}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 block">${formatFileSize(file.size)}</span>
+                                </div>
+                            </div>
+                            <button type="button" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+
+                        filePreview.appendChild(fileItem);
+
+                        // Remove file button
+                        const removeBtn = fileItem.querySelector('button');
+                        removeBtn.addEventListener('click', function() {
+                            fileItem.remove();
+                            if (filePreview.children.length === 0) {
+                                filePreview.classList.add('hidden');
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                else return (bytes / 1048576).toFixed(1) + ' MB';
+            }
+
+            // Show error message
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4';
+                errorDiv.innerHTML = `
+                    <p>${message}</p>
+                `;
+
+                const form = document.getElementById('editAssignmentForm');
+                form.insertBefore(errorDiv, form.firstChild);
+
+                // Remove error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+
+            // File input change event
+            if (attachmentsInput) {
+                attachmentsInput.addEventListener('change', function() {
+                    handleFiles(this.files);
+                });
+            }
+
+            // Drag and drop functionality
+            if (dropZone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, highlight, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, unhighlight, false);
+                });
+
+                function highlight() {
+                    dropZone.classList.add('bg-gray-50', 'dark:bg-gray-700');
+                }
+
+                function unhighlight() {
+                    dropZone.classList.remove('bg-gray-50', 'dark:bg-gray-700');
+                }
+
+                dropZone.addEventListener('drop', handleDrop, false);
+
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    handleFiles(files);
+                }
+            }
+
+            // Form submission
+            const form = document.getElementById('editAssignmentForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Additional validation can be added here if needed
+                });
+            }
+        });
+    </script>
 @endsection

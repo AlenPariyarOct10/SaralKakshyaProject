@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 
-class Student extends Authenticatable
+class Student extends Authenticatable implements CanResetPasswordContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, CanResetPassword;
     protected $guard = 'student';
 
     protected $table = 'students'; // Specify the table name if not default
@@ -52,6 +54,11 @@ class Student extends Authenticatable
         return "{$this->fname} {$this->lname}";
     }
 
+    public function unseenNotifications()
+    {
+        return $this->notifications()->whereNull('seen_at');
+    }
+
     public function institutes()
     {
         return $this->belongsToMany(Institute::class, 'institute_student')
@@ -65,10 +72,10 @@ class Student extends Authenticatable
             ->where('user_type', 'student');
     }
 
-    public function seenStatuses()
-    {
-        return $this->morphMany(SeenStatus::class, 'user');
-    }
+
+
+
+
 
 
 }

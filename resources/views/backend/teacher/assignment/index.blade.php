@@ -4,13 +4,18 @@
 
 @section('content')
     <!-- Main Content Area -->
-    <main class="p-4 md:p-6">
+    <main class="p-6 md:p-6 min-h-screen overflow-y-auto pb-16">
         <!-- Page Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 md:mb-0">
-                Manage Assignments
-            </h2>
-            <a href="{{route('teacher.assignment.create')}}" class="btn-primary flex items-center">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-1">
+                    Manage Assignments
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Create, edit, and manage your class assignments
+                </p>
+            </div>
+            <a href="{{route('teacher.assignment.create')}}" class="mt-4 md:mt-0 btn-primary flex items-center">
                 <i class="fas fa-plus mr-2"></i> Create New Assignment
             </a>
         </div>
@@ -23,10 +28,6 @@
                     <label for="departmentFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Department</label>
                     <select id="departmentFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Departments</option>
-                        <option value="science">Science</option>
-                        <option value="arts">Arts</option>
-                        <option value="engineering">Engineering</option>
-                        <option value="business">Business</option>
                     </select>
                 </div>
 
@@ -34,10 +35,6 @@
                     <label for="programFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Program</label>
                     <select id="programFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Programs</option>
-                        <option value="undergraduate">Undergraduate</option>
-                        <option value="postgraduate">Postgraduate</option>
-                        <option value="diploma">Diploma</option>
-                        <option value="certificate">Certificate</option>
                     </select>
                 </div>
 
@@ -45,13 +42,6 @@
                     <label for="subjectFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Subject</label>
                     <select id="subjectFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Subjects</option>
-                        <option value="math">Mathematics</option>
-                        <option value="physics">Physics</option>
-                        <option value="cs">Computer Science</option>
-                        <option value="history">History</option>
-                        <option value="literature">Literature</option>
-                        <option value="biology">Biology</option>
-                        <option value="chemistry">Chemistry</option>
                     </select>
                 </div>
 
@@ -59,9 +49,8 @@
                     <label for="statusFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Status</label>
                     <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Status</option>
+                        <option value="active">Active</option>
                         <option value="draft">Draft</option>
-                        <option value="published">Published</option>
-                        <option value="archived">Archived</option>
                     </select>
                 </div>
             </div>
@@ -100,7 +89,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subject</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Program</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Due Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Due Date Time</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Submissions</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
@@ -109,231 +98,11 @@
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     <!-- Row 1 -->
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Linear Algebra Problem Set</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Mathematics</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Undergraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 15, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">Published</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">18/25</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
+                        <td colspan="8" class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-800 dark:text-white text-center">Loading</div>
                         </td>
                     </tr>
 
-                    <!-- Row 2 -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Mechanics Lab Report</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Physics</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Undergraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 18, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">Published</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">12/22</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 3 -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Algorithm Implementation</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Computer Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Engineering</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Undergraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 10, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">Published</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">20/20</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 4 -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Literary Analysis Essay</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Literature</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Arts</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Undergraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">May 25, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">Draft</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">0/30</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 5 -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Business Case Study</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Business Administration</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Business</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Postgraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">June 5, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">Draft</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">0/15</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 6 -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">Gene Expression Analysis</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Biology</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Postgraduate</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">April 30, 2023</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-100">Archived</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">12/12</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="text-primary-600 hover:text-primary-800" title="View Assignment">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-600 hover:text-yellow-800" title="Edit Assignment">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-800" title="Delete Assignment">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -596,197 +365,515 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Create Assignment Modal
-            const createAssignmentBtn = document.getElementById('createAssignmentBtn');
+            // DOM Elements
+            const departmentFilter = document.getElementById('departmentFilter');
+            const programFilter = document.getElementById('programFilter');
+            const subjectFilter = document.getElementById('subjectFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.getElementById('searchInput');
+            const resetFilters = document.getElementById('resetFilters');
+            const assignmentsTableBody = document.querySelector('tbody');
+
+            // Modal Elements
             const createAssignmentModal = document.getElementById('createAssignmentModal');
             const closeCreateModal = document.getElementById('closeCreateModal');
             const cancelCreateAssignment = document.getElementById('cancelCreateAssignment');
             const createAssignmentForm = document.getElementById('createAssignmentForm');
-
-            // Delete Confirmation Modal
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const closeDeleteModal = document.getElementById('closeDeleteModal');
             const cancelDelete = document.getElementById('cancelDelete');
             const confirmDelete = document.getElementById('confirmDelete');
-
-            // View Assignment Modal
             const viewAssignmentModal = document.getElementById('viewAssignmentModal');
             const closeViewModal = document.getElementById('closeViewModal');
             const closeViewAssignment = document.getElementById('closeViewAssignment');
             const editViewedAssignment = document.getElementById('editViewedAssignment');
             const viewSubmissions = document.getElementById('viewSubmissions');
+            const assignmentFiles = document.getElementById('assignmentFiles');
+            const filePreview = document.getElementById('filePreview');
 
-            // Show Create Assignment Modal
-            if (createAssignmentBtn) {
-                createAssignmentBtn.addEventListener('click', () => {
-                    createAssignmentModal.classList.remove('hidden');
-                });
-            }
+            // Initialize filters and load data
+            initializeFilters();
+            loadAssignments();
 
-            // Close Create Assignment Modal
-            if (closeCreateModal) {
-                closeCreateModal.addEventListener('click', () => {
-                    createAssignmentModal.classList.add('hidden');
-                });
-            }
+            // Event Listeners
+            departmentFilter.addEventListener('change', getDepartmentPrograms);
+            programFilter.addEventListener('change', getDepartmentSubjects);
+            statusFilter.addEventListener('change', loadAssignments);
+            searchInput.addEventListener('input', debounce(loadAssignments, 300));
+            resetFilters.addEventListener('click', resetAllFilters);
 
-            // Cancel Create Assignment Modal
-            if (cancelCreateAssignment) {
-                cancelCreateAssignment.addEventListener('click', () => {
-                    createAssignmentModal.classList.add('hidden');
-                });
-            }
+            // Modal Event Listeners
+            if (closeCreateModal) closeCreateModal.addEventListener('click', () => toggleModal(createAssignmentModal));
+            if (cancelCreateAssignment) cancelCreateAssignment.addEventListener('click', () => toggleModal(createAssignmentModal));
+            if (closeDeleteModal) closeDeleteModal.addEventListener('click', () => toggleModal(deleteConfirmationModal));
+            if (cancelDelete) cancelDelete.addEventListener('click', () => toggleModal(deleteConfirmationModal));
+            if (closeViewModal) closeViewModal.addEventListener('click', () => toggleModal(viewAssignmentModal));
+            if (closeViewAssignment) closeViewAssignment.addEventListener('click', () => toggleModal(viewAssignmentModal));
 
-            // Handle form submission
+            // Form Submission
             if (createAssignmentForm) {
-                createAssignmentForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // Add form submission logic here
-
-                    // Close modal after submission
-                    createAssignmentModal.classList.add('hidden');
-
-                    // Show success message
-                    alert('Assignment created successfully!');
-                });
-            }
-
-            // Close Delete Confirmation Modal
-            if (closeDeleteModal) {
-                closeDeleteModal.addEventListener('click', () => {
-                    deleteConfirmationModal.classList.add('hidden');
-                });
-            }
-
-            // Cancel Delete Confirmation Modal
-            if (cancelDelete) {
-                cancelDelete.addEventListener('click', () => {
-                    deleteConfirmationModal.classList.add('hidden');
-                });
+                createAssignmentForm.addEventListener('submit', handleCreateAssignment);
             }
 
             // Confirm Delete
             if (confirmDelete) {
-                confirmDelete.addEventListener('click', () => {
-                    // Add delete logic here
-
-                    // Close modal after deletion
-                    deleteConfirmationModal.classList.add('hidden');
-
-                    // Show success message
-                    alert('Assignment deleted successfully!');
-                });
+                confirmDelete.addEventListener('click', handleDeleteAssignment);
             }
-
-            // Close View Assignment Modal
-            if (closeViewModal) {
-                closeViewModal.addEventListener('click', () => {
-                    viewAssignmentModal.classList.add('hidden');
-                });
-            }
-
-            // Close View Assignment Button
-            if (closeViewAssignment) {
-                closeViewAssignment.addEventListener('click', () => {
-                    viewAssignmentModal.classList.add('hidden');
-                });
-            }
-
-            // Edit viewed assignment
-            if (editViewedAssignment) {
-                editViewedAssignment.addEventListener('click', () => {
-                    viewAssignmentModal.classList.add('hidden');
-                    // Show edit modal or redirect to edit page
-                    // For now, just show the create modal as an example
-                    createAssignmentModal.classList.remove('hidden');
-                });
-            }
-
-            // View submissions
-            if (viewSubmissions) {
-                viewSubmissions.addEventListener('click', () => {
-                    // Redirect to submissions page or show submissions modal
-                    alert('Redirecting to submissions page...');
-                });
-            }
-
-            // Delete Buttons Event Listeners
-            document.querySelectorAll('[title="Delete Assignment"]').forEach(button => {
-                button.addEventListener('click', () => {
-                    deleteConfirmationModal.classList.remove('hidden');
-                });
-            });
-
-            // View Buttons Event Listeners
-            document.querySelectorAll('[title="View Assignment"]').forEach(button => {
-                button.addEventListener('click', () => {
-                    viewAssignmentModal.classList.remove('hidden');
-                });
-            });
-
-            // Edit Buttons Event Listeners
-            document.querySelectorAll('[title="Edit Assignment"]').forEach(button => {
-                button.addEventListener('click', () => {
-                    // Show edit modal or redirect to edit page
-                    createAssignmentModal.classList.remove('hidden');
-                });
-            });
 
             // File Upload Preview
-            const assignmentFiles = document.getElementById('assignmentFiles');
-            const filePreview = document.getElementById('filePreview');
-
             if (assignmentFiles) {
-                assignmentFiles.addEventListener('change', function() {
-                    if (this.files.length > 0) {
-                        filePreview.classList.remove('hidden');
-                        filePreview.innerHTML = '';
+                assignmentFiles.addEventListener('change', handleFileUpload);
+            }
 
-                        Array.from(this.files).forEach(file => {
-                            const fileItem = document.createElement('div');
-                            fileItem.className = 'p-2 bg-gray-50 dark:bg-gray-700 rounded-md mb-2';
-                            fileItem.innerHTML = `
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <i class="fas fa-file mr-2 text-gray-500"></i>
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">${file.name}</span>
-                                </div>
-                                <button type="button" class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        `;
-                            filePreview.appendChild(fileItem);
+            // Functions
+            function initializeFilters() {
+                getDepartments();
 
-                            // Remove file button
-                            const removeBtn = fileItem.querySelector('button');
-                            removeBtn.addEventListener('click', function() {
-                                fileItem.remove();
-                                if (filePreview.children.length === 0) {
-                                    filePreview.classList.add('hidden');
-                                }
-                            });
-                        });
-                    }
+            }
+
+            async function loadAssignments() {
+                try {
+                    // Show loading state
+                    assignmentsTableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-800 dark:text-white text-center">Loading assignments...</div></td></tr>';
+
+                    // Build query parameters
+                    const params = new URLSearchParams();
+                    if (departmentFilter.value) params.append('department_id', departmentFilter.value);
+                    if (programFilter.value) params.append('program_id', programFilter.value);
+                    if (subjectFilter.value) params.append('subject_id', subjectFilter.value);
+                    if (statusFilter.value) params.append('status', statusFilter.value);
+                    if (searchInput.value) params.append('search', searchInput.value);
+
+                    const response = await fetch(`/teacher/assignments?${params.toString()}`);
+                    if (!response.ok) throw new Error('Failed to fetch assignments');
+
+                    const { data: assignments, meta } = await response.json();
+
+                    // Populate table
+                    renderAssignmentsTable(assignments);
+                    updatePagination(meta);
+
+                } catch (error) {
+                    console.error('Error loading assignments:', error);
+                    assignmentsTableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-800 dark:text-white text-center">Error loading assignments</div></td></tr>';
+                }
+            }
+
+            function renderAssignmentsTable(assignments) {
+                assignmentsTableBody.innerHTML = '';
+
+                if (assignments.length === 0) {
+                    assignmentsTableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-800 dark:text-white text-center">No assignments found</div></td></tr>';
+                    return;
+                }
+
+                console.log(assignments);
+
+                assignments.data.forEach(assignment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm font-medium text-gray-800 dark:text-white">${assignment.title}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">${assignment.subject?.name || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">${assignment.department || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">${assignment.program || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            ${assignment.due_date} <br> (${assignment.due_date_human})
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(assignment.status)}">
+                            ${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            ${assignment.submissions_count || 0} / ${assignment.total_students || 0}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-normal">
+                        <div class="flex space-x-2">
+                            <button class="view-btn text-primary-600 hover:text-primary-800" title="View Assignment" data-id="${assignment.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="edit-btn text-yellow-600 hover:text-yellow-800" title="Edit Assignment" data-id="${assignment.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn text-red-600 hover:text-red-800" title="Delete Assignment" data-id="${assignment.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                    assignmentsTableBody.appendChild(row);
+                });
+
+                // Setup event listeners for the buttons in the table
+                setupTableEventListeners();
+            }
+
+            function getStatusClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'active':
+                    case 'published':
+                        return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100';
+                    case 'draft':
+                        return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100';
+                    case 'archived':
+                        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
+                    default:
+                        return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100';
+                }
+            }
+
+            function setupTableEventListeners() {
+                // View Buttons
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.currentTarget.getAttribute('data-id');
+                        window.location.href = `/teacher/assignment/${assignmentId}`;
+                    });
+                });
+
+                // Edit Buttons
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.currentTarget.getAttribute('data-id');
+                        window.location.href = `/teacher/assignment/${assignmentId}/edit`;
+                    });
+                });
+
+                // Delete Buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.currentTarget.getAttribute('data-id');
+                        deleteConfirmationModal.setAttribute('data-assignment-id', assignmentId);
+                        toggleModal(deleteConfirmationModal);
+                    });
                 });
             }
 
-            // Filter Reset Button
-            const resetFilters = document.getElementById('resetFilters');
-            if (resetFilters) {
-                resetFilters.addEventListener('click', () => {
-                    document.getElementById('departmentFilter').value = '';
-                    document.getElementById('programFilter').value = '';
-                    document.getElementById('subjectFilter').value = '';
-                    document.getElementById('statusFilter').value = '';
-                    document.getElementById('searchInput').value = '';
-                });
+            async function viewAssignment(assignmentId) {
+                try {
+                    const response = await fetch(`/teacher/assignment/${assignmentId}`);
+                    if (!response.ok) throw new Error('Failed to fetch assignment details');
+
+                    const assignment = await response.json();
+
+                    // Populate view modal
+                    document.getElementById('viewAssignmentTitle').textContent = assignment.title;
+                    document.getElementById('viewAssignmentDepartment').textContent = assignment.department?.name || 'N/A';
+                    document.getElementById('viewAssignmentProgram').textContent = assignment.program?.name || 'N/A';
+                    document.getElementById('viewAssignmentSubject').textContent = assignment.subject?.name || 'N/A';
+                    document.getElementById('viewAssignmentDueDate').textContent =
+                        `${new Date(assignment.due_date).toLocaleDateString()} at ${assignment.due_time}`;
+                    document.getElementById('viewAssignmentStatus').textContent =
+                        assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1);
+                    document.getElementById('viewAssignmentPoints').textContent = assignment.max_points;
+                    document.getElementById('viewAssignmentDescription').textContent = assignment.description;
+
+                    // Set status class
+                    const statusElement = document.getElementById('viewAssignmentStatus');
+                    statusElement.className = `px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(assignment.status)}`;
+
+                    // Populate resources
+                    const resourcesContainer = document.getElementById('viewAssignmentResources');
+                    resourcesContainer.innerHTML = '';
+                    if (assignment.attachments && assignment.attachments.length > 0) {
+                        assignment.attachments.forEach(attachment => {
+                            const fileType = attachment.path.split('.').pop().toLowerCase();
+                            let iconClass = 'fa-file';
+                            if (['pdf'].includes(fileType)) iconClass = 'fa-file-pdf text-red-500';
+                            if (['doc', 'docx'].includes(fileType)) iconClass = 'fa-file-word text-blue-500';
+                            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) iconClass = 'fa-file-image text-green-500';
+                            if (['mp4', 'mov', 'avi'].includes(fileType)) iconClass = 'fa-file-video text-purple-500';
+
+                            const resourceElement = document.createElement('a');
+                            resourceElement.href = `/teacher/assignment/${assignmentId}/attachment/${attachment.id}`;
+                            resourceElement.className = 'flex items-center px-3 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500';
+                            resourceElement.innerHTML = `<i class="fas ${iconClass} mr-2"></i> ${attachment.original_name}`;
+                            resourceElement.target = '_blank';
+                            resourcesContainer.appendChild(resourceElement);
+                        });
+                    } else {
+                        resourcesContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No resources attached</p>';
+                    }
+
+                    // Set assignment ID for edit and view submissions buttons
+                    viewAssignmentModal.setAttribute('data-assignment-id', assignmentId);
+
+                    // Show the modal
+                    toggleModal(viewAssignmentModal);
+
+                } catch (error) {
+                    console.error('Error viewing assignment:', error);
+                    alert('Failed to load assignment details');
+                }
+            }
+
+            async function getDepartments() {
+                try {
+                    const response = await fetch("/teacher/departments");
+                    if (!response.ok) throw new Error('Failed to fetch departments');
+
+                    const { data: departments } = await response.json();
+
+                    // Clear existing options except the first one
+                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
+
+                    departments.forEach(department => {
+                        const option = document.createElement('option');
+                        option.value = department.id;
+                        option.textContent = department.name;
+                        departmentFilter.appendChild(option);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching departments:', error);
+                    departmentFilter.innerHTML = '<option value="">Error loading departments</option>';
+                }
+            }
+
+            async function getPrograms(departmentId = null) {
+                try {
+                    let url = "/teacher/programs";
+                    if (departmentId) url = `/teacher/departments/${departmentId}/programs`;
+
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch programs');
+
+                    const { data: programs } = await response.json();
+
+                    // Clear existing options except the first one
+                    programFilter.innerHTML = '<option value="">All Programs</option>';
+
+                    programs.forEach(program => {
+                        const option = document.createElement('option');
+                        option.value = program.id;
+                        option.textContent = program.name;
+                        programFilter.appendChild(option);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching programs:', error);
+                    programFilter.innerHTML = '<option value="">Error loading programs</option>';
+                }
+            }
+
+            async function getDepartmentPrograms() {
+                const departmentId = departmentFilter.value;
+                programFilter.disabled = !departmentId;
+                subjectFilter.disabled = true;
+
+                if (!departmentId) {
+                    programFilter.innerHTML = '<option value="">All Programs</option>';
+                    subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+                    loadAssignments();
+                    return;
+                }
+
+                try {
+                    programFilter.innerHTML = '<option value="">Loading programs...</option>';
+                    await getPrograms(departmentId);
+                    loadAssignments();
+                } catch (error) {
+                    console.error('Error fetching department programs:', error);
+                    programFilter.innerHTML = '<option value="">Error loading programs</option>';
+                }
+            }
+
+            async function getSubjects(programId = null) {
+                try {
+                    let url = "/teacher/subjects";
+                    if (programId) url = `/teacher/programs/${programId}/subjects`;
+
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch subjects');
+
+                    const { data: subjects } = await response.json();
+
+                    // Clear existing options except the first one
+                    subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+
+                    subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.id;
+                        option.textContent = subject.name;
+                        subjectFilter.appendChild(option);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching subjects:', error);
+                    subjectFilter.innerHTML = '<option value="">Error loading subjects</option>';
+                }
+            }
+
+            async function getDepartmentSubjects() {
+                const programId = programFilter.value;
+                subjectFilter.disabled = !programId;
+
+                if (!programId) {
+                    subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+                    loadAssignments();
+                    return;
+                }
+
+                try {
+                    subjectFilter.innerHTML = '<option value="">Loading subjects...</option>';
+                    await getSubjects(programId);
+                    loadAssignments();
+                } catch (error) {
+                    console.error('Error fetching program subjects:', error);
+                    subjectFilter.innerHTML = '<option value="">Error loading subjects</option>';
+                }
+            }
+
+            function resetAllFilters() {
+                departmentFilter.value = '';
+                programFilter.value = '';
+                subjectFilter.value = '';
+                statusFilter.value = '';
+                searchInput.value = '';
+
+                programFilter.disabled = true;
+                subjectFilter.disabled = true;
+
+                loadAssignments();
+            }
+
+            async function handleCreateAssignment(e) {
+                e.preventDefault();
+
+                try {
+                    const formData = new FormData(createAssignmentForm);
+
+                    // Add files to form data
+                    const files = assignmentFiles.files;
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('attachments[]', files[i]);
+                    }
+
+                    const response = await fetch('/teacher/assignment', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to create assignment');
+                    }
+
+                    const assignment = await response.json();
+                    toggleModal(createAssignmentModal);
+                    loadAssignments();
+                    alert('Assignment created successfully!');
+
+                    // Reset form
+                    createAssignmentForm.reset();
+                    filePreview.innerHTML = '';
+                    filePreview.classList.add('hidden');
+
+                } catch (error) {
+                    console.error('Error creating assignment:', error);
+                    alert(`Error: ${error.message}`);
+                }
+            }
+
+            async function handleDeleteAssignment() {
+                const assignmentId = deleteConfirmationModal.getAttribute('data-assignment-id');
+
+                try {
+                    const response = await fetch(`/teacher/assignment/${assignmentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Failed to delete assignment');
+
+                    toggleModal(deleteConfirmationModal);
+                    loadAssignments();
+                    alert('Assignment deleted successfully!');
+
+                } catch (error) {
+                    console.error('Error deleting assignment:', error);
+                    alert('Failed to delete assignment');
+                }
+            }
+
+            function handleFileUpload() {
+                if (this.files.length > 0) {
+                    filePreview.classList.remove('hidden');
+                    filePreview.innerHTML = '';
+
+                    Array.from(this.files).forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'p-2 bg-gray-50 dark:bg-gray-700 rounded-md mb-2';
+                        fileItem.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-file mr-2 text-gray-500"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">${file.name}</span>
+                            </div>
+                            <button type="button" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                        filePreview.appendChild(fileItem);
+
+                        // Remove file button
+                        const removeBtn = fileItem.querySelector('button');
+                        removeBtn.addEventListener('click', function() {
+                            fileItem.remove();
+                            if (filePreview.children.length === 0) {
+                                filePreview.classList.add('hidden');
+                            }
+                        });
+                    });
+                }
+            }
+
+            function toggleModal(modal) {
+                modal.classList.toggle('hidden');
+                document.body.style.overflow = modal.classList.contains('hidden') ? '' : 'hidden';
+            }
+
+            function updatePagination(meta) {
+                // Implement pagination update logic here
+                // You'll need to update the pagination controls based on the meta data
+                // This is just a placeholder implementation
+                const totalElement = document.querySelector('.card .text-sm.text-gray-500.dark\\:text-gray-400');
+                if (totalElement && meta) {
+                    totalElement.textContent = `Total: ${meta.total} assignments`;
+                }
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this, args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), wait);
+                };
             }
         });
     </script>
