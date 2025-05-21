@@ -53,10 +53,6 @@ class AssignmentSubmission extends Model
         return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
     }
 
-    public function getStatusAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
 
     public function getFeedbackAttribute($value)
     {

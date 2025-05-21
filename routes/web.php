@@ -54,3 +54,4 @@ require __DIR__ . '/teacher_routes.php';
 require __DIR__ . '/super_admin_routes.php';
 
 require __DIR__ . '/api/student_routes.php';
+require __DIR__ . '/api/teacher_routes.php';

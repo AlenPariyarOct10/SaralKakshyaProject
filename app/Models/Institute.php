@@ -16,8 +16,7 @@ class Institute extends Model
 
     public function departments()
     {
-        return $this->hasMany(Department::class, 'institute_id', 'id')->withPivot('approved_at')
-            ->withTimestamps();
+        return $this->hasMany(Department::class, 'institute_id', 'id');
     }
 
     public function students()

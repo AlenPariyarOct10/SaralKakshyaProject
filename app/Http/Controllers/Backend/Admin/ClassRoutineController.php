@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\ClassRoutine;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,8 @@ class ClassRoutineController extends Controller
     public function index()
     {
         $user = auth()->user();
-        return view('backend.admin.classroutine.index', compact('user'));
+        $departments = Admin::find($user->id)->institute->departments()->get();
+        return view('backend.admin.classroutine.index', compact('user', 'departments'));
     }
 
 
@@ -135,10 +137,16 @@ class ClassRoutineController extends Controller
                 'day_schedules.*.note' => 'nullable|string|max:255'
             ]);
 
-            // Check for time conflicts - UPDATED COLUMN NAME HERE
+            // Get the program ID from the subject teacher mapping
+            $subjectTeacherMapping = \App\Models\SubjectTeacherMapping::with('subject.program')
+                ->findOrFail($request->subject_teacher_mappings_id);
+            $programId = $subjectTeacherMapping->subject->program->id;
+
+            // Check for time conflicts - both teacher and program conflicts
             foreach ($request->day_schedules as $schedule) {
-                $conflict = ClassRoutine::where('subject_teacher_mappings_id', $request->subject_teacher_mappings_id) // Changed from subject_teacher_mapping_id
-                ->where('day', $schedule['day'])
+                // 1. Check teacher availability (existing check)
+                $teacherConflict = ClassRoutine::where('subject_teacher_mappings_id', $request->subject_teacher_mappings_id)
+                    ->where('day', $schedule['day'])
                     ->where(function($query) use ($schedule) {
                         $query->whereBetween('start_time', [$schedule['start_time'], $schedule['end_time']])
                             ->orWhereBetween('end_time', [$schedule['start_time'], $schedule['end_time']])
@@ -149,16 +157,39 @@ class ClassRoutineController extends Controller
                     })
                     ->first();
 
-                if ($conflict) {
+                if ($teacherConflict) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Time conflict detected for ' . $schedule['day'],
-                        'conflict' => $conflict
+                        'message' => 'Teacher has a time conflict for ' . $schedule['day'],
+                        'conflict' => $teacherConflict
+                    ], 422);
+                }
+
+                // 2. Check program availability (new check)
+                $programConflict = ClassRoutine::whereHas('subjectTeacherMapping.subject.program', function($q) use ($programId) {
+                    $q->where('id', $programId);
+                })
+                    ->where('day', $schedule['day'])
+                    ->where(function($query) use ($schedule) {
+                        $query->whereBetween('start_time', [$schedule['start_time'], $schedule['end_time']])
+                            ->orWhereBetween('end_time', [$schedule['start_time'], $schedule['end_time']])
+                            ->orWhere(function($q) use ($schedule) {
+                                $q->where('start_time', '<=', $schedule['start_time'])
+                                    ->where('end_time', '>=', $schedule['end_time']);
+                            });
+                    })
+                    ->first();
+
+                if ($programConflict) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Program has a time conflict for ' . $schedule['day'],
+                        'conflict' => $programConflict
                     ], 422);
                 }
             }
 
-            // Create the routines - UPDATED COLUMN NAME HERE
+            // Create the routines
             $createdRoutines = [];
             foreach ($request->day_schedules as $schedule) {
                 $routine = ClassRoutine::create([

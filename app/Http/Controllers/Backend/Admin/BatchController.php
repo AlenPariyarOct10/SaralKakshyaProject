@@ -50,6 +50,7 @@ class BatchController extends Controller
             $semester = $request->input('semester');
             $batch = $request->input('batch');
             $status = $request->input('status');
+            $institute_id = session('institute_id');
 
             Batch::create([
                 'department_id' => $department_id,
@@ -57,6 +58,7 @@ class BatchController extends Controller
                 'semester' => $semester,
                 'batch' => $batch,
                 'status' => $status,
+                'institute_id' => $institute_id
             ]);
 
             return response()->json(["status"=>"success"]);

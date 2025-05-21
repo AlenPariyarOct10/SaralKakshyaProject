@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -90,6 +91,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if ($admin && $admin->id == $institute->created_by && Auth::guard('admin')->attempt($credentials)) {
             Auth::guard('admin')->login($admin);
+            Session::put('institute_id', $institute->id);
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard');
         }

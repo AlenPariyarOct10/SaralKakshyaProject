@@ -175,7 +175,12 @@ class ResourceController extends Controller
             $subChapters = Chapter::where('parent_id', $resource->chapter_id)->get();
         }
 
-        return view('backend.teacher.resources.edit', compact('resource', 'subjects', 'chapters', 'subChapters'));
+        return view('backend.teacher.resources.edit', compact(
+            'resource',
+            'subjects',
+            'chapters',
+            'subChapters',
+        ));
     }
 
     /**

@@ -81,17 +81,25 @@
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="assignments.html" class="sidebar-item">
+                <a href="{{route("student.assignment.index")}}" class="sidebar-item {{ Route::is('student.assignment.index') ? 'active' : '' }}">
                     <i class="fas fa-book"></i>
                     <span>Assignments</span>
                 </a>
-                <a href="live-class.html" class="sidebar-item">
-                    <i class="fas fa-video"></i>
-                    <span>Live Classes</span>
-                </a>
-                <a href="announcements.html" class="sidebar-item">
+                <a href="{{route('student.announcement.index')}}" class="sidebar-item">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
+                </a>
+                <a href="{{route('student.resources.index')}}" class="sidebar-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Resources</span>
+                </a>
+                <a href="{{route('student.subjects.index')}}" class="sidebar-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Subjects</span>
+                </a>
+                <a href="{{route('student.announcement.index')}}" class="sidebar-item">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Routine</span>
                 </a>
 
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">

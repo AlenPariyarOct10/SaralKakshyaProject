@@ -264,13 +264,13 @@
                 subChapterSelect.innerHTML = '<option value="">Select Sub Chapter</option>';
 
                 if (subjectId) {
-                    fetch(`/api/subjects/${subjectId}/chapters`)
+                    fetch(`/api/teacher/subject/${subjectId}/chapters`)
                         .then(response => response.json())
                         .then(data => {
                             data.forEach(chapter => {
                                 const option = document.createElement('option');
                                 option.value = chapter.id;
-                                option.textContent = chapter.name;
+                                option.textContent = chapter.title;
                                 chapterSelect.appendChild(option);
                             });
                         });
@@ -283,13 +283,13 @@
                 subChapterSelect.innerHTML = '<option value="">Select Sub Chapter</option>';
 
                 if (chapterId) {
-                    fetch(`/api/chapters/${chapterId}/sub-chapters`)
+                    fetch(`/api/teacher/chapters/${chapterId}/sub-chapters`)
                         .then(response => response.json())
                         .then(data => {
                             data.forEach(subChapter => {
                                 const option = document.createElement('option');
                                 option.value = subChapter.id;
-                                option.textContent = subChapter.name;
+                                option.textContent = subChapter.title;
                                 subChapterSelect.appendChild(option);
                             });
                         });

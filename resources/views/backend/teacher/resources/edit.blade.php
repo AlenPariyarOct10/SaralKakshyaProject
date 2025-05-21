@@ -194,22 +194,22 @@
                     </div>
 
                     <!-- Existing Attachments -->
-                    @if(isset($attachments) && $attachments->count() > 0)
+                    @if($resource->attachments->count() > 0)
                         <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                             <h4 class="text-base font-medium text-gray-900 dark:text-white mb-4">Existing Attachments</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                @foreach($attachments as $attachment)
-                                    <div class="border border-gray-200 rounded-md p-4">
+                                @foreach($resource->attachments as $attachment)
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-md p-4">
                                         <div class="flex justify-between items-center mb-2">
                                             <h3 class="text-lg font-medium">{{ $attachment->title }}</h3>
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                {{ ucfirst($attachment->file_type) }}
-                                            </span>
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                            {{ ucfirst($attachment->file_type) }}
+                        </span>
                                         </div>
                                         <div class="flex justify-between items-center">
-                                            <span class="text-sm text-gray-500">
-                                                {{ \Illuminate\Support\Str::afterLast($attachment->path, '/') }}
-                                            </span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ \Illuminate\Support\Str::afterLast($attachment->path, '/') }}
+                        </span>
                                             <div class="flex space-x-2">
                                                 <a href="{{ asset('storage/' . $attachment->path) }}" download class="text-blue-600 hover:text-blue-800">
                                                     <i class="fas fa-download"></i>
@@ -302,6 +302,37 @@
             </form>
         </div>
     </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="fixed inset-0 z-50 items-center justify-center hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300 ease-in-out"></div>
+
+        <!-- Modal panel -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden max-w-md w-full mx-auto transform transition-all opacity-0 translate-y-4 duration-300 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4 text-red-600 dark:text-red-500">
+                    <div class="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+
+                <h3 id="modal-title" class="text-lg font-medium text-center text-gray-900 dark:text-white mb-2">Delete Resource</h3>
+                <p class="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
+                    Are you sure you want to delete this resource? This action cannot be undone.
+                </p>
+
+                <div class="flex justify-center space-x-4">
+                    <button id="cancelDelete" type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
+                        Cancel
+                    </button>
+                    <button id="confirmDelete" type="button" class="px-4 py-2 border border-transparent rounded-md font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 dark:bg-red-700 dark:hover:bg-red-800">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section("scripts")
@@ -474,30 +505,92 @@
                 });
             });
 
-            // Delete resource
-            const deleteResource = document.getElementById('deleteResource');
-            deleteResource.addEventListener('click', function() {
-                if (confirm('Are you sure you want to delete this resource? This action cannot be undone.')) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ route('teacher.resources.destroy', $resource->id) }}';
-                    form.style.display = 'none';
+            // Delete confirmation modal handling
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            const deleteBtn = document.getElementById('deleteResource');
+            const cancelBtn = document.getElementById('cancelDelete');
+            const confirmBtn = document.getElementById('confirmDelete');
+            const modalContent = deleteModal.querySelector('.bg-white');
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+            // Function to show modal with animation
+            function showModal() {
+                deleteModal.classList.remove('hidden');
+                deleteModal.classList.add('flex');
 
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
+                // Trigger animation after a small delay for the browser to recognize the element
+                setTimeout(() => {
+                    modalContent.classList.remove('opacity-0', 'translate-y-4');
+                    modalContent.classList.add('opacity-100', 'translate-y-0');
+                }, 10);
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(methodField);
-                    document.body.appendChild(form);
-                    form.submit();
+                // Focus the cancel button by default (for accessibility)
+                cancelBtn.focus();
+            }
+
+            // Function to hide modal with animation
+            function hideModal() {
+                modalContent.classList.remove('opacity-100', 'translate-y-0');
+                modalContent.classList.add('opacity-0', 'translate-y-4');
+
+                // Wait for animation to complete before hiding
+                setTimeout(() => {
+                    deleteModal.classList.remove('flex');
+                    deleteModal.classList.add('hidden');
+                }, 300);
+            }
+
+            // Show delete confirmation modal when delete button is clicked
+            deleteBtn.addEventListener('click', showModal);
+
+            // Hide modal when cancel button is clicked
+            cancelBtn.addEventListener('click', hideModal);
+
+            // Close modal when clicking outside
+            deleteModal.addEventListener('click', function(e) {
+                // Only close if the backdrop was clicked (not the modal itself)
+                if (e.target === deleteModal) {
+                    hideModal();
                 }
+            });
+
+            // Handle keyboard events
+            document.addEventListener('keydown', function(e) {
+                // Close modal on Escape key
+                if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+                    hideModal();
+                }
+            });
+
+            // Handle delete confirmation
+            confirmBtn.addEventListener('click', function() {
+                // Create and submit the delete form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route('teacher.resources.destroy', $resource->id) }}';
+                form.style.display = 'none';
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+
+                form.appendChild(csrfToken);
+                form.appendChild(methodField);
+                document.body.appendChild(form);
+
+                // Add a subtle loading effect to button when form is submitted
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Deleting...';
+                confirmBtn.disabled = true;
+
+                // Submit the form after a short delay to show the loading state
+                setTimeout(() => {
+                    form.submit();
+                }, 300);
             });
         });
     </script>

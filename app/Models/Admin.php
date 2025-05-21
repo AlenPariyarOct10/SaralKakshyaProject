@@ -65,4 +65,6 @@ class Admin extends Authenticatable implements CanResetPasswordContract
             ->where('user_type', 'admin');
     }
 
+
+
 }

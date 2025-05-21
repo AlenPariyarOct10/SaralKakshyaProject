@@ -148,7 +148,7 @@
                                                             <i class="fas fa-eye"></i>
                                                         </button>
                                                     @endif
-                                                    <a href="{{ route('student.assignment.download', [$assignment->id, $attachment->id]) }}"
+                                                    <a href="{{ route('student.assignment.download', $attachment->id) }}"
                                                        class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
                                                        title="Download">
                                                         <i class="fas fa-download"></i>
@@ -210,11 +210,11 @@
                                             @endif
                                         </div>
 
-                                        @if($submission->comment)
+                                        @if($submission->description)
                                             <div class="mb-3">
                                                 <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Comment:</h5>
                                                 <p class="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-3 rounded-md">
-                                                    {{ $submission->comment }}
+                                                    {{ $submission->description }}
                                                 </p>
                                             </div>
                                         @endif
@@ -263,10 +263,11 @@
                                                         @endphp
                                                         <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-md">
                                                             <div class="flex items-start space-x-3 min-w-0">
+
                                                                 <i class="fas {{ $icon }} {{ $iconColor }} mt-1"></i>
                                                                 <div class="min-w-0">
                                                                     <div class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                                                                        {{ $attachment->original_name }}
+                                                                        {{ $attachment->title ?? 'Untitled' }}
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -278,7 +279,7 @@
                                                                         <i class="fas fa-eye"></i>
                                                                     </button>
                                                                 @endif
-                                                                <a href="{{ route('student.submission.download', [$submission->id, $attachment->id]) }}"
+                                                                <a href="{{ route('student.submittedassignment.download', $attachment->id) }}"
                                                                    class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
                                                                    title="Download">
                                                                     <i class="fas fa-download"></i>
@@ -309,32 +310,32 @@
                                             <p class="mt-1 text-sm">This assignment is past its due date. Contact your teacher if you need an extension.</p>
                                         </div>
                                     @else
-                                        <form action="{{ route('student.assignment.submit', $assignment->id) }}" method="POST" enctype="multipart/form-data">
+                                        <form action="{{ route('student.assignment.store', $assignment->id) }}" method="POST" enctype="multipart/form-data" id="submissionForm">
                                             @csrf
-
+                                            <input type="hidden" name="assignment_id" value="{{ $assignment->id }}">
                                             <div class="space-y-4">
                                                 <div>
                                                     <label for="comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                         Comment (Optional)
                                                     </label>
-                                                    <textarea id="comment" name="comment" rows="3"
+                                                    <textarea id="comment" name="description" rows="3"
                                                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                                                              placeholder="Add any comments about your submission here...">{{ $submission->comment ?? '' }}</textarea>
+                                                              placeholder="Add any comments about your submission here...">{{ $submission->description ?? '' }}</textarea>
                                                 </div>
 
                                                 <div>
                                                     <label for="files" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                         Upload Files
                                                     </label>
-                                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+                                                    <div id="upload-container" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md relative">
                                                         <div class="space-y-1 text-center">
                                                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                             </svg>
-                                                            <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                                                            <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
                                                                 <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 focus-within:outline-none">
                                                                     <span>Upload files</span>
-                                                                    <input id="file-upload" name="files[]" type="file" class="sr-only" multiple>
+                                                                    <input id="file-upload" name="attachments[]" type="file" class="sr-only" multiple>
                                                                 </label>
                                                                 <p class="pl-1">or drag and drop</p>
                                                             </div>
@@ -343,11 +344,18 @@
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div id="file-list" class="mt-2 space-y-1"></div>
+
+                                                    <!-- File Preview Container -->
+                                                    <div id="file-list" class="mt-4 space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
+
+                                                    <!-- Selected Files Counter -->
+                                                    <div id="file-counter" class="mt-2 text-sm text-gray-600 dark:text-gray-400 hidden">
+                                                        <span id="file-count">0</span> files selected
+                                                    </div>
                                                 </div>
 
                                                 <div class="flex justify-end">
-                                                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                                                    <button type="submit" id="submit-btn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
                                                         {{ isset($submission) && $submission ? 'Update Submission' : 'Submit Assignment' }}
                                                     </button>
                                                 </div>
@@ -468,6 +476,23 @@
             </div>
         </div>
     </div>
+
+    <!-- File Preview Modal (For uploaded files before submission) -->
+    <div id="filePreviewModal" class="fixed h-full inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl h-full max-w-8xl w-full flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-medium" id="filePreviewTitle">File Preview</h3>
+                <button onclick="closeFilePreview()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-auto p-4 h-full">
+                <div id="filePreviewContent" class="w-full h-full flex items-center justify-center">
+                    <!-- Content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -481,7 +506,7 @@
             const unsupported = document.getElementById('unsupportedPreview');
 
             title.textContent = attachment.original_name;
-            const url = `/student/assignment/${attachment.parent_id}/view/${attachmentId}`;
+            const url = `/student/assignment/attachment/${attachmentId}/view/`;
 
             fetch(url)
                 .then(response => {
@@ -527,7 +552,7 @@
             const unsupported = document.getElementById('submissionUnsupportedPreview');
 
             title.textContent = attachment.original_name;
-            const url = `/student/submission/${attachment.parent_id}/view/${attachmentId}`;
+            const url = `/student/assignment/submitted-attachment/${attachmentId}/view/`;
 
             fetch(url)
                 .then(response => {
@@ -564,6 +589,61 @@
             document.getElementById('submissionPreviewFrame').src = '';
         }
 
+        // Preview for files before submission
+        function openFilePreview(fileIndex) {
+            const fileInput = document.getElementById('file-upload');
+            if (!fileInput.files[fileIndex]) return;
+
+            const file = fileInput.files[fileIndex];
+            const modal = document.getElementById('filePreviewModal');
+            const title = document.getElementById('filePreviewTitle');
+            const content = document.getElementById('filePreviewContent');
+
+            title.textContent = file.name;
+            content.innerHTML = '';
+
+            if (file.type.includes('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'max-h-[80vh] max-w-full object-contain';
+                img.onload = function() {
+                    URL.revokeObjectURL(this.src);
+                };
+                content.appendChild(img);
+            } else if (file.type === 'application/pdf') {
+                const iframe = document.createElement('iframe');
+                iframe.src = URL.createObjectURL(file);
+                iframe.className = 'w-full h-full border-0';
+                content.appendChild(iframe);
+            } else if (file.type.includes('text/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const pre = document.createElement('pre');
+                    pre.className = 'bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto w-full h-full';
+                    pre.textContent = e.target.result;
+                    content.appendChild(pre);
+                };
+                reader.readAsText(file);
+            } else {
+                const div = document.createElement('div');
+                div.className = 'text-center';
+                div.innerHTML = `
+                    <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+                    <p class="text-gray-700 dark:text-gray-300">Preview not available for this file type</p>
+                `;
+                content.appendChild(div);
+            }
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeFilePreview() {
+            document.getElementById('filePreviewModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            document.getElementById('filePreviewContent').innerHTML = '';
+        }
+
         // Show submission form when updating
         function showSubmissionForm() {
             document.getElementById('submissionForm').classList.remove('hidden');
@@ -573,46 +653,228 @@
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('file-upload');
             const fileList = document.getElementById('file-list');
+            const fileCounter = document.getElementById('file-counter');
+            const fileCount = document.getElementById('file-count');
+            const uploadContainer = document.getElementById('upload-container');
+            const submitBtn = document.getElementById('submit-btn');
+            const form = document.getElementById('submissionForm');
+
+            // Disable submit button if no files selected
+            if (submitBtn) {
+                submitBtn.disabled = true;
+            }
 
             if (fileInput) {
+                // Handle file selection
                 fileInput.addEventListener('change', function() {
-                    fileList.innerHTML = '';
+                    updateFileList();
+                });
 
-                    for (let i = 0; i < this.files.length; i++) {
-                        const file = this.files[i];
+                // Handle drag and drop
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, highlight, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, unhighlight, false);
+                });
+
+                function highlight() {
+                    uploadContainer.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+                }
+
+                function unhighlight() {
+                    uploadContainer.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+                }
+
+                uploadContainer.addEventListener('drop', handleDrop, false);
+
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+
+                    // Create a new FileList-like object
+                    const newFileList = new DataTransfer();
+
+                    // Add existing files
+                    if (fileInput.files) {
+                        for (let i = 0; i < fileInput.files.length; i++) {
+                            newFileList.items.add(fileInput.files[i]);
+                        }
+                    }
+
+                    // Add new files
+                    for (let i = 0; i < files.length; i++) {
+                        newFileList.items.add(files[i]);
+                    }
+
+                    // Set the new FileList to the input
+                    fileInput.files = newFileList.files;
+
+                    // Update the file list display
+                    updateFileList();
+                }
+            }
+
+            function updateFileList() {
+                if (!fileInput || !fileList) return;
+
+                fileList.innerHTML = '';
+
+                if (fileInput.files.length > 0) {
+                    fileCounter.classList.remove('hidden');
+                    fileCount.textContent = fileInput.files.length;
+
+                    // Enable submit button
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+
+                    const dt = new DataTransfer();
+
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        dt.items.add(file);
+
                         const fileItem = document.createElement('div');
-                        fileItem.className = 'flex items-center text-sm text-gray-600 dark:text-gray-400';
+                        fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md';
 
-                        // Icon based on file type
+                        // Determine icon based on file type
                         let icon = 'fa-file';
+                        let iconColor = 'text-gray-500';
+                        let viewable = false;
+
                         if (file.type.includes('pdf')) {
                             icon = 'fa-file-pdf';
+                            iconColor = 'text-red-500';
+                            viewable = true;
                         } else if (file.type.includes('word') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
                             icon = 'fa-file-word';
+                            iconColor = 'text-blue-500';
                         } else if (file.type.includes('image')) {
                             icon = 'fa-file-image';
+                            iconColor = 'text-green-500';
+                            viewable = true;
                         } else if (file.type.includes('zip') || file.name.endsWith('.zip')) {
                             icon = 'fa-file-archive';
+                            iconColor = 'text-yellow-500';
+                        } else if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+                            icon = 'fa-file-alt';
+                            iconColor = 'text-gray-400';
+                            viewable = true;
                         }
 
+                        const fileIndex = i;
+
                         fileItem.innerHTML = `
-                            <i class="fas ${icon} mr-2"></i>
-                            <span>${file.name}</span>
-                            <span class="ml-2 text-xs">(${formatFileSize(file.size)})</span>
+                            <div class="flex items-start space-x-3 min-w-0">
+                                <i class="fas ${icon} ${iconColor} mt-1"></i>
+                                <div class="min-w-0">
+                                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate" title="${file.name}">
+                                        ${file.name}
+                                    </div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        ${formatFileSize(file.size)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 flex-shrink-0">
+                                ${viewable ? `
+                                <button type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                        onclick="openFilePreview(${fileIndex})" title="Preview">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ` : ''}
+                                <button type="button" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                        onclick="removeFile(${fileIndex})" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                         `;
 
                         fileList.appendChild(fileItem);
                     }
-                });
+                } else {
+                    fileCounter.classList.add('hidden');
+
+                    // Disable submit button
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                    }
+                }
             }
 
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            // Form validation
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!fileInput || fileInput.files.length === 0) {
+                        e.preventDefault();
+                        alert('Please select at least one file to upload.');
+                        return false;
+                    }
+
+                    // Check file sizes
+                    let totalSize = 0;
+                    let oversizedFiles = [];
+
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        totalSize += file.size;
+
+                        if (file.size > 10 * 1024 * 1024) { // 10MB
+                            oversizedFiles.push(file.name);
+                        }
+                    }
+
+                    if (oversizedFiles.length > 0) {
+                        e.preventDefault();
+                        alert(`The following files exceed the maximum size of 10MB:\n${oversizedFiles.join('\n')}`);
+                        return false;
+                    }
+
+                    // Optional: Check total upload size
+                    if (totalSize > 50 * 1024 * 1024) { // 50MB
+                        e.preventDefault();
+                        alert('Total upload size exceeds the maximum of 50MB.');
+                        return false;
+                    }
+                });
             }
         });
+
+        // Remove a file from the selection
+        function removeFile(index) {
+            const fileInput = document.getElementById('file-upload');
+            const dt = new DataTransfer();
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(fileInput.files[i]);
+                }
+            }
+
+            fileInput.files = dt.files;
+
+            // Update the file list display
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
     </script>
 @endsection

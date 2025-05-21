@@ -26,10 +26,11 @@ class Student extends Authenticatable implements CanResetPasswordContract
         'guardian_name',
         'guardian_phone',
         'roll_number',
-        'batch',
+        'batch_id',
         'section',
         'admission_number',
         'admission_date',
+        'institute_id',
         'profile_picture',
         'password',
         'status'
@@ -72,10 +73,36 @@ class Student extends Authenticatable implements CanResetPasswordContract
             ->where('user_type', 'student');
     }
 
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class);
+    }
 
 
+    public function instituteStudents()
+    {
+        return $this->hasMany(InstituteStudent::class);
+    }
 
+    public function currentInstitute()
+    {
+        return $this->belongsTo(Institute::class, 'institute_id');
+    }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(ProgramSection::class, 'section_id', 'id');
+    }
 
 
 }

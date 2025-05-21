@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\Batch;
 use App\Models\Institute;
+use App\Models\Program;
 use App\Models\Student;
 use App\Models\SystemSetting;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Session;
 class AuthController extends Controller
 {
 
@@ -57,16 +59,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validate input
         $validated = $request->validate([
             'email' => 'required|email|max:255',
             'institute' => 'required|exists:institutes,id',
             'password' => 'required|string|min:8',
         ]);
 
-        // Attempt authentication
         if (!Auth::guard('student')->attempt($request->only('email', 'password'))) {
-
             return back()
                 ->withErrors(['email' => 'Invalid credentials'])
                 ->withInput($request->only('email', 'institute'));
@@ -74,7 +73,6 @@ class AuthController extends Controller
 
         $student = Auth::guard('student')->user();
 
-        // Check account status
         if (!$student->status) {
             Auth::guard('student')->logout();
             return back()
@@ -82,13 +80,13 @@ class AuthController extends Controller
                 ->withInput($request->only('email', 'institute'));
         }
 
-        // Check institute approval
-        $isApproved = $student->institutes()
-            ->where('institutes.id', $validated['institute'])
-            ->wherePivot('is_approved', true)
-            ->exists();
+        // Fetch the related InstituteStudent record
+        $instituteStudent = $student->instituteStudents()
+            ->where('institute_id', $validated['institute'])
+            ->where('is_approved', true)
+            ->first();
 
-        if (!$isApproved) {
+        if (!$instituteStudent) {
             Auth::guard('student')->logout();
             return back()
                 ->withErrors([
@@ -97,12 +95,22 @@ class AuthController extends Controller
                 ->withInput($request->only('email', 'institute'));
         }
 
-        Student::where('id', $student->id)->update(['institute_id' => $validated['institute']]);
+        // Update current institute
+        $student->update(['institute_id' => $validated['institute']]);
 
-        // Regenerate session for security
         $request->session()->regenerate();
 
-        // Log login activity
+        // Store required values in session
+        session([
+            'institute_id'   => $validated['institute'],
+            'student_id'     => $student->id,
+            'batch_id'       => $instituteStudent->batch_id,
+            'department_id'  => $instituteStudent->department_id,
+            'program_id'     => $instituteStudent->program_id,
+            'section_id'     => $instituteStudent->section_id,
+        ]);
+
+        // Log activity
         ActivityLog::create([
             'user_id'     => $student->id,
             'user_type'   => 'student',
@@ -117,6 +125,7 @@ class AuthController extends Controller
 
         return redirect()->intended(route('student.dashboard'));
     }
+
 
     public function logout(Request $request)
     {
@@ -145,7 +154,11 @@ class AuthController extends Controller
         }
 
         $studentData = $request->session()->get('student_registration');
-        return view('backend.student.signup-phase2', compact('studentData'));
+
+        $departments = Institute::find($studentData['institute'])->departments()->get();
+
+
+        return view('backend.student.signup-phase2', compact('studentData',  'departments'));
     }
 
     public function completeProfile(Request $request)
@@ -158,21 +171,31 @@ class AuthController extends Controller
             'guardian_name' => 'required|string|max:255',
             'guardian_phone' => 'required|string|max:15',
             'roll_number' => 'required|string|max:20|unique:students',
-            'batch' => 'required|string|max:50',
-            'section' => 'required|string|max:10',
+            'department_id' => 'required|exists:departments,id',
+            'program_id' => 'required|exists:programs,id',
+            'batch_id' => 'required|exists:batches,id',
+            'section_id' => 'required|exists:program_sections,id',
             'admission_date' => 'required|date',
             'profile_picture' => 'nullable|image|max:2048',
         ]);
 
-        // Retrieve basic registration details from the session
         $basicDetails = $request->session()->get('student_registration');
-
         if (!$basicDetails) {
             return redirect()->route('student.register')->with('error', 'Session expired. Please register again.');
         }
 
-        // Create the student account
-        $student = Student::create(array_merge($basicDetails, [
+        // Handle profile picture upload
+        $profilePicturePath = null;
+        if ($request->hasFile('profile_picture')) {
+            $profilePicturePath = $request->file('profile_picture')->store('profile_pictures', 'public');
+        }
+
+        // Create the student
+        $student = Student::create([
+            'fname' => $basicDetails['fname'],
+            'lname' => $basicDetails['lname'],
+            'email' => $basicDetails['email'],
+            'password' => $basicDetails['password'],
             'phone' => $request->phone,
             'address' => $request->address,
             'gender' => $request->gender,
@@ -180,33 +203,64 @@ class AuthController extends Controller
             'guardian_name' => $request->guardian_name,
             'guardian_phone' => $request->guardian_phone,
             'roll_number' => $request->roll_number,
-            'batch' => $request->batch,
-            'section' => $request->section,
+            'batch_id' => $request->batch_id,
+            'section_id' => $request->section_id,
+            'department_id' => $request->department_id,
+            'program_id' => $request->program_id,
             'admission_date' => $request->admission_date,
-            'profile_picture' => $request->file('profile_picture') ? $request->file('profile_picture')->store('profile_pictures', 'public') : null,
-            'status' => true, // Mark as active
-            'institute_id' => $request->institute, // Mark as active
-        ]));
-
-        // Attach the student to the selected institute
-        $student->institutes()->attach($basicDetails['institute']);
-
-        // Log the profile completion activity
-        ActivityLog::create([
-            'user_id'     => $student->id,
-            'user_type'   => 'student',
-            'action_type' => 'complete_profile',
-            'description' => 'Student completed their profile (Phase 2)',
-            'model_type'  => get_class($student),
-            'model_id'    => $student->id,
-            'url'         => $request->fullUrl(),
-            'ip_address'  => $request->ip(),
-            'user_agent'  => $request->userAgent(),
+            'profile_picture' => $profilePicturePath,
+            'status' => true,
+            'institute_id' => $basicDetails['institute'],
         ]);
 
-        // Clear the session data after successful account creation
-        $request->session()->forget('student_registration');
+        // Create the institute_student record
+        $student->instituteStudents()->create([
+            'institute_id' => $basicDetails['institute'],
+            'batch_id' => $request->batch_id,
+            'department_id' => $request->department_id,
+            'program_id' => $request->program_id,
+            'section_id' => $request->section_id,
+            'is_approved' => false, // Assuming immediate approval for self-registration
+            'approved_at' => null,
+        ]);
 
+        ActivityLog::create([
+            'user_id' => $student->id,
+            'user_type' => 'student',
+            'action_type' => 'complete_profile',
+            'description' => 'Student completed their profile (Phase 2)',
+            'model_type' => get_class($student),
+            'model_id' => $student->id,
+            'url' => $request->fullUrl(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        $request->session()->forget('student_registration');
         return redirect()->route('student.login')->with('success', 'Profile completed successfully!');
+    }
+
+    public function getDepartmentPrograms($id)
+    {
+        $programs = Program::where('department_id', $id)->get();
+        return response()->json($programs);
+    }
+
+    public function getProgramBatches(Request $request)
+    {
+        $programId = $request->input('program_id');
+        $departmentId = $request->input('department_id');
+
+        $batches = Batch::where('program_id', $programId)
+            ->where('department_id', $departmentId)
+            ->get();
+        return response()->json($batches);
+    }
+
+    public function getProgramSections($programId)
+    {
+        $sections = Program::find($programId)->sections()->get();
+
+        return response()->json($sections);
     }
 }
