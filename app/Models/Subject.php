@@ -29,4 +29,14 @@ class Subject extends Model
     {
         return $this->hasMany(Chapter::class, 'subject_id', 'id');
     }
+
+    public function resources()
+    {
+        return $this->hasMany(Resource::class, 'subject_id', 'id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'subject_id', 'id');
+    }
 }

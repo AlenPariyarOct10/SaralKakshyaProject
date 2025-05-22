@@ -161,9 +161,9 @@
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link Type</label>
                                     <select name="links[0][link_type]"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                                        <option value="website" {{ old('links.0.link_type') == 'website' ? 'selected' : '' }}>Website</option>
-                                        <option value="youtube" {{ old('links.0.link_type') == 'youtube' ? 'selected' : '' }}>YouTube</option>
-                                        <option value="drive" {{ old('links.0.link_type') == 'drive' ? 'selected' : '' }}>Google Drive</option>
+                                        <option value="youtube" {{ old('links.0.link_type') == 'youtube' ? 'selected' : '' }}>Youtube</option>
+                                        <option value="drive" {{ old('links.0.link_type') == 'drive' ? 'selected' : '' }}>Drive</option>
+                                        <option value="article" {{ old('links.0.link_type') == 'article' ? 'selected' : '' }}>Article</option>
                                         <option value="other" {{ old('links.0.link_type') == 'other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                 </div>
@@ -312,11 +312,10 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link Type</label>
                         <select name="links[${linkCounter}][link_type]"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                            <option value="website">Website</option>
-                            <option value="youtube">YouTube</option>
-                            <option value="drive">Google Drive</option>
-                            <option value="other">Other</option>
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">                                        <option value="youtube">Youtube</option>
+                                        <option value="drive">Drive</option>
+                                        <option value="article">Article</option>
+                                        <option value="other">Other</option>
                         </select>
                     </div>
                     <div>

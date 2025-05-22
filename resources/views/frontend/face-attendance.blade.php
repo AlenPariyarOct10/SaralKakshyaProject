@@ -113,6 +113,30 @@
                 box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
             }
         }
+
+        .recognition-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .recognition-status.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: rgba(16, 185, 129, 1);
+        }
+
+        .recognition-status.pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: rgba(245, 158, 11, 1);
+        }
+
+        .recognition-status.failed {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: rgba(239, 68, 68, 1);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -237,7 +261,7 @@
                 <div id="recognitionResult" class="flex-1 p-4 hidden">
                     <div class="text-center mb-4">
                         <div class="w-20 h-20 rounded-full bg-emerald-50 border-4 border-emerald-500 mx-auto mb-3 flex items-center justify-center overflow-hidden">
-                            <img id="personImage" src="" alt="Person" class="w-full h-full object-cover hidden">
+                            <img id="personImage" src="/placeholder.svg" alt="Person" class="w-full h-full object-cover hidden">
                             <i id="personIcon" class="fas fa-user-circle text-emerald-300 text-4xl"></i>
                         </div>
                         <h3 id="recognizedName" class="text-lg font-semibold text-gray-800"></h3>
@@ -246,12 +270,12 @@
 
                     <div class="space-y-3">
                         <div class="bg-gray-50 rounded-lg p-3">
-                            <div class="text-xs text-gray-500 mb-1">Recognition Confidence</div>
-                            <div class="flex items-center gap-2">
-                                <div class="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div id="confidenceBar" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
+                            <div class="text-xs text-gray-500 mb-1">Recognition Status</div>
+                            <div class="flex items-center justify-center">
+                                <div id="recognitionStatus" class="recognition-status success">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    <span>Recognized</span>
                                 </div>
-                                <div id="confidenceValue" class="text-xs font-medium">0%</div>
                             </div>
                         </div>
 
@@ -306,10 +330,7 @@
                             <i class="fas fa-arrow-left"></i>
                             <span>Dashboard</span>
                         </a>
-                        <a href="" class="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-center text-sm">
-                            <i class="fas fa-edit"></i>
-                            <span>Manual</span>
-                        </a>
+
                     </div>
                 </div>
             </div>
@@ -343,8 +364,7 @@
         const retryBtn = document.getElementById('retryBtn');
         const recognizedName = document.getElementById('recognizedName');
         const recognizedId = document.getElementById('recognizedId');
-        const confidenceBar = document.getElementById('confidenceBar');
-        const confidenceValue = document.getElementById('confidenceValue');
+        const recognitionStatus = document.getElementById('recognitionStatus');
         const currentDate = document.getElementById('currentDate');
         const currentTime = document.getElementById('currentTime');
         const attendanceTimestamp = document.getElementById('attendanceTimestamp');
@@ -542,9 +562,29 @@
             overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
             // In a real implementation, you would use a proper face detection library here
-            // For this example, we'll just set hasFace to false since we removed the simulation
             hasFace = true;
             faceBox = true;
+
+            // Add face detection box when a face is detected
+            if (hasFace && faceBox && isRecognizing) {
+                // Create a face detection box in the center of the frame (simulated)
+                const boxWidth = canvas.width * 0.4;
+                const boxHeight = canvas.height * 0.6;
+                const boxX = (canvas.width - boxWidth) / 2;
+                const boxY = (canvas.height - boxHeight) / 2;
+
+                // Draw face box on overlay canvas
+                overlayContext.strokeStyle = '#10B981';
+                overlayContext.lineWidth = 3;
+                overlayContext.setLineDash([]);
+                overlayContext.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+                // Add pulsing effect
+                overlayContext.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+                overlayContext.lineWidth = 5;
+                overlayContext.strokeRect(boxX - 3, boxY - 3, boxWidth + 6, boxHeight + 6);
+            }
+
             faceDetectionOverlay.innerHTML = '';
         }
 
@@ -561,7 +601,6 @@
 
         // Start face recognition
         function startRecognition() {
-            console.log("start");
             if (!stream) {
                 showStatus('Error', 'Camera not initialized', 'fa-exclamation-triangle');
                 return;
@@ -649,7 +688,6 @@
 
         // API call for face recognition
         function recognizeFace(imageData) {
-            console.log("hello");
             showStatus('Processing', 'Analyzing facial features...', 'fa-cog fa-spin');
 
             // Make API call to Flask backend
@@ -666,7 +704,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        console.log(data);
                         fetchStudentDetails(data.student_id, data.confidence);
                     } else {
                         handleRecognitionFailure(data.message || 'No matching face found');
@@ -679,49 +716,34 @@
 
         // Fetch student details from the backend
         async function fetchStudentDetails(studentId, confidence) {
-                // Mock student data - in a real implementation, this would come from your backend
-
-                await fetch("{{route('student.getInfo')}}", {
+            try {
+                const response = await fetch("{{route('student.getInfo')}}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     },
                     body: JSON.stringify({
-                        id:studentId,
+                        id: studentId,
                         institute_id: instituteId,
                     })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("recognized ", data.student);
-                            // fetchStudentDetails(data.student_id, data.confidence);
+                });
 
-                            handleRecognitionSuccess({
-                                success: true,
-                                person: data.student,
-                                confidence: confidence
-                            });
-                        } else {
-                            // handleRecognitionFailure(data.message || 'No matching face found');
-                            console.log("error", data);
-                        }
-                    })
-                    .catch(error => {
-                        handleRecognitionFailure('No matching face found');
-                        console.log("error", error);
+                const data = await response.json();
 
+                if (data.success) {
+                    handleRecognitionSuccess({
+                        success: true,
+                        person: data.student,
+                        confidence: confidence
                     });
-                const studentData = {
-                    id: studentId,
-                    name: 'John Doe',
-                    student_id: 'STU' + studentId,
-                    department: 'Computer Science',
-                    role: 'Student'
-                };
-
-
+                } else {
+                    handleRecognitionFailure(data.message || 'Student information not found');
+                }
+            } catch (error) {
+                console.error('Error fetching student details:', error);
+                handleRecognitionFailure('Failed to fetch student information');
+            }
         }
 
         // Handle successful recognition
@@ -735,21 +757,21 @@
 
             // Update recognition result
             recognizedName.textContent = response.person.fname+" "+response.person.lname;
-            recognizedId.textContent = `Student • Roll : ${response.person.id} • ${response.person.institute.name}`
-            console.log(response.person.profile_picture);
-            if(response.person.profile_picture!=null) {
-                document.getElementById("personImage").src = "{{ asset('storage/profile_pictures') }}/" +response.person.profile_picture;
-                document.getElementById("personImage").classList.remove("hidden");
-                document.getElementById("personIcon").classList.add("hidden");
-            }else{
-                document.getElementById("personImage").classList.add("hidden");
-                document.getElementById("personIcon").classList.remove("hidden");
-            }
+            recognizedId.textContent = `Student • Roll : ${response.person.id} • ${response.person.institute.name}`;
 
-            // Update confidence bar
-            const confidencePercent = Math.round(response.confidence * 100);
-            confidenceBar.style.width = `${confidencePercent}%`;
-            confidenceValue.textContent = `${confidencePercent}%`;
+            // Update recognition status
+            recognitionStatus.className = 'recognition-status success';
+            recognitionStatus.innerHTML = '<i class="fas fa-check-circle mr-1"></i><span>Recognized</span>';
+
+            // Update profile image
+            if(response.person.profile_picture != null) {
+                personImage.src = "{{ asset('storage/profile_pictures') }}/" + response.person.profile_picture;
+                personImage.classList.remove("hidden");
+                personIcon.classList.add("hidden");
+            } else {
+                personImage.classList.add("hidden");
+                personIcon.classList.remove("hidden");
+            }
 
             // Update attendance timestamp
             const now = new Date();
@@ -785,8 +807,6 @@
         // API call for logging attendance
         function logAttendance(studentId) {
             // Make API call to your Laravel backend to log attendance
-            // This would typically be a POST request to your attendance logging endpoint
-
             const attendanceData = {
                 student_id: studentId,
                 institute_id: instituteId,
@@ -805,12 +825,40 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Attendance logged:', data);
-                    // You could show a success message here if needed
+                    // Show a success notification
+                    showAttendanceNotification(studentId);
                 })
                 .catch(error => {
                     console.error('Error logging attendance:', error);
-                    // Handle error if needed
                 });
+        }
+
+        // Show attendance notification
+        function showAttendanceNotification(studentId) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 slide-in';
+            notification.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-xl"></i>
+                    <div>
+                        <div class="font-medium">Attendance Recorded</div>
+                        <div class="text-xs">Student ID: ${studentId}</div>
+                    </div>
+                </div>
+            `;
+
+            // Add to document
+            document.body.appendChild(notification);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
         }
 
         // Switch camera (front/back)

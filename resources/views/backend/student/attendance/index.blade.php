@@ -53,29 +53,6 @@
                     </div>
                 </div>
 
-                <!-- Monthly Trend -->
-                <div class="card">
-                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Monthly Trend</h3>
-                    <div class="h-40" id="monthlyTrendChart"></div>
-                </div>
-
-                <!-- Course Breakdown -->
-                <div class="card">
-                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Course Breakdown</h3>
-                    <div class="space-y-4">
-                        @foreach ($courseAttendance as $course)
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $course['name'] }}</span>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $course['percentage'] }}%</span>
-                                </div>
-                                <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200 dark:bg-gray-700">
-                                    <div style="width:{{ $course['percentage'] }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center {{ $course['percentage'] >= 75 ? 'bg-primary-500' : 'bg-yellow-500' }}"></div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
             </div>
 
             <!-- Calendar View -->
@@ -123,68 +100,6 @@
                 </div>
             </div>
 
-            <!-- Detailed Attendance Records -->
-            <div class="card">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Detailed Records</h3>
-                    <div class="flex items-center">
-                        <span class="mr-2 text-sm text-gray-600 dark:text-gray-400">Filter by:</span>
-                        <select id="courseFilter" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md px-3 py-1 pr-8 focus:outline-none focus:ring-1 focus:ring-primary-500">
-                            <option value="all">All Courses</option>
-                            @foreach ($courseAttendance as $course)
-                                <option value="{{ $course['id'] }}">{{ $course['name'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Time</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Method</th>
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="attendanceRecords">
-                        @foreach ($attendanceRecords as $record)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $record['date'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $record['course'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $record['status'] === 'Present' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                                    {{ $record['status'] }}
-                                </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $record['time'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                    @if($record['method'] === 'Face Recognition')
-                                        <span class="flex items-center"><i class="fas fa-camera text-primary-500 mr-1"></i> Face Recognition</span>
-                                    @elseif($record['method'] === 'Manual')
-                                        <span class="flex items-center"><i class="fas fa-user-check text-gray-500 mr-1"></i> Manual</span>
-                                    @else
-                                        {{ $record['method'] }}
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex justify-between items-center mt-6">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                        Showing <span id="recordsShown">{{ count($attendanceRecords) }}</span> of <span id="totalRecords">{{ $totalRecords }}</span> records
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">Previous</button>
-                        <button class="px-3 py-1 rounded-md bg-primary-500 text-white hover:bg-primary-600">Next</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 @endsection
@@ -197,7 +112,7 @@
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             datasets: [{
                 label: 'Attendance %',
-                data: [85, 90, 78, 95, 88, 92],
+                data: [85, 90, 78, 95, 88, 92, 91],
                 borderColor: '#0ea5e9',
                 backgroundColor: 'rgba(14, 165, 233, 0.2)',
                 tension: 0.3,

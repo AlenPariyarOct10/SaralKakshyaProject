@@ -81,10 +81,15 @@ Route::group(['prefix' => 'student'], function () {
 
         ################################# Subjects #############################################
         Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('student.subjects.index');
+        Route::get('/subject/{id}', [StudentSubjectController::class, 'show'])->name('student.subject.show');
+        Route::get('/subject/{id}/resources', [StudentSubjectController::class, 'subjectResources'])->name('student.subject.resources');
+        Route::get('/subject/{id}/assignments', [StudentSubjectController::class, 'subjectAssignments'])->name('student.subject.assignments');
 
 
         ################################## Resources #############################################
         Route::get('/resources', [StudentResourceController::class, 'index'])->name('student.resources.index');
+        Route::get('/resource/{id}', [StudentResourceController::class, 'show'])->name('student.resource.show');
+        Route::get('/resource/{id}/download', [StudentResourceController::class, 'download'])->name('student.resource.download');
 
     });
 });

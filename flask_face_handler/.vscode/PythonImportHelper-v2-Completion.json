@@ -1,0 +1,458 @@
+[
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "cv2",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "cv2",
+        "description": "cv2",
+        "detail": "cv2",
+        "documentation": {}
+    },
+    {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "base64",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "base64",
+        "description": "base64",
+        "detail": "base64",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "Flask",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "SQLAlchemy",
+        "importPath": "flask_sqlalchemy",
+        "description": "flask_sqlalchemy",
+        "isExtraImport": true,
+        "detail": "flask_sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "CORS",
+        "importPath": "flask_cors",
+        "description": "flask_cors",
+        "isExtraImport": true,
+        "detail": "flask_cors",
+        "documentation": {}
+    },
+    {
+        "label": "SQLAlchemyError",
+        "importPath": "sqlalchemy.exc",
+        "description": "sqlalchemy.exc",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.exc",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "secure_filename",
+        "importPath": "werkzeug.utils",
+        "description": "werkzeug.utils",
+        "isExtraImport": true,
+        "detail": "werkzeug.utils",
+        "documentation": {}
+    },
+    {
+        "label": "train_test_split",
+        "importPath": "sklearn.model_selection",
+        "description": "sklearn.model_selection",
+        "isExtraImport": true,
+        "detail": "sklearn.model_selection",
+        "documentation": {}
+    },
+    {
+        "label": "KNeighborsClassifier",
+        "importPath": "sklearn.neighbors",
+        "description": "sklearn.neighbors",
+        "isExtraImport": true,
+        "detail": "sklearn.neighbors",
+        "documentation": {}
+    },
+    {
+        "label": "accuracy_score",
+        "importPath": "sklearn.metrics",
+        "description": "sklearn.metrics",
+        "isExtraImport": true,
+        "detail": "sklearn.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "classification_report",
+        "importPath": "sklearn.metrics",
+        "description": "sklearn.metrics",
+        "isExtraImport": true,
+        "detail": "sklearn.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "joblib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "joblib",
+        "description": "joblib",
+        "detail": "joblib",
+        "documentation": {}
+    },
+    {
+        "label": "warnings",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "warnings",
+        "description": "warnings",
+        "detail": "warnings",
+        "documentation": {}
+    },
+    {
+        "label": "FaceData",
+        "kind": 6,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "class FaceData(db.Model):\n    __tablename__ = 'face_data'\n    id = db.Column(db.Integer, primary_key=True)\n    student_id = db.Column(db.Integer, nullable=False, index=True)\n    institute_id = db.Column(db.Integer, nullable=False, index=True)\n    histogram = db.Column(db.Text, nullable=False)\n    created_at = db.Column(db.DateTime, default=datetime.utcnow)\n    image_path = db.Column(db.String(255))\n    is_training_sample = db.Column(db.Boolean, default=False, index=True)\n    # Add composite unique constraint",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "FaceModel",
+        "kind": 6,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "class FaceModel(db.Model):\n    __tablename__ = 'face_models'\n    id = db.Column(db.Integer, primary_key=True)\n    institute_id = db.Column(db.Integer, nullable=False, unique=True, index=True)\n    model_path = db.Column(db.String(255), nullable=False)\n    accuracy = db.Column(db.Float)\n    created_at = db.Column(db.DateTime, default=datetime.utcnow)\n    parameters = db.Column(db.Text)\n    is_active = db.Column(db.Boolean, default=True)\n    def __repr__(self):",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "allowed_file",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def allowed_file(filename):\n    \"\"\"Check if file extension is allowed\"\"\"\n    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']\ndef save_image_file(image, student_id, prefix=\"\"):\n    \"\"\"Save image file to disk\"\"\"\n    try:\n        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n        filename = f\"{prefix}_{student_id}_{timestamp}.jpg\"\n        filename = secure_filename(filename)\n        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "save_image_file",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def save_image_file(image, student_id, prefix=\"\"):\n    \"\"\"Save image file to disk\"\"\"\n    try:\n        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n        filename = f\"{prefix}_{student_id}_{timestamp}.jpg\"\n        filename = secure_filename(filename)\n        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)\n        # Ensure the image is saved with proper quality\n        cv2.imwrite(filepath, image, [cv2.IMWRITE_JPEG_QUALITY, 95])\n        return filepath",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "decode_and_process_image",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def decode_and_process_image(base64_str, student_id=None, purpose=\"register\"):\n    \"\"\"Decode base64 image and convert to OpenCV format\"\"\"\n    try:\n        # Remove data URL prefix if present\n        if base64_str.startswith('data:image'):\n            base64_str = base64_str.split(',')[1]\n        # Decode base64\n        img_data = base64.b64decode(base64_str)\n        np_arr = np.frombuffer(img_data, np.uint8)\n        color_img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "enhanced_face_detection",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def enhanced_face_detection(image):\n    \"\"\"Detect and extract face from image with multiple strategies\"\"\"\n    if image is None or image.size == 0:\n        return None\n    # Strategy 1: Standard detection\n    faces = face_cascade.detectMultiScale(\n        image,\n        scaleFactor=1.1,\n        minNeighbors=5,\n        minSize=(80, 80),",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "advanced_preprocessing",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def advanced_preprocessing(image, target_size=(128, 128)):\n    \"\"\"Advanced preprocessing for face images\"\"\"\n    try:\n        if image is None or image.size == 0:\n            return None\n        # Apply CLAHE for histogram equalization\n        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))\n        enhanced = clahe.apply(image)\n        # Apply Gaussian blur to reduce noise\n        blurred = cv2.GaussianBlur(enhanced, (3, 3), 0)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "compute_lbp_histogram",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def compute_lbp_histogram(image, radius=1, n_points=8):\n    \"\"\"Compute Local Binary Pattern histogram\"\"\"\n    if image is None or image.size == 0:\n        return None\n    try:\n        h, w = image.shape\n        lbp_image = np.zeros((h - 2 * radius, w - 2 * radius), dtype=np.uint8)\n        for i in range(radius, h - radius):\n            for j in range(radius, w - radius):\n                center = image[i, j]",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "validate_ids",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def validate_ids(student_id, institute_id):\n    \"\"\"Validate student and institute IDs\"\"\"\n    try:\n        student_id = int(student_id)\n        institute_id = int(institute_id)\n        return student_id > 0 and institute_id > 0, student_id, institute_id\n    except (ValueError, TypeError):\n        return False, None, None\ndef train_knn_model(institute_id, n_neighbors=5, test_size=0.2):\n    \"\"\"Train KNN model for face recognition\"\"\"",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "train_knn_model",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def train_knn_model(institute_id, n_neighbors=5, test_size=0.2):\n    \"\"\"Train KNN model for face recognition\"\"\"\n    try:\n        # Get training data for institute\n        training_data = FaceData.query.filter_by(\n            institute_id=institute_id,\n            is_training_sample=True\n        ).all()\n        if len(training_data) < 10:  # Minimum samples required\n            return None, f\"At least 10 training samples required, got {len(training_data)}\"",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "predict_with_model",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def predict_with_model(institute_id, features):\n    \"\"\"Make prediction using trained model\"\"\"\n    try:\n        # Get active model for institute\n        model = FaceModel.query.filter_by(\n            institute_id=institute_id,\n            is_active=True\n        ).first()\n        if not model or not os.path.exists(model.model_path):\n            return None, \"No trained model available\"",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "health_check",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def health_check():\n    \"\"\"Health check endpoint\"\"\"\n    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200\n@app.route('/register-face', methods=['POST'])\ndef register_face():\n    \"\"\"Register a new face for a student\"\"\"\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "register_face",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def register_face():\n    \"\"\"Register a new face for a student\"\"\"\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400\n        student_id = data.get('student_id')\n        institute_id = data.get('institute_id')\n        image = data.get('image')\n        # Validate input",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "add_training_data",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def add_training_data():\n    \"\"\"Add multiple images for training purposes\"\"\"\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400\n        student_id = data.get('student_id')\n        institute_id = data.get('institute_id')\n        images = data.get('images', [])\n        # Validate input",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "train_model",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def train_model():\n    \"\"\"Train machine learning model for face recognition\"\"\"\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400\n        institute_id = data.get('institute_id')\n        n_neighbors = data.get('n_neighbors', 5)\n        test_size = data.get('test_size', 0.2)\n        # Validate input",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "recognize_face",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def recognize_face():\n    \"\"\"Recognize face in provided image\"\"\"\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400\n        image_base64 = data.get('image')\n        institute_id = data.get('institute_id')\n        use_model = data.get('use_model', True)\n        confidence_threshold = data.get('confidence_threshold', 0.6)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "get_model_info",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def get_model_info(institute_id):\n    \"\"\"Get information about trained model for institute\"\"\"\n    try:\n        model = FaceModel.query.filter_by(\n            institute_id=institute_id,\n            is_active=True\n        ).first()\n        if not model:\n            return jsonify({\n                'success': False,",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "request_entity_too_large",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def request_entity_too_large(error):\n    return jsonify({'success': False, 'error': 'File too large'}), 413\n@app.errorhandler(400)\ndef bad_request(error):\n    return jsonify({'success': False, 'error': 'Bad request'}), 400\n@app.errorhandler(500)\ndef internal_error(error):\n    db.session.rollback()\n    return jsonify({'success': False, 'error': 'Internal server error'}), 500\nif __name__ == '__main__':",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "bad_request",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def bad_request(error):\n    return jsonify({'success': False, 'error': 'Bad request'}), 400\n@app.errorhandler(500)\ndef internal_error(error):\n    db.session.rollback()\n    return jsonify({'success': False, 'error': 'Internal server error'}), 500\nif __name__ == '__main__':\n    try:\n        with app.app_context():\n            db.create_all()",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "internal_error",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def internal_error(error):\n    db.session.rollback()\n    return jsonify({'success': False, 'error': 'Internal server error'}), 500\nif __name__ == '__main__':\n    try:\n        with app.app_context():\n            db.create_all()\n            logger.info(\"Database tables created successfully\")\n        logger.info(\"Starting Face Recognition API server...\")\n        app.run(debug=True, host='0.0.0.0', port=5000)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app = Flask(__name__)\nCORS(app)\n# Configure logging\nlogging.basicConfig(\n    level=logging.INFO,\n    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'\n)\nlogger = logging.getLogger(__name__)\n# Database configuration\napp.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# Database configuration\napp.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(\n    'DATABASE_URI',\n    'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db'\n)\napp.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False\napp.config['UPLOAD_FOLDER'] = 'face_images'\napp.config['TRAINING_FOLDER'] = 'training_data'\napp.config['MODEL_FOLDER'] = 'trained_models'",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['SQLALCHEMY_DATABASE_URI']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(\n    'DATABASE_URI',\n    'mysql+pymysql://root:@localhost:3306/saralkakshyaproject_face_db'\n)\napp.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False\napp.config['UPLOAD_FOLDER'] = 'face_images'\napp.config['TRAINING_FOLDER'] = 'training_data'\napp.config['MODEL_FOLDER'] = 'trained_models'\napp.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['SQLALCHEMY_TRACK_MODIFICATIONS']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False\napp.config['UPLOAD_FOLDER'] = 'face_images'\napp.config['TRAINING_FOLDER'] = 'training_data'\napp.config['MODEL_FOLDER'] = 'trained_models'\napp.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['UPLOAD_FOLDER']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['UPLOAD_FOLDER'] = 'face_images'\napp.config['TRAINING_FOLDER'] = 'training_data'\napp.config['MODEL_FOLDER'] = 'trained_models'\napp.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database\ndb = SQLAlchemy(app)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['TRAINING_FOLDER']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['TRAINING_FOLDER'] = 'training_data'\napp.config['MODEL_FOLDER'] = 'trained_models'\napp.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database\ndb = SQLAlchemy(app)\n# Load Haar Cascade for face detection",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['MODEL_FOLDER']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['MODEL_FOLDER'] = 'trained_models'\napp.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database\ndb = SQLAlchemy(app)\n# Load Haar Cascade for face detection\ncascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['ALLOWED_EXTENSIONS']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}\napp.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database\ndb = SQLAlchemy(app)\n# Load Haar Cascade for face detection\ncascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'\nface_cascade = cv2.CascadeClassifier(cascade_path)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config['MAX_CONTENT_LENGTH']",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size\n# Create directories if they don't exist\nfor folder in [app.config['UPLOAD_FOLDER'], app.config['TRAINING_FOLDER'], app.config['MODEL_FOLDER']]:\n    os.makedirs(folder, exist_ok=True)\n# Initialize database\ndb = SQLAlchemy(app)\n# Load Haar Cascade for face detection\ncascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'\nface_cascade = cv2.CascadeClassifier(cascade_path)\nif face_cascade.empty():",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "db = SQLAlchemy(app)\n# Load Haar Cascade for face detection\ncascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'\nface_cascade = cv2.CascadeClassifier(cascade_path)\nif face_cascade.empty():\n    logger.error(\"Failed to load Haar Cascade classifier\")\n    raise RuntimeError(\"Face cascade classifier not found\")\n# ---------- DATABASE MODELS ----------\nclass FaceData(db.Model):\n    __tablename__ = 'face_data'",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "cascade_path",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'\nface_cascade = cv2.CascadeClassifier(cascade_path)\nif face_cascade.empty():\n    logger.error(\"Failed to load Haar Cascade classifier\")\n    raise RuntimeError(\"Face cascade classifier not found\")\n# ---------- DATABASE MODELS ----------\nclass FaceData(db.Model):\n    __tablename__ = 'face_data'\n    id = db.Column(db.Integer, primary_key=True)\n    student_id = db.Column(db.Integer, nullable=False, index=True)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "face_cascade",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "face_cascade = cv2.CascadeClassifier(cascade_path)\nif face_cascade.empty():\n    logger.error(\"Failed to load Haar Cascade classifier\")\n    raise RuntimeError(\"Face cascade classifier not found\")\n# ---------- DATABASE MODELS ----------\nclass FaceData(db.Model):\n    __tablename__ = 'face_data'\n    id = db.Column(db.Integer, primary_key=True)\n    student_id = db.Column(db.Integer, nullable=False, index=True)\n    institute_id = db.Column(db.Integer, nullable=False, index=True)",
+        "detail": "app",
+        "documentation": {}
+    }
+]

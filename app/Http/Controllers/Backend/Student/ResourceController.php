@@ -47,6 +47,11 @@ class ResourceController extends Controller
         //
     }
 
+    public function download(string $id)
+    {
+        //
+    }
+
     /**
      * Update the specified resource in storage.
      */

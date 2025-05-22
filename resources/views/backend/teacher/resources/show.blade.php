@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Str; @endphp
 @extends("backend.layout.teacher-dashboard-layout")
 
 @section('title', $resource->title)
@@ -243,11 +244,11 @@
                         </div>
                         <div>
                             <span class="text-gray-600 dark:text-gray-400 font-medium">Chapter:</span>
-                            <span class="ml-2 text-gray-800 dark:text-white">{{ $resource->chapter->name ?? 'Not assigned' }}</span>
+                            <span class="ml-2 text-gray-800 dark:text-white">{{ $resource->chapter->title ?? 'Not assigned' }}</span>
                         </div>
                         <div>
                             <span class="text-gray-600 dark:text-gray-400 font-medium">Sub Chapter:</span>
-                            <span class="ml-2 text-gray-800 dark:text-white">{{ $resource->subChapter->name ?? 'Not assigned' }}</span>
+                            <span class="ml-2 text-gray-800 dark:text-white">{{ $resource->subChapter->title ?? 'Not assigned' }}</span>
                         </div>
                         <div>
                             <span class="text-gray-600 dark:text-gray-400 font-medium">Created:</span>
