@@ -57,7 +57,7 @@
                                     <option value="">Select Batch</option>
                                     @foreach($batches as $batch)
                                         <option value="{{ $batch->id }}" {{ old('batch_id') == $batch->id ? 'selected' : '' }}>
-                                            {{ $batch->name }} ({{ $batch->program->name }})
+                                            {{ $batch->batch }} ({{ $batch->program->name }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -96,7 +96,7 @@
                             </div>
 
                             <!-- Semester -->
-                            <div>
+                            <div class="hidden">
                                 <label for="semester" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Semester <span class="text-red-500">*</span>
                                 </label>
@@ -212,11 +212,9 @@
                         <a href="{{ route('teacher.evaluation.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             Cancel
                         </a>
-                        <button type="submit" name="save_draft" value="1" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-                            Save as Draft
-                        </button>
+
                         <button type="submit" name="finalize" value="1" class="btn-primary">
-                            Finalize Evaluation
+                            Save Evaluation
                         </button>
                     </div>
                 </form>
@@ -358,9 +356,9 @@
                     formats.forEach(format => {
                         const option = document.createElement('option');
                         option.value = format.id;
-                        option.textContent = format.name;
+                        option.textContent = format.criteria;
                         option.setAttribute('data-full-marks', format.full_marks);
-                        option.setAttribute('data-weight', format.weight);
+                        option.setAttribute('data-weight', format.marks_weight);
                         option.setAttribute('data-description', format.description || 'No description available');
                         formatSelect.appendChild(option);
                     });
@@ -382,7 +380,7 @@
                 // Display format details
                 formatName.textContent = selectedOption.textContent;
                 formatMarks.textContent = selectedOption.getAttribute('data-full-marks');
-                formatWeight.textContent = selectedOption.getAttribute('data-weight') + '%';
+                formatWeight.textContent = selectedOption.getAttribute('data-weight') + 'Marks';
                 formatDescription.textContent = selectedOption.getAttribute('data-description');
 
                 formatInfo.classList.remove('hidden');
@@ -428,10 +426,10 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="${student.profile_picture || '/images/default-avatar.png'}" alt="${student.full_name}">
+                                        <img class="h-10 w-10 rounded-full object-cover" src="/storage/${student.profile_picture || '/images/default-avatar.png'}" alt="${student.full_name}">
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-800 dark:text-white">${student.full_name}</div>
+                                        <div class="text-sm font-medium text-gray-800 dark:text-white">${student.fname} ${student.lname}</div>
                                         <input type="hidden" name="students[]" value="${student.id}">
                                     </div>
                                 </div>

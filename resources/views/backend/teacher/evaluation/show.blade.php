@@ -172,7 +172,7 @@
 
                             <div>
                                 <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Created By</h4>
-                                <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluatedBy->full_name }}</p>
+                                <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluatedBy->fname }}</p>
                             </div>
 
                             <div>
@@ -249,15 +249,15 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $detail->student->profile_picture ?? '/images/default-avatar.png' }}" alt="{{ $detail->student->full_name }}">
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $detail->student->profile_picture ?? '/images/default-avatar.png' }}" alt="{{ $detail->student }}">
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-800 dark:text-white">{{ $detail->student->full_name }}</div>
+                                        <div class="text-sm font-medium text-gray-800 dark:text-white">{{ $detail->student }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-800 dark:text-white">{{ $detail->student->roll_number }}</div>
+                                <div class="text-sm text-gray-800 dark:text-white">{{ $detail->student }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-800 dark:text-white">

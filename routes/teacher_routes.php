@@ -16,6 +16,10 @@ use App\Http\Controllers\Backend\Teacher\PersonalRoutineController as TeacherPer
 use App\Http\Controllers\Backend\Teacher\ResourceController as TeacherResourceController;
 use App\Http\Controllers\Backend\Teacher\AssignmentSubmissionController as AssignmentSubmissionController;
 
+use App\Http\Controllers\Backend\Teacher\EvaluationController as TeacherEvaluationController;
+use App\Http\Controllers\Backend\Teacher\EvaluationReportController as TeacherEvaluationReportController;
+use App\Http\Controllers\Backend\Teacher\EvaluationApiController as TeacherEvaluationApiController;
+
 Route::group(['prefix' => 'teacher'], function () {
     Route::middleware('guest:teacher')->group(function () {
         Route::get('/login', [TeacherAuthController::class, 'showLogin'])->name('teacher.login');
@@ -99,6 +103,63 @@ Route::group(['prefix' => 'teacher'], function () {
         //Department Subjects
         Route::get('/programs/{id}/subjects', [DepartmentController::class, 'getSubjects'])
             ->name('teacher.department.subjects');
+
+        // Teacher Evaluation Routes
+        Route::get('/evaluation', [TeacherEvaluationController::class, 'index'])
+            ->name('teacher.evaluation.index');
+        Route::get('/evaluations', [TeacherEvaluationController::class, 'getEvaluations']);
+        Route::get('/evaluation/create', [TeacherEvaluationController::class, 'create'])
+            ->name('teacher.evaluation.create');
+        Route::post('/evaluation', [TeacherEvaluationController::class, 'store'])
+            ->name('teacher.evaluation.store');
+        Route::get('/evaluation/{id}', [TeacherEvaluationController::class, 'show'])
+            ->name('teacher.evaluation.show');
+        Route::get('/evaluation/{id}/edit', [TeacherEvaluationController::class, 'edit'])
+            ->name('teacher.evaluation.edit');
+        Route::put('/evaluation/{id}', [TeacherEvaluationController::class, 'update'])
+            ->name('teacher.evaluation.update');
+        Route::post('/evaluation/{id}/finalize', [TeacherEvaluationController::class, 'finalize'])
+            ->name('teacher.evaluation.finalize');
+        Route::delete('/evaluation/{id}', [TeacherEvaluationController::class, 'destroy'])
+            ->name('teacher.evaluation.destroy');
+        Route::get('/evaluation/{id}/export', [TeacherEvaluationController::class, 'export'])
+            ->name('teacher.evaluation.export');
+
+// Batch Evaluation Routes
+        Route::get('/evaluation/batch/create', [TeacherEvaluationController::class, 'batchEvaluation'])
+            ->name('teacher.evaluation.batch.create');
+        Route::post('/evaluation/batch', [TeacherEvaluationController::class, 'storeBatchEvaluation'])
+            ->name('teacher.evaluation.batch.store');
+
+// Evaluation API Routes
+        Route::get('/batch/{batchId}/subjects', [TeacherEvaluationApiController::class, 'getBatchSubjects'])
+            ->name('teacher.batch.subjects');
+        Route::get('/subject/{subjectId}/evaluation-formats', [TeacherEvaluationApiController::class, 'getSubjectEvaluationFormats'])
+            ->name('teacher.subject.evaluation-formats');
+        Route::get('/batch/{batchId}/students', [TeacherEvaluationApiController::class, 'getBatchStudents'])
+            ->name('teacher.batch.students');
+
+// Evaluation Report Routes
+        Route::get('/evaluation/reports', [TeacherEvaluationReportController::class, 'index'])
+            ->name('teacher.evaluation.reports.index');
+        Route::get('/evaluation/reports/batch-performance', [TeacherEvaluationReportController::class, 'batchPerformance'])
+            ->name('teacher.evaluation.reports.batch-performance');
+        Route::get('/evaluation/reports/student-performance', [TeacherEvaluationReportController::class, 'studentPerformance'])
+            ->name('teacher.evaluation.reports.student-performance');
+        Route::get('/evaluation/reports/format-comparison', [TeacherEvaluationReportController::class, 'formatComparison'])
+            ->name('teacher.evaluation.reports.format-comparison');
+
+// Evaluation API Routes for Reports and Charts
+        Route::get('/api/evaluation/departments', [TeacherEvaluationApiController::class, 'getDepartments'])
+            ->name('api.teacher.evaluation.departments');
+        Route::get('/api/evaluation/department/{departmentId}/programs', [TeacherEvaluationApiController::class, 'getDepartmentPrograms'])
+            ->name('api.teacher.evaluation.department.programs');
+        Route::get('/api/evaluation/program/{programId}/subjects', [TeacherEvaluationApiController::class, 'getProgramSubjects'])
+            ->name('api.teacher.evaluation.program.subjects');
+        Route::get('/api/evaluation/batch/statistics', [TeacherEvaluationApiController::class, 'getBatchStatistics'])
+            ->name('api.teacher.evaluation.batch.statistics');
+        Route::get('/api/evaluation/student/{studentId}/performance', [TeacherEvaluationApiController::class, 'getStudentPerformance'])
+            ->name('api.teacher.evaluation.student.performance');
 
 
         //Assignment API

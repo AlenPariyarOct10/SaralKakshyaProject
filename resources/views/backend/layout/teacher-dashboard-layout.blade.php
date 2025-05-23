@@ -38,6 +38,10 @@
                 <i class="fas fa-calendar-check"></i>
                 <span>Attendance</span>
             </a>
+            <a href="{{route('teacher.evaluation.index')}}" class="sidebar-item {{(Route::is('teacher.evaluation.index')?'active':'')}}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Evaluation</span>
+            </a>
             <a href="{{route('teacher.assignment.index')}}" class="sidebar-item {{(Route::is('teacher.assignment.index')?'active':'')}}">
                 <i class="fas fa-book"></i>
                 <span>Assignments</span>

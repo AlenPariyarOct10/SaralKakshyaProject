@@ -5,6 +5,7 @@
 @section('content')
     <!-- Main Content Area -->
     <main class="p-6 md:p-6 min-h-screen overflow-y-auto pb-16">
+        <x-show-success-failure-badge />
         <!-- Page Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>

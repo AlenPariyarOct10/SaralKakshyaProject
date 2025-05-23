@@ -269,7 +269,7 @@
                         <td class="table-cell">{{$student->roll_number}}</td>
                         <td class="table-cell">{{$student->email}}</td>
                         <td class="table-cell">{{$student->batch->batch}}</td>
-                        <td class="table-cell">{{ dd($student) }}</td>
+                        <td class="table-cell">{{ $student->section }}</td>
                         <td class="table-cell">{{$student->admission_date->format("d M, Y")}}</td>
                         <td class="table-cell">
                             @if($student->status)

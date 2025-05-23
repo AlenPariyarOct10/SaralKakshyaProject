@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
+use App\Models\StudentEvaluation;
+use App\Models\Subject;
+use App\Models\SubjectEvaluationFormat;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EvaluationApiController extends Controller
 {
@@ -45,10 +51,10 @@ class EvaluationApiController extends Controller
     public function getBatchStudents(string $batchId, Request $request): JsonResponse
     {
         $students = Student::where('batch_id', $batchId)
-            ->where('status', 'active')
+            ->where('status', '1')
             ->get();
 
-        // If subject_id and format_id are provided, check if students are already evaluated
+//         If subject_id and format_id are provided, check if students are already evaluated
         if ($request->has('subject_id') && $request->has('format_id')) {
             $subjectId = $request->subject_id;
             $formatId = $request->format_id;

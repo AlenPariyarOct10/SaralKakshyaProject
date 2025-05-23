@@ -3,7 +3,17 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
+use App\Models\Student;
+use App\Models\StudentEvaluation;
+use App\Models\StudentEvaluationDetail;
+use App\Models\Subject;
+use App\Models\SubjectEvaluationFormat;
+use App\Models\Teacher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EvaluationController extends Controller
 {
@@ -37,7 +47,7 @@ class EvaluationController extends Controller
             ->distinct()
             ->get();
 
-        return view('backend.teacher.evaluation.index-evaluation', compact('batches', 'subjects', 'evaluationFormats'));
+        return view('backend.teacher.evaluation.index', compact('batches', 'subjects', 'evaluationFormats'));
     }
 
     /**
@@ -112,7 +122,7 @@ class EvaluationController extends Controller
             ->distinct()
             ->get();
 
-        return view('backend.teacher.evaluation.create-evaluation', compact('batches'));
+        return view('backend.teacher.evaluation.create', compact('batches'));
     }
 
     /**
@@ -158,33 +168,15 @@ class EvaluationController extends Controller
                 throw new \Exception("Teacher is not associated with any institute.");
             }
 
-            // Create the main evaluation record
-            $evaluation = StudentEvaluation::create([
-                'subject_id' => $validated['subject_id'],
-                'evaluation_format_id' => $validated['evaluation_format_id'],
-                'institute_id' => $instituteId,
-                'evaluated_by' => $teacherId,
-                'comment' => $validated['comment'] ?? null,
-                'is_finalized' => $validated['is_finalized'],
-                'semester' => $validated['semester'],
-                'batch_id' => $validated['batch_id'],
-                'total_obtained_marks' => 0, // Will be updated below
-                'total_normalized_marks' => 0, // Will be updated below
-            ]);
-
-            $totalObtainedMarks = 0;
-            $totalNormalizedMarks = 0;
-
             // Create evaluation details for each student
             foreach ($validated['students'] as $studentId) {
                 $obtainedMarks = $validated['marks'][$studentId] ?? 0;
 
                 // Calculate normalized marks based on weight
-                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->weight;
+                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->marks_weight;
 
                 // Create evaluation detail
                 StudentEvaluationDetail::create([
-                    'evaluation_id' => $evaluation->id,
                     'evaluation_format_id' => $validated['evaluation_format_id'],
                     'subject_id' => $validated['subject_id'],
                     'evaluated_by' => $teacherId,
@@ -197,19 +189,13 @@ class EvaluationController extends Controller
                     'batch_id' => $validated['batch_id'],
                 ]);
 
-                $totalObtainedMarks += $obtainedMarks;
-                $totalNormalizedMarks += $normalizedMarks;
             }
 
-            // Update the main evaluation with totals
-            $evaluation->update([
-                'total_obtained_marks' => $totalObtainedMarks,
-                'total_normalized_marks' => $totalNormalizedMarks,
-            ]);
+
 
             DB::commit();
 
-            return redirect()->route('teacher.evaluation.show', $evaluation->id)
+            return redirect()->route('teacher.evaluation.index')
                 ->with('success', 'Evaluation created successfully!');
 
         } catch (\Exception $e) {
@@ -243,7 +229,7 @@ class EvaluationController extends Controller
             ->with('student')
             ->get();
 
-        return view('backend.teacher.evaluation.show-evaluation', compact('evaluation', 'evaluationDetails'));
+        return view('backend.teacher.evaluation.show', compact('evaluation', 'evaluationDetails'));
     }
 
     /**
@@ -274,7 +260,7 @@ class EvaluationController extends Controller
             ->with('student')
             ->get();
 
-        return view('backend.teacher.evaluation.edit-evaluation', compact('evaluation', 'evaluationDetails'));
+        return view('backend.teacher.evaluation.edit', compact('evaluation', 'evaluationDetails'));
     }
 
     /**
@@ -501,7 +487,7 @@ class EvaluationController extends Controller
             ->distinct()
             ->get();
 
-        return view('backend.teacher.evaluation.batch-evaluation', compact('batches'));
+        return view('backend.teacher.evaluation.batch', compact('batches'));
     }
 
     /**

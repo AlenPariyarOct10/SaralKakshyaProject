@@ -8,7 +8,6 @@ class StudentEvaluation extends Model
 {
     protected $table = 'student_evaluations';
     protected $fillable = [
-        'student_id',
         'subject_id',
         'evaluation_format_id',
         'institute_id',
@@ -25,6 +24,7 @@ class StudentEvaluation extends Model
     {
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
+
 
     public function subject()
     {

@@ -8,7 +8,6 @@ class StudentEvaluationDetail extends Model
 {
     protected $table = 'student_evaluation_details';
     protected $fillable = [
-        'evaluation_id',
         'evaluation_format_id',
         'subject_id',
         'evaluated_by',
@@ -21,9 +20,9 @@ class StudentEvaluationDetail extends Model
         'batch_id'
     ];
 
-    public function evaluation()
+    public function student()
     {
-        return $this->belongsTo(StudentEvaluation::class, 'evaluation_id', 'id');
+        return $this->belongsTo(Student::class, 'student_id', 'id');
     }
 
     public function evaluationFormat()

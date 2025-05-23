@@ -148,52 +148,50 @@ class StudentController extends Controller
         return redirect()->back()->with('success', 'Student approved and notified successfully.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $user = Auth::user();
+        $instituteId = $user->institute->id;
+
+        $student = Student::whereHas('institutes', function ($query) use ($instituteId) {
+            $query->where('institutes.id', $instituteId);
+        })->findOrFail($id);
+
+        return view('backend.admin.students.show', compact('student', 'user'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        $user = Auth::user();
+        $instituteId = $user->institute->id;
+
+        $student = Student::whereHas('institutes', function ($query) use ($instituteId) {
+            $query->where('institutes.id', $instituteId);
+        })->findOrFail($id);
+
+        try {
+            // Detach from institute first
+            $student->institutes()->detach($instituteId);
+
+            // Delete the student if they don't belong to any other institutes
+            if ($student->institutes()->count() === 0) {
+                $student->delete();
+            }
+
+            return redirect()->route('admin.students.index')->with('success', 'Student removed successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error removing student: ' . $e->getMessage());
+        }
     }
 
 

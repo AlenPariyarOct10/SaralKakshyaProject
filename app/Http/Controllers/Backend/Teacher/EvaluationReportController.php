@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
+use App\Models\Student;
+use App\Models\StudentEvaluation;
+use App\Models\Subject;
+use App\Models\SubjectEvaluationFormat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EvaluationReportController extends Controller
 {

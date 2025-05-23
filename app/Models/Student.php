@@ -104,5 +104,10 @@ class Student extends Authenticatable implements CanResetPasswordContract
         return $this->belongsTo(ProgramSection::class, 'section_id', 'id');
     }
 
+    public function studentEvaluations()
+    {
+        return $this->hasMany(StudentEvaluation::class);
+    }
+
 
 }
