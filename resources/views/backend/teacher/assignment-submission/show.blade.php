@@ -2,6 +2,63 @@
 
 @section('title', 'View Submission')
 
+@php
+    function getStatusClass($status) {
+        switch(strtolower($status)) {
+            case 'submitted':
+                return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100';
+            case 'graded':
+                return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100';
+            case 'late':
+                return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100';
+            default:
+                return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
+        }
+    }
+
+    function getFileIcon($filePath) {
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+
+        switch(strtolower($extension)) {
+            case 'pdf':
+                return 'fa-file-pdf text-red-500';
+            case 'doc':
+            case 'docx':
+                return 'fa-file-word text-blue-500';
+            case 'xls':
+            case 'xlsx':
+                return 'fa-file-excel text-green-500';
+            case 'ppt':
+            case 'pptx':
+                return 'fa-file-powerpoint text-orange-500';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return 'fa-file-image text-purple-500';
+            case 'zip':
+            case 'rar':
+                return 'fa-file-archive text-yellow-500';
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+                return 'fa-file-video text-blue-500';
+            default:
+                return 'fa-file text-gray-500';
+        }
+    }
+
+    function formatFileSize($bytes) {
+        if ($bytes === 0) return '0 Bytes';
+
+        $k = 1024;
+        $sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        $i = floor(log($bytes) / log($k));
+
+        return round($bytes / pow($k, $i), 2) . ' ' . $sizes[$i];
+    }
+@endphp
+
 @section('content')
     <!-- Main Content Area -->
     <main class="p-6 md:p-6 min-h-screen overflow-y-auto pb-16">
@@ -16,10 +73,10 @@
                 </p>
             </div>
             <div class="mt-4 md:mt-0 flex space-x-3">
-                <a href="{{ route('teacher.assignment-submissions.index') }}" class="btn-secondary flex items-center">
+                <a href="{{ route('teacher.assignment.submission.index', \Illuminate\Support\Facades\Auth::user()->id) }}" class="btn-secondary flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Submissions
                 </a>
-                <a href="{{ route('teacher.assignment-submissions.edit', $submission->id) }}" class="btn-primary flex items-center">
+                <a href="{{ route('teacher.assignment.submission.edit', $submission->id) }}" class="btn-primary flex items-center">
                     <i class="fas fa-check-square mr-2"></i> Grade Submission
                 </a>
             </div>
@@ -88,7 +145,7 @@
                             @if($submission->attachments->count() > 0)
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($submission->attachments as $attachment)
-                                        <a href="{{ route('teacher.assignment-submissions.download', $attachment->id) }}"
+                                        <a href="{{ route('teacher.assignment.submission.download', $attachment->id) }}"
                                            class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded">
                                                 <i class="fas {{ getFileIcon($attachment->path) }} text-gray-500 dark:text-gray-400"></i>
@@ -124,7 +181,7 @@
                             @if($submission->assignment->attachments->count() > 0)
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($submission->assignment->attachments as $attachment)
-                                        <a href="{{ route('teacher.assignments.download', $attachment->id) }}"
+                                        <a href="{{ route('teacher.assignment.download', $attachment->id) }}"
                                            class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded">
                                                 <i class="fas {{ getFileIcon($attachment->path) }} text-gray-500 dark:text-gray-400"></i>
@@ -182,7 +239,7 @@
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Quick Grading</h3>
 
-                        <form action="{{ route('teacher.assignment-submissions.update', $submission->id) }}" method="POST">
+                        <form action="{{ route('teacher.assignment.submission.update', $submission->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
@@ -230,60 +287,5 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Any additional JavaScript can go here
         });
-
-        function getStatusClass(status) {
-            switch(status.toLowerCase()) {
-                case 'submitted':
-                    return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100';
-                case 'graded':
-                    return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100';
-                case 'late':
-                    return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100';
-                default:
-                    return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
-            }
-        }
-
-        function getFileIcon(filePath) {
-            const extension = filePath.split('.').pop().toLowerCase();
-
-            switch(extension) {
-                case 'pdf':
-                    return 'fa-file-pdf text-red-500';
-                case 'doc':
-                case 'docx':
-                    return 'fa-file-word text-blue-500';
-                case 'xls':
-                case 'xlsx':
-                    return 'fa-file-excel text-green-500';
-                case 'ppt':
-                case 'pptx':
-                    return 'fa-file-powerpoint text-orange-500';
-                case 'jpg':
-                case 'jpeg':
-                case 'png':
-                case 'gif':
-                    return 'fa-file-image text-purple-500';
-                case 'zip':
-                case 'rar':
-                    return 'fa-file-archive text-yellow-500';
-                case 'mp4':
-                case 'avi':
-                case 'mov':
-                    return 'fa-file-video text-blue-500';
-                default:
-                    return 'fa-file text-gray-500';
-            }
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
     </script>
 @endsection

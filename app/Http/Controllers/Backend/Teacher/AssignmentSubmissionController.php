@@ -71,7 +71,7 @@ class AssignmentSubmissionController extends Controller
         // Get paginated results
         $submissions = $query->latest('submitted_at')->paginate(10);
 
-        return view('backend.teacher.assignment-submissions.index', compact('submissions', 'assignments', 'batches'));
+        return view('backend.teacher.assignment-submission.index', compact('submissions', 'assignments', 'batches'));
     }
 
     /**
@@ -92,7 +92,7 @@ class AssignmentSubmissionController extends Controller
             })
             ->findOrFail($id);
 
-        return view('backend.teacher.assignment-submissions.show', compact('submission'));
+        return view('backend.teacher.assignment-submission.show', compact('submission'));
     }
 
     /**

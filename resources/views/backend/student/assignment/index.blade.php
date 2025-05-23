@@ -57,7 +57,7 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         {{ $assignment->subject->name ?? 'N/A' }} |
                                         Due: {{ $assignment->due_date }}
-                                        @if(\Carbon\Carbon::parse($assignment->due_date)->isPast() && !$assignment->submissions()->where('student_id', $user->id)->exists())
+                                        @if(\Carbon\Carbon::parse($assignment->due_date)->isPast() && !$assignment->assignmentSubmissions()->where('student_id', $user->id)->exists())
                                             (<span class="text-red-500">Overdue</span>)
                                         @endif
                                     </p>
@@ -164,7 +164,7 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="submittedAssignments">
                         @forelse($submittedAssignments as $assignment)
                             @php
-                                $submission = $assignment->submissions()->where('student_id', $user->id)->first();
+                                $submission = $assignment->assignmentSubmissions()->where('student_id', $user->id)->first();
                             @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap">

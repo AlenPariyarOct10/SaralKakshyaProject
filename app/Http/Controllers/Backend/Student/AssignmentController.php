@@ -29,18 +29,18 @@ class AssignmentController extends Controller
         $batchId = $student->batch ? $student->batch->id : null;
 
         // Fetch assignments for the student's batch
-        $assignments = $batchId ? Assignment::with(['subject', 'batch', 'submissions'])
+        $assignments = $batchId ? Assignment::with(['subject', 'batch', 'assignment_submissions'])
             ->where('batch_id', $batchId)
             ->where('status', 'active')
             ->get() : collect();
 
         // Separate submitted and pending assignments
         $submittedAssignments = $assignments->filter(function ($assignment) use ($user) {
-            return $assignment->submissions()->where('student_id', $user->id)->exists();
+            return $assignment->assignmentSubmissions()->where('student_id', $user->id)->exists();
         });
 
         $pendingAssignments = $assignments->filter(function ($assignment) use ($user) {
-            return !$assignment->submissions()->where('student_id', $user->id)->exists();
+            return !$assignment->assignmentSubmissions()->where('student_id', $user->id)->exists();
         });
 
         return view('backend.student.assignment.index', compact('user', 'submittedAssignments', 'pendingAssignments'));
@@ -54,7 +54,7 @@ class AssignmentController extends Controller
         $assignments = $batchId ? Assignment::with(['subject', 'batch'])
             ->where('batch_id', $batchId)
             ->where('status', 'active')
-            ->whereDoesntHave('submissions', function ($query) use ($user) {
+            ->whereDoesntHave('assignment_submissions', function ($query) use ($user) {
                 $query->where('student_id', $user->id);
             })
             ->get() : collect();
@@ -80,7 +80,7 @@ class AssignmentController extends Controller
             ->where('batch_id', $user->batch ? $user->batch->id : null)
             ->firstOrFail();
 
-        if ($assignment->submissions()->where('student_id', $user->id)->exists()) {
+        if ($assignment->assignmentSubmissions()->where('student_id', $user->id)->exists()) {
             return redirect()->back()->with('error', 'You have already submitted this assignment.');
         }
 
@@ -160,7 +160,7 @@ class AssignmentController extends Controller
             ->where('batch_id', $user->batch ? $user->batch->id : null)
             ->firstOrFail();
 
-        $submission = $assignment->submissions()
+        $submission = $assignment->assignmentSubmissions()
             ->where('student_id', $user->id)
             ->with('attachments')
             ->first();

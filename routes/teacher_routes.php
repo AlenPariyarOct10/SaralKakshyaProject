@@ -14,6 +14,7 @@ use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\SettingController as TeacherSettingController;
 use App\Http\Controllers\Backend\Teacher\PersonalRoutineController as TeacherPersonalRoutineController;
 use App\Http\Controllers\Backend\Teacher\ResourceController as TeacherResourceController;
+use App\Http\Controllers\Backend\Teacher\AssignmentSubmissionController as AssignmentSubmissionController;
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::middleware('guest:teacher')->group(function () {
@@ -72,10 +73,15 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/assignment/create', [TeacherAssignmentController::class, "create"])->name('teacher.assignment.create');
         Route::POST('/assignment', [TeacherAssignmentController::class, "store"])->name('teacher.assignment.store');
         Route::get('/assignment/{assignment}', [TeacherAssignmentController::class, "show"])->name('teacher.assignment.show');
+        Route::get('/assignment/{assignment}/submissions', [AssignmentSubmissionController::class, "index"])->name('teacher.assignment.submission.index');
+        Route::get('/assignment/submission/{id}', [AssignmentSubmissionController::class, "show"])->name('teacher.assignment.submission.show');
+        Route::get('/assignment/submission/{id}/edit', [AssignmentSubmissionController::class, "edit"])->name('teacher.assignment.submission.edit');
+        Route::get('/assignment/submission/{id}/download', [AssignmentSubmissionController::class, "download"])->name('teacher.assignment.submission.download');
 
         Route::get('/assignment/{assignment}/edit', [TeacherAssignmentController::class, "edit"])->name('teacher.assignment.edit');
         Route::PUT('/assignment/{assignment}', [TeacherAssignmentController::class, "update"])->name('teacher.assignment.update');
 
+        Route::delete('/assignments', [TeacherAssignmentController::class, "index"])->name('teacher.assignments.index');
         Route::delete('/assignment/{assignment}', [TeacherAssignmentController::class, "destroy"])->name('teacher.assignment.destroy');
         Route::get('/assignment/draft', [TeacherAssignmentController::class, "draft"])->name('teacher.assignment.draft');
         Route::get('/assignment/{id}/duplicate', [TeacherAssignmentController::class, "duplicate"])->name('teacher.assignment.duplicate');
@@ -94,9 +100,6 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/programs/{id}/subjects', [DepartmentController::class, 'getSubjects'])
             ->name('teacher.department.subjects');
 
-        //Assignment Submission
-        Route::get('/assignment/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])
-            ->name('teacher.assignment.submissions');
 
         //Assignment API
         Route::get('/api/assignments', [TeacherAssignmentController::class, 'myAssignments'])

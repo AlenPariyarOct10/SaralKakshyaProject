@@ -298,7 +298,7 @@
                         </div>
 
                         <div class="mt-6">
-                            <a href="{{ route('teacher.assignment.submissions', $assignment->id) }}" class="btn-primary w-full flex items-center justify-center">
+                            <a href="{{ route('teacher.assignment.submission.index', $assignment->id) }}" class="btn-primary w-full flex items-center justify-center">
                                 <i class="fas fa-clipboard-list mr-2"></i> View Submissions
                             </a>
                         </div>

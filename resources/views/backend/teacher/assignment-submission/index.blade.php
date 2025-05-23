@@ -2,6 +2,21 @@
 
 @section('title', 'Assignment Submissions')
 
+@php
+    function getStatusClass($status) {
+        switch(strtolower($status)) {
+            case 'submitted':
+                return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100';
+            case 'graded':
+                return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100';
+            case 'late':
+                return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100';
+            default:
+                return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
+        }
+    }
+@endphp
+
 @section('content')
     <!-- Main Content Area -->
     <main class="p-6 md:p-6 min-h-screen overflow-y-auto pb-16">
@@ -104,7 +119,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full" src="{{ $submission->student->profile_picture ?? '/placeholder.svg?height=40&width=40' }}" alt="{{ $submission->student->full_name }}">
+                                        <img class="h-10 w-10 rounded-full" src="{{ asset("storage/".$submission->student->profile_picture) ?? '/placeholder.svg?height=40&width=40' }}" alt="{{ $submission->student->full_name }}">
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $submission->student->full_name }}</div>
@@ -142,11 +157,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('teacher.assignment-submissions.show', $submission->id) }}" class="text-primary-600 hover:text-primary-800" title="View Submission">
+                                    <a href="{{ route('teacher.assignment.submission.show',$submission->id) }}" class="text-primary-600 hover:text-primary-800" title="View Submission">
                                         <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('teacher.assignment-submissions.edit', $submission->id) }}" class="text-yellow-600 hover:text-yellow-800" title="Grade Submission">
-                                        <i class="fas fa-check-square"></i>
                                     </a>
                                 </div>
                             </td>
@@ -239,17 +251,6 @@
             if (urlParams.has('search')) searchInput.value = urlParams.get('search');
         });
 
-        function getStatusClass(status) {
-            switch(status.toLowerCase()) {
-                case 'submitted':
-                    return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100';
-                case 'graded':
-                    return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100';
-                case 'late':
-                    return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100';
-                default:
-                    return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
-            }
-        }
+
     </script>
 @endsection
