@@ -14,7 +14,6 @@
     {{$user->profile_picture}}
 @endsection
 
-
 @push("styles")
     <script>
         tailwind.config = {
@@ -80,10 +79,11 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
-                    <input type="text" id="searchTeachers" placeholder="Search teachers..." class="form-input pl-12 pr-4 py-2">
-
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="searchTeachers" placeholder="Search teachers..." class="form-input pl-10 pr-4 py-2">
                 </div>
-
             </div>
             <div class="flex justify-end">
                 <a id="exportBtn" href="{{route('admin.teacher.download.excel')}}" class="btn-secondary flex items-center justify-center mr-2">
@@ -96,8 +96,6 @@
                     </span>
                 </a>
             </div>
-
-
         </div>
 
         <!-- Teachers Table -->
@@ -147,19 +145,22 @@
                                 <div class="flex items-center space-x-2">
                                     <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
                                             data-id="{{ $teacher->id }}"
-                                            title="View Profile">
+                                            title="View Profile"
+                                            aria-label="View teacher profile">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if($teacher->status=="active")
                                         <button class="block-teacher-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                                                 data-id="{{ $teacher->id }}"
-                                                title="Block Teacher">
+                                                title="Block Teacher"
+                                                aria-label="Block teacher">
                                             <i class="fas fa-ban"></i>
                                         </button>
                                     @else
                                         <button class="unblock-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
                                                 data-id="{{ $teacher->id }}"
-                                                title="Activate Teacher">
+                                                title="Activate Teacher"
+                                                aria-label="Activate teacher">
                                             <i class="fas fa-check-circle"></i>
                                         </button>
                                     @endif
@@ -183,11 +184,12 @@
     <!-- Teacher Profile Modal -->
     <div id="teacherProfileModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="p-6 overflow-y-auto max-h-[80vh]">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-2xl font-semibold text-gray-800 dark:text-white">Teacher Profile</h3>
-                    <button id="closeProfileModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button id="closeProfileModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            aria-label="Close profile modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -246,8 +248,8 @@
                                 <p id="teacherExperience" class="font-medium"></p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
-                                <p id="teacherStatus" class="font-medium"></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Account Status</p>
+                                <p id="teacherAccountStatus" class="font-medium"></p>
                             </div>
                         </div>
                     </div>
@@ -263,7 +265,8 @@
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 id="blockModalTitle" class="text-xl font-semibold text-gray-800 dark:text-white">Confirm Action</h3>
-                    <button id="closeBlockModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button id="closeBlockModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            aria-label="Close confirmation modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -281,6 +284,18 @@
 
 @section('scripts')
     <script>
+        // Toast Notification Setup
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
 
         // DOM Elements
         const teacherProfileModal = document.getElementById('teacherProfileModal');
@@ -291,21 +306,19 @@
         const searchInput = document.getElementById('searchTeachers');
 
         // View Profile
-        // JavaScript for Handling the Teacher Profile Modal
         document.querySelectorAll('.view-profile-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const teacherId = button.getAttribute('data-id');
-                const modal = document.getElementById('teacherProfileModal');
 
                 // Show loading state
                 button.disabled = true;
                 button.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Loading...
-        `;
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading...
+                `;
 
                 try {
                     const response = await fetch(`/admin/api/teacher/${teacherId}`);
@@ -323,14 +336,10 @@
 
                     const teacher = data.data.teacher;
 
-                    console.log("Teacher data:", teacher);
-
-                    document.getElementById("teacherQualification").innerText = teacher.qualification;
-
                     // Populate modal with teacher data
                     document.getElementById('teacherProfilePicture').src =
                         teacher.profile_picture
-                            ? `/storage/${teacher.profile_picture}` // Correctly prepend storage path
+                            ? `/storage/${teacher.profile_picture}`
                             : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                                 `${teacher.fname} ${teacher.lname}`
                             )}&background=random`;
@@ -347,31 +356,33 @@
                         teacher.created_at ? new Date(teacher.created_at).toLocaleDateString() : 'Unknown';
                     document.getElementById('teacherStatus').textContent =
                         teacher.status || 'Unknown';
+                    document.getElementById('teacherQualification').textContent =
+                        teacher.qualification || 'Not provided';
+                    document.getElementById('teacherSpecialization').textContent =
+                        teacher.specialization || 'Not specified';
+                    document.getElementById('teacherExperience').textContent =
+                        teacher.experience || 'Not specified';
+                    document.getElementById('teacherAccountStatus').textContent =
+                        teacher.status === 'active' ? 'Active' : 'Inactive';
 
-                    // Optional: Remove the department field if it's not provided in API
+                    // Handle department if available
                     if (teacher.department) {
-                        document.getElementById('teacherDepartment').textContent = teacher.department.name;
+                        document.getElementById('teacherDepartment').textContent =
+                            teacher.department.name || 'Not assigned';
                     } else {
                         document.getElementById('teacherDepartment').textContent = 'Not assigned';
                     }
 
                     // Show modal
-                    modal.classList.remove('hidden');
+                    teacherProfileModal.classList.remove('hidden');
                     document.body.classList.add('overflow-hidden');
 
                 } catch (error) {
                     console.error('Error fetching teacher data:', error);
-
-                    // Show error to user
-                    const toast = document.createElement('div');
-                    toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
-                    toast.textContent = 'Failed to load teacher profile';
-                    document.body.appendChild(toast);
-
-                    // Remove toast after 3 seconds
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 3000);
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Error loading profile: ' + (error.message || 'Unknown error')
+                    });
                 } finally {
                     // Reset button state
                     button.disabled = false;
@@ -380,22 +391,14 @@
             });
         });
 
-        // Modal close functionality
-        const modalCloseBtn = document.getElementById('closeTeacherModal');
-        if (modalCloseBtn) {
-            modalCloseBtn.addEventListener('click', () => {
-                document.getElementById('teacherProfileModal').classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
-
         // Block/Unblock Teacher
         document.querySelectorAll('.block-teacher-btn, .unblock-teacher-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const teacherId = button.getAttribute('data-id');
                 const isBlocking = button.classList.contains('block-teacher-btn');
 
-                document.getElementById('blockModalTitle').textContent = isBlocking ? 'Block Teacher' : 'Unblock Teacher';
+                document.getElementById('blockModalTitle').textContent =
+                    isBlocking ? 'Block Teacher' : 'Unblock Teacher';
                 document.getElementById('blockModalMessage').textContent = isBlocking
                     ? 'Are you sure you want to block this teacher? They will not be able to access the system.'
                     : 'Are you sure you want to unblock this teacher? They will regain access to the system.';
@@ -409,57 +412,53 @@
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                             },
-                            body: JSON.stringify({}) // optional if you don’t need to send data
+                            body: JSON.stringify({})
                         });
 
                         const data = await response.json();
 
                         if (response.ok && data.status) {
+                            // Update UI
+                            const badge = document.getElementById(`status-badge-${teacherId}`);
+                            const newStatus = badge.textContent.trim() === "Active" ? "Inactive" : "Active";
 
-                            let badge = document.getElementById(`status-badge-${teacherId}`);
-
-
-                            if (badge.innerText.trim() === "Active") {
-                                badge.innerText = "Blocked";
-                                badge.classList.remove('bg-green-100', 'text-green-800');
-                                badge.classList.add('bg-red-100', 'text-red-800');
-                            } else {
-                                badge.innerText = "Active";
-                                badge.classList.remove('bg-red-100', 'text-red-800');
-                                badge.classList.add('bg-green-100', 'text-green-800');
-                            }
+                            badge.textContent = newStatus;
+                            badge.classList.toggle('bg-green-100', newStatus === "Active");
+                            badge.classList.toggle('text-green-800', newStatus === "Active");
+                            badge.classList.toggle('dark:bg-green-800', newStatus === "Active");
+                            badge.classList.toggle('dark:text-green-100', newStatus === "Active");
+                            badge.classList.toggle('bg-red-100', newStatus === "Inactive");
+                            badge.classList.toggle('text-red-800', newStatus === "Inactive");
+                            badge.classList.toggle('dark:bg-red-800', newStatus === "Inactive");
+                            badge.classList.toggle('dark:text-red-100', newStatus === "Inactive");
 
                             blockConfirmModal.classList.add('hidden');
 
-                            await Toast.fire({
+                            Toast.fire({
                                 icon: 'success',
                                 title: 'Status updated successfully',
                             });
-
                         } else {
                             throw new Error(data.message || 'Failed to update status');
                         }
                     } catch (error) {
-                        console.log("failed", error);
-
+                        console.error("Status update failed:", error);
                         blockConfirmModal.classList.add('hidden');
-
-                        await Toast.fire({
+                        Toast.fire({
                             icon: 'error',
-                            title: 'Failed to update',
+                            title: 'Failed to update status',
                         });
                     }
-
                 };
 
                 blockConfirmModal.classList.remove('hidden');
             });
         });
 
-
         // Close modals
         closeProfileModal.addEventListener('click', () => {
             teacherProfileModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
         });
 
         closeBlockModal.addEventListener('click', () => {

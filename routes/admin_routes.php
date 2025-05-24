@@ -21,6 +21,8 @@ use App\Http\Controllers\Backend\Admin\SubjectTeacherMappingController as AdminS
 use App\Http\Controllers\Backend\Admin\ClassRoutineController as AdminClassRoutineController;
 use App\Http\Controllers\Backend\Admin\ForgotPasswordController as AdminForgotPasswordController;
 use App\Http\Controllers\Backend\Admin\ResetPasswordController as AdminResetPasswordController;
+use App\Http\Controllers\Backend\Admin\InstituteSessionController as AdminInstituteSessionController;
+
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -122,6 +124,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/student/approve/{id}', [AdminStudentController::class, "approve_student"])->name('admin.student.approve');
         Route::POST('/student/status/{id}', [AdminStudentController::class, "toggle_status"])->name('admin.student.status');
         Route::get('/student/download/excel', [AdminStudentController::class, "generatePDF"])->name('admin.student.download.excel');
+
         //Teacher
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
         Route::get('/teachers/getAll', [AdminTeacherController::class, "getAll"])->name('admin.teacher.getAll');
@@ -165,6 +168,15 @@ Route::group(['prefix' => 'admin'], function () {
             return 'Event has been broadcast!';
         });
 
+
+        ############################################# StudentPassPredictionController #############################################
+        Route::get('/prediction', [App\Http\Controllers\Algorithm\StudentPassPredictionController::class, 'index'])->name('admin.prediction.index');
+        Route::post('/prediction/train', [App\Http\Controllers\Algorithm\StudentPassPredictionController::class, 'train'])->name('admin.prediction.train');
+        Route::post('/prediction/predict', [App\Http\Controllers\Algorithm\StudentPassPredictionController::class, 'predict'])->name('admin.prediction.predict');
+
+
+        ############################################# Institute Session #############################################
+        Route::get('/session', [AdminInstituteSessionController::class, 'index'])->name('admin.session.index');
 
 
         /*

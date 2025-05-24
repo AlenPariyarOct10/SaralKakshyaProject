@@ -124,6 +124,14 @@
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>
                 </a>
+                <a href="{{route("admin.prediction.index")}}" class="sidebar-item  {{Route::is("admin.department.index")? "active":""}}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Predictions</span>
+                </a>
+                <a href="{{route("admin.session.index")}}" class="sidebar-item  {{Route::is("admin.session.index")? "active":""}}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Session</span>
+                </a>
                 <a href="{{route("admin.routine-planner.index")}}" class="sidebar-item  {{Route::is("admin.routine-planner.index")? "active":""}}">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span>Class Routine</span>

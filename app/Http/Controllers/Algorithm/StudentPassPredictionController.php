@@ -133,7 +133,7 @@ class StudentPassPredictionController extends Controller
         return redirect()->back()->with([
             'prediction_result' => $prediction,
             'prediction_probability' => $prediction ? $probability : (1 - $probability)
-        ]);
+        ])->withInput()->with('predicted', true);
     }
 
     /**

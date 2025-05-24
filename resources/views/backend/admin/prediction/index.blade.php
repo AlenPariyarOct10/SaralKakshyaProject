@@ -224,6 +224,7 @@
                         </form>
 
                         @if(session('prediction_result'))
+                            hello
                             <div class="prediction-result {{ session('prediction_result') ? 'prediction-pass' : 'prediction-fail' }}">
                                 @if(session('prediction_result'))
                                     <div class="flex items-center justify-center">

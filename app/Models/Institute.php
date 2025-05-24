@@ -14,6 +14,11 @@ class Institute extends Model
 
     protected $casts = ['deleted_at' => 'datetime'];
 
+    public function batches()
+    {
+        return $this->hasMany(Batch::class, 'institute_id', 'id');
+    }
+
     public function departments()
     {
         return $this->hasMany(Department::class, 'institute_id', 'id');
@@ -37,6 +42,11 @@ class Institute extends Model
     public function announcements()
     {
         return $this->hasMany(Announcement::class);
+    }
+
+    public function sessions()
+    {
+        return $this->hasMany(InstituteSession::class);
     }
 
 }

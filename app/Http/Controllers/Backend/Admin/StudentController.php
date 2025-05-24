@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Admin;
 use App\Exports\Admin\TeacherExport;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Institute;
 use App\Models\Student;
 use App\Models\Teacher;
 use Carbon\Carbon;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\In;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
@@ -23,6 +25,8 @@ class StudentController extends Controller
     {
         $user = Auth::user(); // assuming Admin is logged in
         $instituteId = $user->institute->id;
+        $batches = Institute::with('batches')->where('id', $instituteId)->get();
+
 
         // Get students through the pivot table relationship
         $students = Student::whereHas('institutes', function ($query) use ($instituteId) {
@@ -30,7 +34,7 @@ class StudentController extends Controller
                 ->whereNotNull('institute_student.approved_at'); // This is the correct way
         })->get();
 
-        return view('backend.admin.students.index', compact('user', 'students'));
+        return view('backend.admin.students.index', compact('user', 'students', 'batches'));
     }
 
 
