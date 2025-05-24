@@ -120,8 +120,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/student', [AdminStudentController::class, "index"])->name('admin.student.index');
         Route::get('/student/{id}', [AdminStudentController::class, "show"])->name('admin.student.show');
-        Route::get('/student/unapproved', [AdminStudentController::class, "index_pending_students"])->name('admin.student.unapproved.index');
+        Route::get('/students/unapproved-students', [AdminStudentController::class, "index_pending_students"])->name('admin.student.unapproved.index');
+
         Route::put('/student/approve/{id}', [AdminStudentController::class, "approve_student"])->name('admin.student.approve');
+        Route::put('/student/unapprove/{id}', [AdminStudentController::class, "unapprove_student"])->name('admin.student.unapprove');
         Route::POST('/student/status/{id}', [AdminStudentController::class, "toggle_status"])->name('admin.student.status');
         Route::get('/student/download/excel', [AdminStudentController::class, "generatePDF"])->name('admin.student.download.excel');
 
@@ -177,6 +179,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         ############################################# Institute Session #############################################
         Route::get('/session', [AdminInstituteSessionController::class, 'index'])->name('admin.session.index');
+        Route::POST('/sessions/bulk-create', [AdminInstituteSessionController::class, 'bulkCreate'])->name('admin.session.bulkCreate');
+        Route::PUT('/sessions/{id}', [AdminInstituteSessionController::class, 'update'])->name('admin.session.update');
+        Route::delete('/sessions/{session}', [AdminInstituteSessionController::class, 'destroy'])
+            ->name('admin.sessions.destroy');
 
 
         /*

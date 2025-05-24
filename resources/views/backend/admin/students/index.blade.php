@@ -200,8 +200,10 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @if($student->status)
-                                        <form action="{{route('admin.student.status', $student->id)}}" method="POST" class="inline">
+                                        <form action="{{route('admin.student.unapprove', $student->id)}}" method="POST" class="inline">
                                             @csrf
+                                            @method('PUT')
+
                                             <button type="submit"
                                                     class="p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                                                     title="Block student">

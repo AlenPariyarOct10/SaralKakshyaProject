@@ -142,10 +142,7 @@
                             <p class="info-label">Batch</p>
                             <p class="info-value">{{ $student->batch->batch }}</p>
                         </div>
-                        <div>
-                            <p class="info-label">Section</p>
-                            <p class="info-value">{{ $student->section }}</p>
-                        </div>
+
                         <div>
                             <p class="info-label">Admission Date</p>
                             <p class="info-value">{{ $student->admission_date->format('d M, Y') }}</p>
@@ -183,8 +180,8 @@
                             </p>
                         </div>
                         <div>
-                            <p class="info-label">Institute ID</p>
-                            <p class="info-value">{{ $student->institute_id }}</p>
+                            <p class="info-label">Institute</p>
+                            <p class="info-value">{{ $insitute->name }}</p>
                         </div>
                     </div>
                 </div>
@@ -200,8 +197,9 @@
                             </button>
                         </form>
                     @else
-                        <form action="{{ route('admin.student.status', $student->id) }}" method="POST" class="inline">
+                        <form action="{{ route('admin.student.unapprove', $student->id) }}" method="POST" class="inline">
                             @csrf
+                            @method('PUT')
                             <button type="submit" class="btn-danger">
                                 <i class="fas fa-ban mr-2"></i>
                                 Block Student

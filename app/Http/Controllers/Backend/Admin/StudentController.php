@@ -79,6 +79,24 @@ class StudentController extends Controller
         }
     }
 
+    public function unapprove_student($id)
+    {
+        $adminInstituteId = Auth::user()->institute->id;
+        DB::table('institute_student')
+            ->where('student_id', $id)
+            ->where('institute_id', $adminInstituteId)
+            ->update(['approved_at' => null, 'is_approved' => 0]);
+
+        $student = Student::findOrFail($id);
+        if ($student->status == 1) {
+            $student->status = 0;
+        }
+
+        $student->save();
+
+        return redirect()->back()->with('success', 'Student blocked successfully.');
+    }
+
 
     public function approve_student($id)
     {
@@ -88,6 +106,15 @@ class StudentController extends Controller
             ->where('student_id', $id)
             ->where('institute_id', $adminInstituteId)
             ->update(['approved_at' => Carbon::now(), 'is_approved' => 1]);
+
+        $student = Student::findOrFail($id);
+        if ($student->status == 1) {
+            $student->status = 0;
+        } else {
+            $student->status = 1;
+        }
+
+        $student->save();
 
         $student = \App\Models\Student::findOrFail($id);
         $email = $student->email;
@@ -162,11 +189,13 @@ class StudentController extends Controller
         $user = Auth::user();
         $instituteId = $user->institute->id;
 
+        $insitute = Institute::findOrFail($instituteId);
+
         $student = Student::whereHas('institutes', function ($query) use ($instituteId) {
             $query->where('institutes.id', $instituteId);
         })->findOrFail($id);
 
-        return view('backend.admin.students.show', compact('student', 'user'));
+        return view('backend.admin.students.show', compact('student', 'user', 'insitute'));
     }
 
 
