@@ -143,26 +143,29 @@
                             </td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
-                                    <button class="view-profile-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
-                                            data-id="{{ $teacher->id }}"
-                                            title="View Profile"
-                                            aria-label="View teacher profile">
+                                    <a href="{{route('admin.teacher.show', $teacher->id)}}"
+                                       class="p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
+                                       title="View profile">
                                         <i class="fas fa-eye"></i>
-                                    </button>
+                                    </a>
                                     @if($teacher->status=="active")
-                                        <button class="block-teacher-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
-                                                data-id="{{ $teacher->id }}"
-                                                title="Block Teacher"
-                                                aria-label="Block teacher">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
+                                        <form action="{{ route('admin.teacher.unapprove', $teacher->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="0">
+                                            <button type="submit" class="text-red-600" onclick="return confirm('Are you sure you want to deactivate this teacher?')">
+                                                <i class="fas fa-ban mr-2"></i>
+
+                                            </button>
+                                        </form>
                                     @else
-                                        <button class="unblock-teacher-btn p-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full"
-                                                data-id="{{ $teacher->id }}"
-                                                title="Activate Teacher"
-                                                aria-label="Activate teacher">
-                                            <i class="fas fa-check-circle"></i>
-                                        </button>
+                                        <form action="{{ route('admin.teacher.approve', $teacher->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="text-green-500" onclick="return confirm('Are you sure you want to approve this teacher?')">
+                                                <i class="fas fa-check-circle mr-2"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </td>

@@ -157,28 +157,13 @@
                         </div>
                         <div>
                             <p class="info-label">Employee ID</p>
-                            <p class="info-value">TCH-{{ str_pad($teacher->id, 4, '0', STR_PAD_LEFT) }}</p>
+                            <p class="info-value">{{ $teacher->id }}</p>
                         </div>
                         <div>
                             <p class="info-label">Joining Date</p>
                             <p class="info-value">{{ $teacher->created_at->format('d M, Y') }}</p>
                         </div>
-                        <div>
-                            <p class="info-label">Email Verified</p>
-                            <p class="info-value">
-                                @if($teacher->email_verified_at)
-                                    <span class="text-green-600 dark:text-green-400">
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        {{ $teacher->email_verified_at->format('d M, Y') }}
-                                    </span>
-                                @else
-                                    <span class="text-yellow-600 dark:text-yellow-400">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        Not verified
-                                    </span>
-                                @endif
-                            </p>
-                        </div>
+
                     </div>
                 </div>
 
@@ -186,26 +171,11 @@
                 <div class="card p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         <i class="fas fa-chalkboard-teacher mr-2"></i>
-                        Teaching Assignments
+                         Assignments
                     </h3>
                     @if($teacher->subjectTeacherMappings && $teacher->subjectTeacherMappings->count() > 0)
-                        <div class="space-y-3">
-                            @foreach($teacher->subjectTeacherMappings as $mapping)
-                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                    <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">
-                                            {{ $mapping->subject->name ?? 'Subject' }}
-                                        </p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $mapping->subject->program->name ?? 'Program' }} -
-                                            Semester {{ $mapping->subject->semester ?? 'N/A' }}
-                                        </p>
-                                    </div>
-                                    <span class="badge bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                                        {{ $mapping->subject->credit_hours ?? 0 }} Credits
-                                    </span>
-                                </div>
-                            @endforeach
+                        <div class="space-y-3 flex flex-row">
+                             <p class="text-gray-500 dark:text-gray-400"> {{$teacher->assignments->count()}} </p> Assignments
                         </div>
                     @else
                         <div class="text-center py-8">
@@ -215,25 +185,60 @@
                     @endif
                 </div>
 
-                <!-- Teaching Batches -->
-                @if($teacher->teachingBatches && $teacher->teachingBatches->count() > 0)
-                    <div class="card p-6 mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            <i class="fas fa-users mr-2"></i>
-                            Teaching Batches
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            @foreach($teacher->teachingBatches as $batch)
-                                <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $batch->batch }}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $batch->program->name ?? 'Program' }} - Semester {{ $batch->semester }}
-                                    </p>
+                <!-- Teaching Assignments -->
+                <div class="card p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>
+                        Subjects
+                    </h3>
+                    @if($teacher->subjectTeacherMappings && $teacher->subjectTeacherMappings->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($teacher->subjectTeacherMappings as $mapping)
+                                @php $subject = $mapping->subject; @endphp
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900 dark:text-white">
+                                                {{ $subject->name }} ({{ $subject->code }})
+                                            </h4>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                <span class="font-medium">Credit:</span> {{ $subject->credit }} |
+                                                <span class="font-medium">Semester:</span> {{ $subject->semester }}
+                                            </p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {{ $subject->program->name ?? 'N/A' }}
+                        </span>
+                                    </div>
+
+                                    @if($subject->description)
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                            {{ Str::limit($subject->description, 150) }}
+                                            @if(strlen($subject->description) > 150)
+                                                <button class="text-blue-600 dark:text-blue-400 text-xs ml-1"
+                                                        onclick="this.previousSibling.textContent = '{{ $subject->description }}'; this.remove()">
+                                                    Show more
+                                                </button>
+                                            @endif
+                                        </p>
+                                    @endif
+
+                                    <div class="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Assigned on: {{ $mapping->created_at->format('M d, Y') }}
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
-                    </div>
-                @endif
+                    @else
+                        <div class="text-center py-8">
+                            <i class="fas fa-chalkboard text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400">No subjects assigned yet</p>
+                        </div>
+                    @endif
+                </div>
+
+
 
                 <!-- Account Information -->
                 <div class="card p-6 mb-6">
@@ -250,10 +255,7 @@
                             <p class="info-label">Last Updated</p>
                             <p class="info-value">{{ $teacher->updated_at->format('d M, Y \a\t H:i') }}</p>
                         </div>
-                        <div>
-                            <p class="info-label">Institute</p>
-                            <p class="info-value">{{ $institute->name ?? 'Not assigned' }}</p>
-                        </div>
+
                         <div>
                             <p class="info-label">Account Status</p>
                             <p class="info-value">
@@ -275,7 +277,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3">
-                    @if(!$teacher->status)
+                    @if($teacher->status=="inactive")
                         <form action="{{ route('admin.teacher.approve', $teacher->id) }}" method="POST" class="inline">
                             @csrf
                             @method('PUT')
@@ -285,8 +287,9 @@
                             </button>
                         </form>
                     @else
-                        <form action="{{ route('admin.teacher.status', $teacher->id) }}" method="POST" class="inline">
+                        <form action="{{ route('admin.teacher.unapprove', $teacher->id) }}" method="POST" class="inline">
                             @csrf
+                            @method('PUT')
                             <input type="hidden" name="status" value="0">
                             <button type="submit" class="btn-danger" onclick="return confirm('Are you sure you want to deactivate this teacher?')">
                                 <i class="fas fa-ban mr-2"></i>
@@ -300,12 +303,6 @@
                         View All Teachers
                     </a>
 
-                    @if($teacher->subjectTeacherMappings && $teacher->subjectTeacherMappings->count() > 0)
-                        <a href="{{ route('admin.subject-teacher.mapping.index') }}?teacher_id={{ $teacher->id }}" class="btn-primary">
-                            <i class="fas fa-cog mr-2"></i>
-                            Manage Assignments
-                        </a>
-                    @endif
                 </div>
             </div>
         </div>

@@ -48,6 +48,11 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         return "{$this->fname} {$this->lname}";
     }
 
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -74,22 +79,16 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         return $this->morphMany(SeenStatus::class, 'user');
     }
 
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_teacher_mappings')
+            ->withTimestamps();
+    }
+
     public function subjectTeacherMappings()
     {
         return $this->hasMany(SubjectTeacherMapping::class);
     }
 
-    public function teachingBatches()
-    {
-        return Batch::select('batches.*')
-            ->join('subjects', function($join) {
-                $join->on('subjects.program_id', '=', 'batches.program_id')
-                    ->whereColumn('subjects.semester', '=', 'batches.semester');
-            })
-            ->join('subject_teacher_mappings', 'subject_teacher_mappings.subject_id', '=', 'subjects.id')
-            ->where('subject_teacher_mappings.teacher_id', $this->id)
-            ->distinct()
-            ->get();
-    }
 
 }

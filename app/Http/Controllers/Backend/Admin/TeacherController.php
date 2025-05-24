@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Exports\Admin\TeacherExport;
 use App\Http\Controllers\Controller;
+use App\Models\Institute;
+use App\Models\Student;
 use App\Models\Teacher;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -190,7 +192,15 @@ class TeacherController extends Controller
             ->where('institute_id', $adminInstituteId)
             ->update(['approvedAt' => Carbon::now(), 'isApproved' => 1]);
 
-        $teacher = \App\Models\Teacher::findOrFail($id);
+        $teacher = Teacher::findOrFail($id);
+
+
+        if ($teacher->status == 'inactive') {
+            $teacher->status = 'active';
+        }
+
+        $teacher->save();
+
         $email = $teacher->email;
 
         // Send test email
@@ -200,6 +210,24 @@ class TeacherController extends Controller
         });
 
         return redirect()->back()->with('success', 'Teacher approved and notified successfully.');
+    }
+
+    public function unapprove_teacher($id)
+    {
+        $adminInstituteId = Auth::user()->institute->id;
+        DB::table('institute_teacher')
+            ->where('teacher_id', $id)
+            ->where('institute_id', $adminInstituteId)
+            ->update(['approvedAt' => null, 'isApproved' => 0]);
+
+        $teacher = Teacher::findOrFail($id);
+        if ($teacher->status == 'active') {
+            $teacher->status = 'inactive';
+        }
+
+        $teacher->save();
+
+        return redirect()->back()->with('success', 'Teacher blocked successfully.');
     }
 
     /**
@@ -225,7 +253,16 @@ class TeacherController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = Auth::user();
+        $instituteId = $user->institute->id;
+
+        $insitute = Institute::findOrFail($instituteId);
+
+        $teacher = Teacher::whereHas('institutes', function ($query) use ($instituteId) {
+            $query->where('institutes.id', $instituteId);
+        })->findOrFail($id);
+
+        return view('backend.admin.teachers.show', compact('teacher', 'user', 'insitute'));
     }
 
     /**

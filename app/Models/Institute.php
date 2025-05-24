@@ -49,4 +49,61 @@ class Institute extends Model
         return $this->hasMany(InstituteSession::class);
     }
 
+    public function resources()
+    {
+        return Resource::whereHas('teacher', function($query) {
+            $query->whereHas('institutes', function($query) {
+                $query->where('institutes.id', $this->id);
+            });
+        });
+    }
+
+// In Institute.php
+    public function studentAttendances()
+    {
+        return $this->hasManyThrough(
+            Attendance::class,
+            Student::class,
+            'institute_id',
+            'attendee_id',
+            'id',
+            'id'
+        )->where('attendances.attendee_type', 'student');
+    }
+
+    public function getAttendanceStats()
+    {
+        $stats = [
+            'total_students' => $this->students()->count(),
+            'records' => [],
+            'average_rate' => 0
+        ];
+
+        $attendanceData = $this->studentAttendances()
+            ->selectRaw('
+            attendee_id,
+            COUNT(*) as total_days,
+            SUM(CASE WHEN attendances.status = "present" THEN 1 ELSE 0 END) as present_days
+        ')
+            ->groupBy('attendee_id')
+            ->get();
+
+        if ($attendanceData->isNotEmpty()) {
+            $stats['records'] = $attendanceData->map(function($item) {
+                $item->attendance_rate = $item->total_days > 0
+                    ? round(($item->present_days / $item->total_days) * 100, 2)
+                    : 0;
+                return $item;
+            });
+
+            $totalPresent = $stats['records']->sum('present_days');
+            $totalPossible = $stats['records']->sum('total_days');
+            $stats['average_rate'] = $totalPossible > 0
+                ? round(($totalPresent / $totalPossible) * 100, 2)
+                : 0;
+        }
+
+        return $stats;
+    }
+
 }

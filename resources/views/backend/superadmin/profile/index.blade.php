@@ -81,26 +81,7 @@
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
                             <p class="text-gray-800 dark:text-white">{{($user->email) ? $user->email : "Not Set"}}</p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->phone) ? $user->phone : "Not Set"}}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Date of Birth</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->dob) ? $user->dob : "Not Set"}}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Address</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->address) ? $user->address : "Not Set"}}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Parents Name</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->guardian_name) ? $user->guardian_name : "Not Set"}}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Parents Phone</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->guardian_phone) ? $user->guardian_phone : "Not Set"}}</p>
-                        </div>
+
                     </div>
                 </div>
             </div>

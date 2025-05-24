@@ -109,5 +109,11 @@ class Student extends Authenticatable implements CanResetPasswordContract
         return $this->hasMany(StudentEvaluation::class);
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'attendee_id')
+            ->where('attendee_type', 'student');
+    }
+
 
 }

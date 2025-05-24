@@ -55,9 +55,24 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        $user = SuperAdmin::all()->first();
+        $user->fname = $validatedData['fname'];
+        $user->lname = $validatedData['lname'];
+        $user->email = $validatedData['email'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully'
+        ]);
     }
 
     public function changePassword(Request $request)

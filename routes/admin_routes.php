@@ -129,9 +129,11 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Teacher
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
+        Route::get('/teacher/{id}', [AdminTeacherController::class, "show"])->name('admin.teacher.show');
         Route::get('/teachers/getAll', [AdminTeacherController::class, "getAll"])->name('admin.teacher.getAll');
         Route::get('/teacher/unapproved', [AdminTeacherController::class, "index_pending_teachers"])->name('admin.teacher.unapproved.index');
         Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
+        Route::put('/teacher/unapprove/{id}', [AdminTeacherController::class, "unapprove_teacher"])->name('admin.teacher.unapprove');
         Route::POST('/teacher/status/{id}', [AdminTeacherController::class, "toggle_status"])->name('admin.teacher.status');
         Route::get('/teacher/download/excel', [AdminTeacherController::class, "generatePDF"])->name('admin.teacher.download.excel');
         Route::get('/teacher/{id}/getTiming', [AdminTeacherController::class, "getTiming"])->name('admin.subject-teacher.getTiming');
