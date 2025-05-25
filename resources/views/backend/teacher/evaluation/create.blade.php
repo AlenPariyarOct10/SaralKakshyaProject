@@ -371,7 +371,7 @@
                     // Show loading state
                     subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
 
-                    const response = await fetch(`/teacher/batch/${batchId}/subjects`);
+                    const response = await fetch(`/teacher/api/batch/${batchId}/subjects`);
                     if (!response.ok) throw new Error('Failed to fetch subjects');
 
                     const subjects = await response.json();
@@ -414,7 +414,7 @@
                     // Show loading state
                     formatSelect.innerHTML = '<option value="">Loading formats...</option>';
 
-                    const response = await fetch(`/teacher/subject/${subjectId}/evaluation-formats`);
+                    const response = await fetch(`/teacher/api/subject/${subjectId}/evaluation-formats`);
                     if (!response.ok) throw new Error('Failed to fetch evaluation formats');
 
                     const formats = await response.json();
@@ -422,23 +422,41 @@
                     // Reset format dropdown
                     formatSelect.innerHTML = '<option value="">Select Evaluation Format</option>';
 
+                    // Check if we got an object (like your sample response) and convert to array if needed
+                    let formatsArray = formats;
+                    if (typeof formats === 'object' && !Array.isArray(formats)) {
+                        formatsArray = Object.values(formats);
+                    }
+
                     // Populate formats
-                    formats.forEach(format => {
+                    formatsArray.forEach(format => {
                         const option = document.createElement('option');
                         option.value = format.id;
                         option.textContent = format.criteria;
                         option.setAttribute('data-full-marks', format.full_marks);
+                        option.setAttribute('data-pass-marks', format.pass_marks || 0);
                         option.setAttribute('data-weight', format.marks_weight);
                         option.setAttribute('data-description', format.description || 'No description available');
+
+                        // If using the alternative API version that includes has_evaluation flag
+                        if (format.has_evaluation) {
+                            option.textContent += ' (Evaluated)';
+                            option.disabled = true; // Optional: disable already evaluated formats
+                        }
+
                         formatSelect.appendChild(option);
                     });
+
+                    // If no formats available
+                    if (formatsArray.length === 0) {
+                        formatSelect.innerHTML = '<option value="">No evaluation formats available</option>';
+                    }
 
                 } catch (error) {
                     console.error('Error loading evaluation formats:', error);
                     formatSelect.innerHTML = '<option value="">Error loading formats</option>';
                 }
             }
-
             function loadFormatDetails() {
                 const selectedOption = formatSelect.options[formatSelect.selectedIndex];
 
@@ -499,7 +517,7 @@
                     studentListContainer.classList.remove('hidden');
                     noStudentsMessage.classList.add('hidden');
 
-                    const response = await fetch(`/teacher/batch/${batchId}/students?subject_id=${subjectId}`);
+                    const response = await fetch(`/teacher/api/batch/${batchId}/students?subject_id=${subjectId}`);
                     if (!response.ok) throw new Error('Failed to fetch students');
 
                     const students = await response.json();
@@ -538,7 +556,7 @@
                     noStudentsMessage.classList.add('hidden');
 
                     // Build URL with parameters
-                    let url = `/teacher/batch/${batchId}/students?subject_id=${subjectId}&source=${source}`;
+                    let url = `/teacher/api/batch/${batchId}/students?subject_id=${subjectId}&source=${source}`;
 
                     // Add date parameters if attendance is selected
                     if (source === 'attendance') {

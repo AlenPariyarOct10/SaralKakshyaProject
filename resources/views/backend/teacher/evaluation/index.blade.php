@@ -55,14 +55,6 @@
                     </select>
                 </div>
 
-                <div class="relative">
-                    <label for="statusFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Status</label>
-                    <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        <option value="">All Status</option>
-                        <option value="1">Finalized</option>
-                        <option value="0">Draft</option>
-                    </select>
-                </div>
             </div>
 
             <div class="flex flex-col md:flex-row gap-4 mt-4">
@@ -100,7 +92,6 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Batch</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Evaluation Format</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Marks</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
@@ -184,7 +175,6 @@
             const batchFilter = document.getElementById('batchFilter');
             const subjectFilter = document.getElementById('subjectFilter');
             const formatFilter = document.getElementById('formatFilter');
-            const statusFilter = document.getElementById('statusFilter');
             const searchInput = document.getElementById('searchInput');
             const resetFilters = document.getElementById('resetFilters');
             const evaluationsTableBody = document.getElementById('evaluations-table-body');
@@ -220,10 +210,7 @@
                 currentPage = 1;
                 loadEvaluations();
             });
-            statusFilter.addEventListener('change', () => {
-                currentPage = 1;
-                loadEvaluations();
-            });
+
             searchInput.addEventListener('input', debounce(() => {
                 currentPage = 1;
                 loadEvaluations();
@@ -246,7 +233,6 @@
                     if (batchFilter.value) params.append('batch_id', batchFilter.value);
                     if (subjectFilter.value) params.append('subject_id', subjectFilter.value);
                     if (formatFilter.value) params.append('format_id', formatFilter.value);
-                    if (statusFilter.value) params.append('is_finalized', statusFilter.value);
                     if (searchInput.value) params.append('search', searchInput.value);
                     params.append('page', currentPage);
 
@@ -339,7 +325,6 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-800 dark:text-white">${batchName}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Semester: ${evaluation.semester || 'N/A'}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-800 dark:text-white">${formatName}</div>
@@ -349,11 +334,7 @@
                             <div class="text-sm text-gray-800 dark:text-white">${obtainedMarks} / ${fullMarks}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400">Normalized: ${parseFloat(normalizedMarks).toFixed(2)}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full ${evaluation.is_finalized ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100' : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100'}">
-                                ${evaluation.is_finalized ? 'Finalized' : 'Draft'}
-                            </span>
-                        </td>
+
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex space-x-2">
                                 <a href="/teacher/evaluation/${evaluation.id}" class="text-primary-600 hover:text-primary-800" title="View Evaluation">
@@ -445,7 +426,6 @@
                 batchFilter.value = '';
                 subjectFilter.value = '';
                 formatFilter.value = '';
-                statusFilter.value = '';
                 searchInput.value = '';
                 currentPage = 1;
                 loadEvaluations();
@@ -455,7 +435,7 @@
                 if (!deleteEvaluationId) return;
 
                 try {
-                    const response = await fetch(`/teacher/evaluation/${deleteEvaluationId}`, {
+                    const response = await fetch(`/teacher/api/evaluation/${deleteEvaluationId}`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

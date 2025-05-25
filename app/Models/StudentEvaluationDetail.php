@@ -17,7 +17,8 @@ class StudentEvaluationDetail extends Model
         'semester',
         'institute_id',
         'created_by',
-        'batch_id'
+        'batch_id',
+        'student_id',
     ];
 
     public function student()
@@ -33,6 +34,11 @@ class StudentEvaluationDetail extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id', 'id');
+    }
+
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class, 'batch_id', 'id');
     }
 
     public function evaluatedBy()

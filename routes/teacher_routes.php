@@ -108,8 +108,8 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/evaluation', [TeacherEvaluationController::class, 'index'])
             ->name('teacher.evaluation.index');
 
-        // FIXED: Added name to the existing evaluations route
-        Route::get('/evaluations', [TeacherEvaluationController::class, 'getEvaluations'])
+        // FIXED: Corrected API route for evaluations list
+        Route::get('/api/evaluations', [TeacherEvaluationController::class, 'getEvaluations'])
             ->name('teacher.evaluation.api.list');
 
         Route::get('/evaluation/create', [TeacherEvaluationController::class, 'create'])
@@ -136,12 +136,15 @@ Route::group(['prefix' => 'teacher'], function () {
             ->name('teacher.evaluation.batch.store');
 
         // Evaluation API Routes
-        Route::get('/batch/{batchId}/subjects', [TeacherEvaluationApiController::class, 'getBatchSubjects'])
+        Route::get('/api/batch/{batchId}/subjects', [TeacherEvaluationApiController::class, 'getBatchSubjects'])
             ->name('teacher.batch.subjects');
-        Route::get('/subject/{subjectId}/evaluation-formats', [TeacherEvaluationApiController::class, 'getSubjectEvaluationFormats'])
+        Route::get('/api/subject/{subjectId}/evaluation-formats', [TeacherEvaluationApiController::class, 'getSubjectEvaluationFormats'])
             ->name('teacher.subject.evaluation-formats');
 
-        Route::get('/batch/{batchId}/students', [TeacherEvaluationApiController::class, 'getBatchStudents'])
+        Route::delete('/api/evaluation/{id}', [TeacherEvaluationApiController::class, 'destoryStudentEvaluation'])
+            ->name('api.teacher.evaluation.delete');
+
+        Route::get('/api/batch/{batchId}/students', [TeacherEvaluationApiController::class, 'getBatchStudents'])
             ->name('teacher.batch.students');
 
         // Evaluation Report Routes

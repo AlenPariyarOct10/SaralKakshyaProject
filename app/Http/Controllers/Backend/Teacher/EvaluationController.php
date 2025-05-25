@@ -51,13 +51,13 @@ class EvaluationController extends Controller
     }
 
     /**
-     * Get evaluations with filters
+     * Get evaluations with filters - FIXED API response structure
      */
     public function getEvaluations(Request $request)
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $query = StudentEvaluationDetail::with(['student', 'subject', 'evaluationFormat'])
+        $query = StudentEvaluationDetail::with(['student', 'subject', 'evaluationFormat', 'batch'])
             ->where('evaluated_by', $teacherId);
 
         // Apply filters
@@ -81,17 +81,30 @@ class EvaluationController extends Controller
             $search = $request->search;
             $query->whereHas('student', function($q) use ($search) {
                 $q->where('fname', 'like', "%{$search}%")
-                    ->orWhere('lname', 'like', "%{$search}%")
-                    ->orWhere('roll_number', 'like', "%{$search}%")
-                    ->orWhere('admission_number', 'like', "%{$search}%");
+                    ->orWhere('lname', 'like', "%{$search}%");
             });
         }
 
         // Get paginated results
         $evaluations = $query->latest()->paginate(10);
 
+        // Transform the data to match frontend expectations
+        $transformedData = $evaluations->getCollection()->map(function($evaluation) {
+            return [
+                'id' => $evaluation->id,
+                'student' => $evaluation->student,
+                'subject' => $evaluation->subject,
+                'evaluation_format' => $evaluation->evaluationFormat,
+                'batch' => $evaluation->batch,
+                'obtained_marks' => $evaluation->obtained_marks,
+                'normalized_marks' => $evaluation->normalized_marks,
+                'comment' => $evaluation->comment,
+                'is_finalized' => $evaluation->is_finalized,
+            ];
+        });
+
         return response()->json([
-            'data' => $evaluations->items(),
+            'data' => $transformedData,
             'meta' => [
                 'current_page' => $evaluations->currentPage(),
                 'from' => $evaluations->firstItem(),
@@ -179,6 +192,7 @@ class EvaluationController extends Controller
                 StudentEvaluationDetail::create([
                     'evaluation_format_id' => $validated['evaluation_format_id'],
                     'subject_id' => $validated['subject_id'],
+                    'student_id' => $studentId,
                     'evaluated_by' => $teacherId,
                     'comment' => $validated['comments'][$studentId] ?? null,
                     'obtained_marks' => $obtainedMarks,
@@ -187,11 +201,9 @@ class EvaluationController extends Controller
                     'institute_id' => $instituteId,
                     'created_by' => $teacherId,
                     'batch_id' => $validated['batch_id'],
+                    'is_finalized' => $validated['is_finalized'],
                 ]);
-
             }
-
-
 
             DB::commit();
 
@@ -214,7 +226,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::with([
+        $evaluation = StudentEvaluationDetail::with([
             'student',
             'subject',
             'evaluationFormat',
@@ -224,8 +236,12 @@ class EvaluationController extends Controller
             ->where('evaluated_by', $teacherId)
             ->findOrFail($id);
 
-        // Get evaluation details with student information
-        $evaluationDetails = StudentEvaluationDetail::where('evaluation_id', $id)
+        // Get all evaluation details for this evaluation
+        $evaluationDetails = StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+            ->where('subject_id', $evaluation->subject_id)
+            ->where('batch_id', $evaluation->batch_id)
+            ->where('semester', $evaluation->semester)
+            ->where('evaluated_by', $teacherId)
             ->with('student')
             ->get();
 
@@ -239,7 +255,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::with([
+        $evaluation = StudentEvaluationDetail::with([
             'student',
             'subject',
             'evaluationFormat',
@@ -255,8 +271,12 @@ class EvaluationController extends Controller
                 ->with('error', 'Finalized evaluations cannot be edited.');
         }
 
-        // Get evaluation details with student information
-        $evaluationDetails = StudentEvaluationDetail::where('evaluation_id', $id)
+        // Get all evaluation details for this evaluation
+        $evaluationDetails = StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+            ->where('subject_id', $evaluation->subject_id)
+            ->where('batch_id', $evaluation->batch_id)
+            ->where('semester', $evaluation->semester)
+            ->where('evaluated_by', $teacherId)
             ->with('student')
             ->get();
 
@@ -270,7 +290,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::where('evaluated_by', $teacherId)
+        $evaluation = StudentEvaluationDetail::where('evaluated_by', $teacherId)
             ->findOrFail($id);
 
         // Check if evaluation is finalized
@@ -303,25 +323,20 @@ class EvaluationController extends Controller
                 }
             }
 
-            // Update the main evaluation
-            $evaluation->update([
-                'comment' => $validated['comment'] ?? null,
-                'is_finalized' => $validated['is_finalized'],
-            ]);
-
-            $totalObtainedMarks = 0;
-            $totalNormalizedMarks = 0;
-
             // Update evaluation details for each student
             foreach ($validated['students'] as $studentId) {
                 $obtainedMarks = $validated['marks'][$studentId] ?? 0;
 
                 // Calculate normalized marks based on weight
-                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->weight;
+                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->marks_weight;
 
                 // Find and update evaluation detail
-                $detail = StudentEvaluationDetail::where('evaluation_id', $id)
+                $detail = StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+                    ->where('subject_id', $evaluation->subject_id)
+                    ->where('batch_id', $evaluation->batch_id)
+                    ->where('semester', $evaluation->semester)
                     ->where('student_id', $studentId)
+                    ->where('evaluated_by', $teacherId)
                     ->first();
 
                 if ($detail) {
@@ -329,34 +344,10 @@ class EvaluationController extends Controller
                         'comment' => $validated['comments'][$studentId] ?? null,
                         'obtained_marks' => $obtainedMarks,
                         'normalized_marks' => $normalizedMarks,
-                    ]);
-                } else {
-                    // Create new detail if not found (unlikely but possible)
-                    StudentEvaluationDetail::create([
-                        'evaluation_id' => $evaluation->id,
-                        'evaluation_format_id' => $evaluation->evaluation_format_id,
-                        'subject_id' => $evaluation->subject_id,
-                        'student_id' => $studentId,
-                        'evaluated_by' => $teacherId,
-                        'comment' => $validated['comments'][$studentId] ?? null,
-                        'obtained_marks' => $obtainedMarks,
-                        'normalized_marks' => $normalizedMarks,
-                        'semester' => $evaluation->semester,
-                        'institute_id' => $evaluation->institute_id,
-                        'created_by' => $teacherId,
-                        'batch_id' => $evaluation->batch_id,
+                        'is_finalized' => $validated['is_finalized'],
                     ]);
                 }
-
-                $totalObtainedMarks += $obtainedMarks;
-                $totalNormalizedMarks += $normalizedMarks;
             }
-
-            // Update the main evaluation with totals
-            $evaluation->update([
-                'total_obtained_marks' => $totalObtainedMarks,
-                'total_normalized_marks' => $totalNormalizedMarks,
-            ]);
 
             DB::commit();
 
@@ -379,7 +370,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::where('evaluated_by', $teacherId)
+        $evaluation = StudentEvaluationDetail::where('evaluated_by', $teacherId)
             ->findOrFail($id);
 
         // Check if already finalized
@@ -389,9 +380,13 @@ class EvaluationController extends Controller
         }
 
         try {
-            $evaluation->update([
-                'is_finalized' => true,
-            ]);
+            // Update all related evaluation details
+            StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+                ->where('subject_id', $evaluation->subject_id)
+                ->where('batch_id', $evaluation->batch_id)
+                ->where('semester', $evaluation->semester)
+                ->where('evaluated_by', $teacherId)
+                ->update(['is_finalized' => true]);
 
             return redirect()->route('teacher.evaluation.show', $id)
                 ->with('success', 'Evaluation finalized successfully!');
@@ -409,28 +404,27 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::where('evaluated_by', $teacherId)
+        $evaluation = StudentEvaluationDetail::where('evaluated_by', $teacherId)
             ->findOrFail($id);
 
         try {
             DB::beginTransaction();
 
-            // Delete all evaluation details
-            StudentEvaluationDetail::where('evaluation_id', $id)->delete();
-
-            // Delete the main evaluation
-            $evaluation->delete();
+            // Delete all related evaluation details
+            StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+                ->where('subject_id', $evaluation->subject_id)
+                ->where('batch_id', $evaluation->batch_id)
+                ->where('semester', $evaluation->semester)
+                ->where('evaluated_by', $teacherId)
+                ->delete();
 
             DB::commit();
 
-            return redirect()->route('teacher.evaluation.index')
-                ->with('success', 'Evaluation deleted successfully!');
+            return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return redirect()->back()
-                ->with('error', 'Error deleting evaluation: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -441,7 +435,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $evaluation = StudentEvaluation::with([
+        $evaluation = StudentEvaluationDetail::with([
             'student',
             'subject',
             'evaluationFormat',
@@ -452,7 +446,11 @@ class EvaluationController extends Controller
             ->findOrFail($id);
 
         // Get evaluation details with student information
-        $evaluationDetails = StudentEvaluationDetail::where('evaluation_id', $id)
+        $evaluationDetails = StudentEvaluationDetail::where('evaluation_format_id', $evaluation->evaluation_format_id)
+            ->where('subject_id', $evaluation->subject_id)
+            ->where('batch_id', $evaluation->batch_id)
+            ->where('semester', $evaluation->semester)
+            ->where('evaluated_by', $teacherId)
             ->with('student')
             ->get();
 
@@ -537,53 +535,28 @@ class EvaluationController extends Controller
                 $obtainedMarks = $validated['marks'][$studentId] ?? 0;
 
                 // Calculate normalized marks based on weight
-                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->weight;
+                $normalizedMarks = ($obtainedMarks / $evaluationFormat->full_marks) * $evaluationFormat->marks_weight;
 
                 // Check if an evaluation already exists for this student, subject, and format
-                $existingEvaluation = StudentEvaluation::where('student_id', $studentId)
+                $existingEvaluation = StudentEvaluationDetail::where('student_id', $studentId)
                     ->where('subject_id', $validated['subject_id'])
                     ->where('evaluation_format_id', $validated['evaluation_format_id'])
                     ->where('batch_id', $validated['batch_id'])
                     ->where('semester', $validated['semester'])
+                    ->where('evaluated_by', $teacherId)
                     ->first();
 
                 if ($existingEvaluation) {
                     // Update existing evaluation
                     $existingEvaluation->update([
-                        'evaluated_by' => $teacherId,
                         'comment' => $validated['comments'][$studentId] ?? null,
-                        'total_obtained_marks' => $obtainedMarks,
-                        'total_normalized_marks' => $normalizedMarks,
+                        'obtained_marks' => $obtainedMarks,
+                        'normalized_marks' => $normalizedMarks,
                         'is_finalized' => $validated['is_finalized'],
                     ]);
-
-                    // Update evaluation detail
-                    StudentEvaluationDetail::where('evaluation_id', $existingEvaluation->id)
-                        ->update([
-                            'evaluated_by' => $teacherId,
-                            'comment' => $validated['comments'][$studentId] ?? null,
-                            'obtained_marks' => $obtainedMarks,
-                            'normalized_marks' => $normalizedMarks,
-                        ]);
                 } else {
-                    // Create new evaluation
-                    $evaluation = StudentEvaluation::create([
-                        'student_id' => $studentId,
-                        'subject_id' => $validated['subject_id'],
-                        'evaluation_format_id' => $validated['evaluation_format_id'],
-                        'institute_id' => $instituteId,
-                        'evaluated_by' => $teacherId,
-                        'comment' => $validated['comments'][$studentId] ?? null,
-                        'total_obtained_marks' => $obtainedMarks,
-                        'total_normalized_marks' => $normalizedMarks,
-                        'is_finalized' => $validated['is_finalized'],
-                        'semester' => $validated['semester'],
-                        'batch_id' => $validated['batch_id'],
-                    ]);
-
-                    // Create evaluation detail
+                    // Create new evaluation detail
                     StudentEvaluationDetail::create([
-                        'evaluation_id' => $evaluation->id,
                         'evaluation_format_id' => $validated['evaluation_format_id'],
                         'subject_id' => $validated['subject_id'],
                         'student_id' => $studentId,
@@ -595,6 +568,7 @@ class EvaluationController extends Controller
                         'institute_id' => $instituteId,
                         'created_by' => $teacherId,
                         'batch_id' => $validated['batch_id'],
+                        'is_finalized' => $validated['is_finalized'],
                     ]);
                 }
             }
@@ -611,65 +585,5 @@ class EvaluationController extends Controller
                 ->with('error', 'Error processing batch evaluation: ' . $e->getMessage())
                 ->withInput();
         }
-    }
-
-    /**
-     * Get subjects for a batch.
-     */
-    public function getBatchSubjects(string $batchId): JsonResponse
-    {
-        $teacherId = Auth::guard('teacher')->id();
-
-        $subjects = Subject::select('subjects.*')
-            ->join('batches', function($join) {
-                $join->on('subjects.program_id', '=', 'batches.program_id')
-                    ->whereColumn('subjects.semester', '=', 'batches.semester');
-            })
-            ->join('subject_teacher_mappings', 'subject_teacher_mappings.subject_id', '=', 'subjects.id')
-            ->where('batches.id', $batchId)
-            ->where('subject_teacher_mappings.teacher_id', $teacherId)
-            ->distinct()
-            ->get();
-
-        return response()->json($subjects);
-    }
-
-    /**
-     * Get evaluation formats for a subject.
-     */
-    public function getSubjectEvaluationFormats(string $subjectId): JsonResponse
-    {
-        $formats = SubjectEvaluationFormat::where('subject_id', $subjectId)
-            ->get();
-
-        return response()->json($formats);
-    }
-
-    /**
-     * Get students for a batch.
-     */
-    public function getBatchStudents(string $batchId, Request $request): JsonResponse
-    {
-        $students = Student::where('batch_id', $batchId)
-            ->where('status', 'active')
-            ->get();
-
-        // If subject_id is provided, check if students are already evaluated for this subject and format
-        if ($request->has('subject_id') && $request->has('format_id')) {
-            $subjectId = $request->subject_id;
-            $formatId = $request->format_id;
-
-            $students->each(function($student) use ($subjectId, $formatId) {
-                $evaluation = StudentEvaluation::where('student_id', $student->id)
-                    ->where('subject_id', $subjectId)
-                    ->where('evaluation_format_id', $formatId)
-                    ->first();
-
-                $student->has_evaluation = (bool) $evaluation;
-                $student->evaluation_id = $evaluation ? $evaluation->id : null;
-            });
-        }
-
-        return response()->json($students);
     }
 }
