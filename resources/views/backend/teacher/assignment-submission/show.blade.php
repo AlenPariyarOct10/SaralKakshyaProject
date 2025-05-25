@@ -49,7 +49,7 @@
     }
 
     function formatFileSize($bytes) {
-        if ($bytes === 0) return '0 Bytes';
+        if ($bytes == 0) return '0 Bytes';
 
         $k = 1024;
         $sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -239,7 +239,7 @@
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Quick Grading</h3>
 
-                        <form action="{{ route('teacher.assignment.submission.update', $submission->id) }}" method="POST">
+                        <form action="" method="POST">
                             @csrf
                             @method('PUT')
 

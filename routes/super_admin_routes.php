@@ -45,5 +45,8 @@ Route::group(['prefix' => 'superadmin'], function () {
         Route::PUT('/setting/contacts', [SuperAdminSettingController::class, "store_contact"])->name('superadmin.setting.contact.update');
         Route::put('/setting', [SuperAdminSettingController::class, "store_general"])->name('superadmin.general.update');
 
+
+        //Admin
+        Route::get('/admin/profile/{id}', [SuperAdminAdminManagementController::class, 'profile'] )->name('superadmin.admin.profile');
     });
 });

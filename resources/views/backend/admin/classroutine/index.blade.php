@@ -2,7 +2,7 @@
 
 
 @section('content')
-    <div class="container mx-auto p-4">
+    <div class="container mx-auto p-4 overflow-scroll">
         <h1 class="text-2xl font-semibold mb-4 dark:text-white">Class Routines</h1>
 
         <!-- Add Routine Button -->
@@ -13,7 +13,7 @@
         </div>
 
         <!-- Routine Form Card -->
-        <div id="routineFormCard" class="bg-white shadow-md rounded-md p-4 mb-4 hidden dark:bg-gray-800">
+        <div id="routineFormCard" class="overflow-scroll bg-white shadow-md rounded-md p-4 mb-4 hidden dark:bg-gray-800">
             <h2 id="formTitle" class="text-lg font-semibold mb-2 dark:text-white">Add Class Routine</h2>
             <form id="routineForm">
                 @csrf
@@ -106,9 +106,7 @@
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
                         Department
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
-                        Program
-                    </th>
+
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
                         Teacher
                     </th>
@@ -725,7 +723,6 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td class="table-cell">${routine.department?.name || 'N/A'}</td>
-                <td class="table-cell">${routine.subject?.program?.name || 'N/A'}</td>
                 <td class="table-cell">${routine.teacher?.fname || ''} ${routine.teacher?.lname || ''}</td>
                 <td class="table-cell">${routine.subject?.name || 'N/A'}</td>
                 <td class="table-cell">${routine.day || 'N/A'}</td>

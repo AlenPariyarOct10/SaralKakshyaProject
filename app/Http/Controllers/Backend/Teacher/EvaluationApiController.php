@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use App\Models\Attendance;
+use App\Models\InstituteSession;
 use App\Models\Student;
 use App\Models\StudentEvaluation;
 use App\Models\Subject;
@@ -45,6 +49,9 @@ class EvaluationApiController extends Controller
         return response()->json($formats);
     }
 
+
+
+
     /**
      * Get students for a batch.
      */
@@ -54,8 +61,65 @@ class EvaluationApiController extends Controller
             ->where('status', '1')
             ->get();
 
-//         If subject_id and format_id are provided, check if students are already evaluated
-        if ($request->has('subject_id') && $request->has('format_id')) {
+        // Handle assignment source request
+        if ($request->has('source') && $request->source === 'assignment' && $request->has('subject_id')) {
+            $subjectId = $request->subject_id;
+            $totalAssignments = Assignment::where('subject_id', $subjectId)
+                ->where('batch_id', $batchId)
+                ->count();
+
+            $students->each(function($student) use ($subjectId, $totalAssignments) {
+                $submittedCount = AssignmentSubmission::where('student_id', $student->id)
+                    ->whereHas('assignment', function($query) use ($subjectId) {
+                        $query->where('subject_id', $subjectId);
+                    })
+                    ->count();
+
+                $student->total_assignments = $totalAssignments;
+                $student->submitted_assignments = $submittedCount;
+                $student->submission_rate = $totalAssignments > 0
+                    ? round(($submittedCount / $totalAssignments) * 100, 2)
+                    : 0;
+            });
+        }
+        // Handle attendance source request
+        elseif ($request->has('source') && $request->source === 'attendance' && $request->has('subject_id')) {
+            $subjectId = $request->subject_id;
+
+            $startDate = $request->date_from ?? null;
+            $endDate = $request->date_to ?? null;
+
+            $students->each(function($student) use ($subjectId, $startDate, $endDate) {
+                $query = Attendance::where('attendee_id', $student->id)
+                    ->where('attendee_type', 'student')
+                    ->where('status', 'present');
+
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+
+                $attendedDays = $query->count();
+
+                // Count total possible attendance days
+                $totalDays = 0;
+                if ($startDate && $endDate) {
+                    $totalDays = InstituteSession::where('status', 'class')
+                        ->whereBetween('date', [$startDate, $endDate])
+                        // ->where('subject_id', $subjectId) // Uncomment if sessions are subject-specific
+                        ->count();
+
+                }
+
+                $student->attended_days = $attendedDays;
+                $student->total_days = $totalDays;
+                $student->attendance_rate = $totalDays > 0
+                    ? round(($attendedDays / $totalDays) * 100, 2)
+                    : 0;
+            });
+        }
+
+        // Handle evaluation check
+        elseif ($request->has('subject_id') && $request->has('format_id')) {
             $subjectId = $request->subject_id;
             $formatId = $request->format_id;
 

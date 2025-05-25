@@ -91,7 +91,10 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'status' => 'inactive',
         ]);
+
         $teacher->institutes()->attach($request->institute);
+
+        Session::put('teacher_id', $teacher->id);
 
         // Redirect to Phase 2
         return redirect()->route('teacher.register.step2');

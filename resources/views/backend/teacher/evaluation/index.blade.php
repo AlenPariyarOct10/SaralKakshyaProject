@@ -30,7 +30,7 @@
                     <select id="batchFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Batches</option>
                         @foreach($batches as $batch)
-                            <option value="{{ $batch->id }}">{{ $batch->name }}</option>
+                            <option value="{{ $batch->id }}">{{ $batch->batch ?? $batch->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -50,7 +50,7 @@
                     <select id="formatFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Formats</option>
                         @foreach($evaluationFormats as $format)
-                            <option value="{{ $format->id }}">{{ $format->name }}</option>
+                            <option value="{{ $format->id }}">{{ $format->criteria ?? $format->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -202,6 +202,7 @@
 
             // Current page for pagination
             let currentPage = 1;
+            let deleteEvaluationId = null;
 
             // Load evaluations on page load
             loadEvaluations();
@@ -249,7 +250,14 @@
                     if (searchInput.value) params.append('search', searchInput.value);
                     params.append('page', currentPage);
 
-                    const response = await fetch(`/teacher/evaluations?${params.toString()}`);
+                    // Updated API endpoint to match controller method
+                    const response = await fetch(`{{ route('teacher.evaluation.api.list') }}?${params.toString()}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    });
+
                     if (!response.ok) throw new Error('Failed to fetch evaluations');
 
                     const data = await response.json();
@@ -281,33 +289,65 @@
 
                 evaluations.forEach(evaluation => {
                     const row = document.createElement('tr');
+
+                    // Handle different data structures from the controller
+                    const student = evaluation.student || {};
+                    const subject = evaluation.subject || {};
+                    const batch = evaluation.batch || {};
+                    const evaluationFormat = evaluation.evaluation_format || evaluation.evaluationFormat || {};
+
+                    // Build student name
+                    const studentName = student.fname && student.lname
+                        ? `${student.fname} ${student.lname}`
+                        : (student.full_name || 'Unknown Student');
+
+                    // Build profile picture URL
+                    const profilePicture = student.profile_picture
+                        ? `/storage/${student.profile_picture}`
+                        : '/images/default-avatar.png';
+
+                    // Handle batch name
+                    const batchName = batch.batch || batch.name || 'Unknown Batch';
+
+                    // Handle evaluation format
+                    const formatName = evaluationFormat.criteria || evaluationFormat.name || 'Unknown Format';
+                    const formatWeight = evaluationFormat.marks_weight || evaluationFormat.weight || 0;
+                    const fullMarks = evaluationFormat.full_marks || 0;
+
+                    // Handle marks
+                    const obtainedMarks = evaluation.obtained_marks || evaluation.total_obtained_marks || 0;
+                    const normalizedMarks = evaluation.normalized_marks || evaluation.total_normalized_marks || 0;
+
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full object-cover" src="${evaluation.student.profile_picture || '/images/default-avatar.png'}" alt="${evaluation.student.full_name}">
+                                    <img class="h-10 w-10 rounded-full object-cover"
+                                         src="${profilePicture}"
+                                         alt="${studentName}"
+                                         onerror="this.src='/images/default-avatar.png'">
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-800 dark:text-white">${evaluation.student.full_name}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">Roll: ${evaluation.student.roll_number}</div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-white">${studentName}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Roll: ${student.roll_number || 'N/A'}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-800 dark:text-white">${evaluation.subject.name}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">${evaluation.subject.code}</div>
+                            <div class="text-sm text-gray-800 dark:text-white">${subject.name || 'Unknown Subject'}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${subject.code || ''}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-800 dark:text-white">${evaluation.batch.name}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Semester: ${evaluation.semester}</div>
+                            <div class="text-sm text-gray-800 dark:text-white">${batchName}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Semester: ${evaluation.semester || 'N/A'}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-800 dark:text-white">${evaluation.evaluation_format.name}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Weight: ${evaluation.evaluation_format.weight}%</div>
+                            <div class="text-sm text-gray-800 dark:text-white">${formatName}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Weight: ${formatWeight}%</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-800 dark:text-white">${evaluation.total_obtained_marks} / ${evaluation.evaluation_format.full_marks}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Normalized: ${evaluation.total_normalized_marks}</div>
+                            <div class="text-sm text-gray-800 dark:text-white">${obtainedMarks} / ${fullMarks}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Normalized: ${parseFloat(normalizedMarks).toFixed(2)}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs font-medium rounded-full ${evaluation.is_finalized ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100' : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100'}">
@@ -319,9 +359,11 @@
                                 <a href="/teacher/evaluation/${evaluation.id}" class="text-primary-600 hover:text-primary-800" title="View Evaluation">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="/teacher/evaluation/${evaluation.id}/edit" class="text-yellow-600 hover:text-yellow-800" title="Edit Evaluation">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                                ${!evaluation.is_finalized ? `
+                                    <a href="/teacher/evaluation/{id}/edit/${evaluation.id}" class="text-yellow-600 hover:text-yellow-800" title="Edit Evaluation">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                ` : ''}
                                 <button class="delete-btn text-red-600 hover:text-red-800" title="Delete Evaluation" data-id="${evaluation.id}">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
@@ -334,8 +376,7 @@
                 // Setup event listeners for delete buttons
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const evaluationId = e.currentTarget.getAttribute('data-id');
-                        deleteConfirmationModal.setAttribute('data-evaluation-id', evaluationId);
+                        deleteEvaluationId = e.currentTarget.getAttribute('data-id');
                         toggleModal(deleteConfirmationModal);
                     });
                 });
@@ -347,6 +388,8 @@
                 paginationTotal.textContent = meta.total;
 
                 paginationContainer.innerHTML = '';
+
+                if (meta.last_page <= 1) return; // Don't show pagination if only one page
 
                 // Previous Page Button
                 const prevButton = document.createElement('a');
@@ -409,14 +452,15 @@
             }
 
             async function handleDeleteEvaluation() {
-                const evaluationId = deleteConfirmationModal.getAttribute('data-evaluation-id');
+                if (!deleteEvaluationId) return;
 
                 try {
-                    const response = await fetch(`/teacher/evaluation/${evaluationId}`, {
+                    const response = await fetch(`/teacher/evaluation/${deleteEvaluationId}`, {
                         method: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
                         }
                     });
 
@@ -426,35 +470,43 @@
                     loadEvaluations();
 
                     // Show success message
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50';
-                    successMessage.innerHTML = '<div class="flex"><div class="py-1"><i class="fas fa-check-circle text-green-500 mr-3"></i></div><div><p class="font-bold">Success!</p><p>Evaluation deleted successfully.</p></div></div>';
-                    document.body.appendChild(successMessage);
-
-                    // Remove success message after 3 seconds
-                    setTimeout(() => {
-                        successMessage.remove();
-                    }, 3000);
+                    showMessage('Evaluation deleted successfully!', 'success');
 
                 } catch (error) {
                     console.error('Error deleting evaluation:', error);
-
-                    // Show error message
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md z-50';
-                    errorMessage.innerHTML = '<div class="flex"><div class="py-1"><i class="fas fa-exclamation-circle text-red-500 mr-3"></i></div><div><p class="font-bold">Error!</p><p>Failed to delete evaluation.</p></div></div>';
-                    document.body.appendChild(errorMessage);
-
-                    // Remove error message after 3 seconds
-                    setTimeout(() => {
-                        errorMessage.remove();
-                    }, 3000);
+                    showMessage('Failed to delete evaluation.', 'error');
                 }
             }
 
             function toggleModal(modal) {
                 modal.classList.toggle('hidden');
                 document.body.style.overflow = modal.classList.contains('hidden') ? '' : 'hidden';
+            }
+
+            function showMessage(message, type = 'success') {
+                const messageDiv = document.createElement('div');
+                const bgColor = type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700';
+                const icon = type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500';
+
+                messageDiv.className = `fixed top-4 right-4 ${bgColor} border-l-4 p-4 rounded shadow-md z-50 max-w-md`;
+                messageDiv.innerHTML = `
+                    <div class="flex">
+                        <div class="py-1">
+                            <i class="fas ${icon} mr-3"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold">${type === 'success' ? 'Success!' : 'Error!'}</p>
+                            <p>${message}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(messageDiv);
+
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 3000);
             }
 
             function debounce(func, wait) {

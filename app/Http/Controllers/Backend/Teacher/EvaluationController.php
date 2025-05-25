@@ -57,7 +57,7 @@ class EvaluationController extends Controller
     {
         $teacherId = Auth::guard('teacher')->id();
 
-        $query = StudentEvaluation::with(['student', 'subject', 'evaluationFormat', 'batch'])
+        $query = StudentEvaluationDetail::with(['student', 'subject', 'evaluationFormat'])
             ->where('evaluated_by', $teacherId);
 
         // Apply filters

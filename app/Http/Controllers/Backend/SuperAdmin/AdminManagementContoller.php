@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Admin;
 
 class AdminManagementContoller extends Controller
 {
@@ -13,6 +14,13 @@ class AdminManagementContoller extends Controller
     public function index()
     {
         return view('backend.superadmin.admin-management');
+    }
+
+    public function profile($id)
+    {
+        $user = auth()->user();
+        $admin = Admin::withTrashed()->findOrFail($id);
+        return view('backend.superadmin.admin.profile', compact('admin', 'user'));
     }
 
     /**

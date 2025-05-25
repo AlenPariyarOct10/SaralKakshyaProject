@@ -95,6 +95,56 @@
                                 </select>
                             </div>
 
+                            <!-- Marks Source Selection -->
+                            <div>
+                                <label for="select_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Select From <span class="text-blue-500">(Optional)</span>
+                                </label>
+                                <select
+                                    id="select_from"
+                                    name="select_from"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="">Select Marks Source</option>
+                                    <option value="assignment">Assignment</option>
+                                    <option value="attendance">Attendance</option>
+                                </select>
+                            </div>
+
+                            <!-- Attendance Date Range -->
+                            <div id="attendance-date-range" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Attendance Date Range <span class="text-blue-500">(Optional)</span>
+                                </label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="date_from" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                            Start Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            id="date_from"
+                                            name="date_from"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="date_to" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                            End Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            id="date_to"
+                                            name="date_to"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                                        />
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Leave empty to include all attendance records
+                                </p>
+                            </div>
+
                             <!-- Semester -->
                             <div class="hidden">
                                 <label for="semester" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -230,6 +280,7 @@
             const batchSelect = document.getElementById('batch_id');
             const subjectSelect = document.getElementById('subject_id');
             const formatSelect = document.getElementById('evaluation_format_id');
+            const selectFrom = document.getElementById('select_from');
             const semesterSelect = document.getElementById('semester');
             const studentListContainer = document.getElementById('student-list-container');
             const studentList = document.getElementById('student-list');
@@ -240,11 +291,20 @@
             const formatWeight = document.getElementById('format-weight');
             const formatDescription = document.getElementById('format-description');
             const createEvaluationForm = document.getElementById('createEvaluationForm');
+            const attendanceDateRange = document.getElementById('attendance-date-range');
+            const dateFrom = document.getElementById('date_from');
+            const dateTo = document.getElementById('date_to');
+            let GlobalfullMarks = 0;
 
             // Event Listeners
             batchSelect.addEventListener('change', loadSubjects);
             subjectSelect.addEventListener('change', loadEvaluationFormats);
             formatSelect.addEventListener('change', loadFormatDetails);
+            selectFrom.addEventListener('change', handleMarksSourceChange);
+
+            // Add event listeners for date range changes
+            dateFrom.addEventListener('change', handleDateRangeChange);
+            dateTo.addEventListener('change', handleDateRangeChange);
 
             // When batch, subject, and format are all selected, load students
             [batchSelect, subjectSelect, formatSelect].forEach(select => {
@@ -259,7 +319,8 @@
                     let valid = true;
 
                     markInputs.forEach(input => {
-                        if (!input.value || isNaN(parseFloat(input.value))) {
+                        const value = parseFloat(input.value);
+                        if (!input.value || isNaN(value) || value < 0) {
                             valid = false;
                             input.classList.add('border-red-500');
                         } else {
@@ -271,6 +332,15 @@
                         e.preventDefault();
                         alert('Please enter valid marks for all students');
                         return false;
+                    }
+
+                    // Validate date range if attendance is selected
+                    if (selectFrom.value === 'attendance' && dateFrom.value && dateTo.value) {
+                        if (new Date(dateFrom.value) > new Date(dateTo.value)) {
+                            e.preventDefault();
+                            alert('Start date cannot be later than end date');
+                            return false;
+                        }
                     }
 
                     // Set is_finalized based on which button was clicked
@@ -380,10 +450,32 @@
                 // Display format details
                 formatName.textContent = selectedOption.textContent;
                 formatMarks.textContent = selectedOption.getAttribute('data-full-marks');
-                formatWeight.textContent = selectedOption.getAttribute('data-weight') + 'Marks';
+                formatWeight.textContent = selectedOption.getAttribute('data-weight') + ' Marks';
                 formatDescription.textContent = selectedOption.getAttribute('data-description');
 
+                GlobalfullMarks = parseFloat(selectedOption.getAttribute('data-full-marks')) || 0;
                 formatInfo.classList.remove('hidden');
+            }
+
+            function handleMarksSourceChange() {
+                if (selectFrom.value === 'attendance') {
+                    attendanceDateRange.classList.remove('hidden');
+                } else {
+                    attendanceDateRange.classList.add('hidden');
+                    // Clear date values when not using attendance
+                    dateFrom.value = '';
+                    dateTo.value = '';
+                }
+
+                // Reload students with marks if all required fields are selected
+                checkAndLoadStudents();
+            }
+
+            function handleDateRangeChange() {
+                // Only reload if attendance is selected and we have the required fields
+                if (selectFrom.value === 'attendance') {
+                    checkAndLoadStudents();
+                }
             }
 
             function checkAndLoadStudents() {
@@ -392,7 +484,11 @@
                 const formatId = formatSelect.value;
 
                 if (batchId && subjectId && formatId) {
-                    loadStudents(batchId, subjectId, formatId);
+                    if (selectFrom.value) {
+                        loadStudentsWithMarks(batchId, subjectId, formatId, selectFrom.value);
+                    } else {
+                        loadStudents(batchId, subjectId, formatId);
+                    }
                 }
             }
 
@@ -416,76 +512,192 @@
 
                     // Get format details for max marks validation
                     const selectedOption = formatSelect.options[formatSelect.selectedIndex];
-                    const fullMarks = selectedOption.getAttribute('data-full-marks');
+                    const fullMarks = parseFloat(selectedOption.getAttribute('data-full-marks')) || 0;
 
                     // Populate student list
                     studentList.innerHTML = '';
                     students.forEach(student => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="/storage/${student.profile_picture || '/images/default-avatar.png'}" alt="${student.full_name}">
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-800 dark:text-white">${student.fname} ${student.lname}</div>
-                                        <input type="hidden" name="students[]" value="${student.id}">
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-800 dark:text-white">${student.roll_number}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <input
-                                    type="number"
-                                    name="marks[${student.id}]"
-                                    class="w-24 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    min="0"
-                                    max="${fullMarks}"
-                                    step="0.01"
-                                    required
-                                >
-                                <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">/ ${fullMarks}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <input
-                                    type="text"
-                                    name="comments[${student.id}]"
-                                    class="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="Optional comment"
-                                >
-                            </td>
-                        `;
+                        const row = createStudentRow(student, fullMarks, '');
                         studentList.appendChild(row);
                     });
 
                     // Add event listeners for mark validation
-                    document.querySelectorAll('input[name^="marks["]').forEach(input => {
-                        input.addEventListener('input', function() {
-                            const value = parseFloat(this.value);
-                            const max = parseFloat(this.getAttribute('max'));
-
-                            if (isNaN(value) || value < 0) {
-                                this.value = '';
-                                this.classList.add('border-red-500');
-                            } else if (value > max) {
-                                this.value = max;
-                                this.classList.add('border-red-500');
-                                setTimeout(() => {
-                                    this.classList.remove('border-red-500');
-                                }, 1000);
-                            } else {
-                                this.classList.remove('border-red-500');
-                            }
-                        });
-                    });
+                    addMarkValidationListeners();
 
                 } catch (error) {
                     console.error('Error loading students:', error);
                     studentList.innerHTML = '<tr><td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600 dark:text-red-400">Error loading students</td></tr>';
                 }
+            }
+
+            async function loadStudentsWithMarks(batchId, subjectId, formatId, source) {
+                try {
+                    // Show loading state
+                    studentList.innerHTML = '<tr><td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 dark:text-gray-400">Loading students with marks...</td></tr>';
+                    studentListContainer.classList.remove('hidden');
+                    noStudentsMessage.classList.add('hidden');
+
+                    // Build URL with parameters
+                    let url = `/teacher/batch/${batchId}/students?subject_id=${subjectId}&source=${source}`;
+
+                    // Add date parameters if attendance is selected
+                    if (source === 'attendance') {
+                        if (dateFrom.value) {
+                            url += `&date_from=${dateFrom.value}`;
+                        }
+                        if (dateTo.value) {
+                            url += `&date_to=${dateTo.value}`;
+                        }
+                    }
+
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch students with marks');
+
+                    const students = await response.json();
+
+                    if (students.length === 0) {
+                        studentListContainer.classList.add('hidden');
+                        noStudentsMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Get format details for max marks validation
+                    const selectedOption = formatSelect.options[formatSelect.selectedIndex];
+                    const fullMarks = parseFloat(selectedOption.getAttribute('data-full-marks')) || 0;
+
+                    // Populate student list with calculated marks
+                    studentList.innerHTML = '';
+                    students.forEach(student => {
+                        // Calculate marks based on submission rate or attendance
+                        let calculatedMarks = '';
+                        let commentText = '';
+
+                        if (student.submission_rate !== undefined && student.submission_rate !== null) {
+                            // For assignments - calculate based on submission rate
+                            const rate = parseFloat(student.submission_rate) || 0;
+                            calculatedMarks = Math.max(1, Math.round(fullMarks * (rate / 100)));
+                            commentText = `Submitted ${student.submitted_assignments || 0} out of ${student.total_assignments || 0} assignments`;
+                        } else if (student.attendance_rate !== undefined && student.attendance_rate !== null) {
+                            // For attendance - calculate based on attendance percentage
+                            const percentage = parseFloat(student.attendance_rate) || 0;
+                            calculatedMarks = Math.max(1, Math.round(fullMarks * (percentage / 100)));
+
+                            // Create attendance comment with date range info
+                            let dateRangeText = '';
+                            if (dateFrom.value && dateTo.value) {
+                                dateRangeText = ` (${dateFrom.value} to ${dateTo.value})`;
+                            } else if (dateFrom.value) {
+                                dateRangeText = ` (from ${dateFrom.value})`;
+                            } else if (dateTo.value) {
+                                dateRangeText = ` (until ${dateTo.value})`;
+                            }
+
+                            commentText = `Attendance: ${percentage.toFixed(1)}%${dateRangeText}`;
+                        }
+
+                        // Ensure calculated marks don't exceed full marks
+                        if (calculatedMarks > fullMarks) {
+                            calculatedMarks = fullMarks;
+                        }
+
+                        const row = createStudentRow(student, fullMarks, calculatedMarks, commentText);
+                        studentList.appendChild(row);
+                    });
+
+                    // Add event listeners for mark validation
+                    addMarkValidationListeners();
+
+                } catch (error) {
+                    console.error('Error loading students with marks:', error);
+                    studentList.innerHTML = '<tr><td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600 dark:text-red-400">Error loading students with marks</td></tr>';
+                }
+            }
+
+            function createStudentRow(student, fullMarks, prefilledMarks = '', prefilledComment = '') {
+                const row = document.createElement('tr');
+
+                // Ensure we have valid values
+                const studentId = student.id || '';
+                const firstName = student.fname || '';
+                const lastName = student.lname || '';
+                const rollNumber = student.roll_number || 'N/A';
+                const profilePicture = student.profile_picture || '/images/default-avatar.png';
+                const marksValue = prefilledMarks !== '' ? prefilledMarks : '';
+                const commentValue = prefilledComment || '';
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full object-cover"
+                                     src="/storage/${profilePicture}"
+                                     alt="${firstName} ${lastName}"
+                                     onerror="this.src='/images/default-avatar.png'">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-800 dark:text-white">${firstName} ${lastName}</div>
+                                <input type="hidden" name="students[]" value="${studentId}">
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-800 dark:text-white">${rollNumber}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            type="number"
+                            name="marks[${studentId}]"
+                            class="w-24 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            min="0"
+                            max="${fullMarks}"
+                            step="0.01"
+                            value="${marksValue}"
+                            required
+                        >
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">/ ${fullMarks}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            type="text"
+                            name="comments[${studentId}]"
+                            class="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Optional comment"
+                            value="${commentValue}"
+                        >
+                    </td>
+                `;
+
+                return row;
+            }
+
+            function addMarkValidationListeners() {
+                document.querySelectorAll('input[name^="marks["]').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const value = parseFloat(this.value);
+                        const max = parseFloat(this.getAttribute('max'));
+
+                        if (this.value === '' || isNaN(value) || value < 0) {
+                            this.classList.add('border-red-500');
+                        } else if (value > max) {
+                            this.value = max;
+                            this.classList.add('border-red-500');
+                            setTimeout(() => {
+                                this.classList.remove('border-red-500');
+                            }, 1000);
+                        } else {
+                            this.classList.remove('border-red-500');
+                        }
+                    });
+
+                    // Also validate on blur to ensure proper formatting
+                    input.addEventListener('blur', function() {
+                        const value = parseFloat(this.value);
+                        if (!isNaN(value) && value >= 0) {
+                            // Format to 2 decimal places if needed
+                            this.value = Math.round(value * 100) / 100;
+                        }
+                    });
+                });
             }
         });
     </script>

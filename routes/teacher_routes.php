@@ -107,7 +107,11 @@ Route::group(['prefix' => 'teacher'], function () {
         // Teacher Evaluation Routes
         Route::get('/evaluation', [TeacherEvaluationController::class, 'index'])
             ->name('teacher.evaluation.index');
-        Route::get('/evaluations', [TeacherEvaluationController::class, 'getEvaluations']);
+
+        // FIXED: Added name to the existing evaluations route
+        Route::get('/evaluations', [TeacherEvaluationController::class, 'getEvaluations'])
+            ->name('teacher.evaluation.api.list');
+
         Route::get('/evaluation/create', [TeacherEvaluationController::class, 'create'])
             ->name('teacher.evaluation.create');
         Route::post('/evaluation', [TeacherEvaluationController::class, 'store'])
@@ -125,21 +129,22 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/evaluation/{id}/export', [TeacherEvaluationController::class, 'export'])
             ->name('teacher.evaluation.export');
 
-// Batch Evaluation Routes
+        // Batch Evaluation Routes
         Route::get('/evaluation/batch/create', [TeacherEvaluationController::class, 'batchEvaluation'])
             ->name('teacher.evaluation.batch.create');
         Route::post('/evaluation/batch', [TeacherEvaluationController::class, 'storeBatchEvaluation'])
             ->name('teacher.evaluation.batch.store');
 
-// Evaluation API Routes
+        // Evaluation API Routes
         Route::get('/batch/{batchId}/subjects', [TeacherEvaluationApiController::class, 'getBatchSubjects'])
             ->name('teacher.batch.subjects');
         Route::get('/subject/{subjectId}/evaluation-formats', [TeacherEvaluationApiController::class, 'getSubjectEvaluationFormats'])
             ->name('teacher.subject.evaluation-formats');
+
         Route::get('/batch/{batchId}/students', [TeacherEvaluationApiController::class, 'getBatchStudents'])
             ->name('teacher.batch.students');
 
-// Evaluation Report Routes
+        // Evaluation Report Routes
         Route::get('/evaluation/reports', [TeacherEvaluationReportController::class, 'index'])
             ->name('teacher.evaluation.reports.index');
         Route::get('/evaluation/reports/batch-performance', [TeacherEvaluationReportController::class, 'batchPerformance'])
@@ -149,7 +154,7 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/evaluation/reports/format-comparison', [TeacherEvaluationReportController::class, 'formatComparison'])
             ->name('teacher.evaluation.reports.format-comparison');
 
-// Evaluation API Routes for Reports and Charts
+        // Evaluation API Routes for Reports and Charts
         Route::get('/api/evaluation/departments', [TeacherEvaluationApiController::class, 'getDepartments'])
             ->name('api.teacher.evaluation.departments');
         Route::get('/api/evaluation/department/{departmentId}/programs', [TeacherEvaluationApiController::class, 'getDepartmentPrograms'])
@@ -161,11 +166,9 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/api/evaluation/student/{studentId}/performance', [TeacherEvaluationApiController::class, 'getStudentPerformance'])
             ->name('api.teacher.evaluation.student.performance');
 
-
         //Assignment API
         Route::get('/api/assignments', [TeacherAssignmentController::class, 'myAssignments'])
             ->name('api.teacher.assignment.index');
-
 
         Route::get('subject/{id}/chapters', [AssignmentController::class, 'getChapters'])
             ->name('teacher.subject.chapters');

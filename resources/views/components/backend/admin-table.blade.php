@@ -77,9 +77,9 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
-                        <button  class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400" title="View">
+                        <a href="{{route('superadmin.admin.profile', $admin->id)}}" class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400" title="View">
                             <i class="fas fa-eye"></i>
-                        </button>
+                        </a>
                         @if(!$admin->trashed())
                             <button wire:click="setDeleted({{$admin->id}})" class="text-red-600 hover:text-red-900 dark:hover:text-red-400" title="Reject">
                                 <i class="fas fa-times"></i>
