@@ -83,10 +83,12 @@
                                 </div>
 
                                 <div>
+
                                     <h5 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Submit Assignment</h5>
                                     <form action="{{ route('student.assignment.store') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <input type="hidden" name="assignment_id" value="{{ $assignment->id }}">
+                                        @if(\Carbon\Carbon::parse($assignment->due_date)->isPast() && !$assignment->submissions()->where('student_id', $user->id)->exists())
                                         <div class="flex flex-col gap-4">
                                             <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
                                                 <input type="file" id="assignment{{ $assignment->id }}File" name="file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
@@ -108,15 +110,14 @@
                                                     </button>
                                                 </div>
                                             </div>
-
+                                            <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600">Submit Assignment</button>
+                                            @endif
                                             @if(\Carbon\Carbon::parse($assignment->due_date)->isPast())
                                                 <div class="p-3 bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-md text-sm">
                                                     <i class="fas fa-exclamation-circle mr-2"></i>
-                                                    This assignment is overdue. Late submissions may be subject to penalties.
+                                                    This assignment is overdue.
                                                 </div>
                                             @endif
-
-                                            <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600">Submit Assignment</button>
                                         </div>
                                     </form>
                                 </div>

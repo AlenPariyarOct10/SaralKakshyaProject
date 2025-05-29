@@ -13,11 +13,16 @@ class InstituteSession extends Model
         'end_time',
         'notes',
         'status',
-        'notes',
         'creator_type',
         'creator_id',
         'specific_group',
         'specific_group_id',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     public function institute()
@@ -25,4 +30,27 @@ class InstituteSession extends Model
         return $this->belongsTo(Institute::class);
     }
 
+    /**
+     * Scope for holiday sessions
+     */
+    public function scopeHolidays($query)
+    {
+        return $query->where('status', 'holiday');
+    }
+
+    /**
+     * Scope for a specific date range
+     */
+    public function scopeDateRange($query, $startDate, $endDate)
+    {
+        return $query->whereBetween('date', [$startDate, $endDate]);
+    }
+
+    /**
+     * Check if this session is a holiday
+     */
+    public function isHoliday()
+    {
+        return $this->status === 'holiday';
+    }
 }

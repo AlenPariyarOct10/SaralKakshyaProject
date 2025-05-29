@@ -53,6 +53,7 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         return $this->hasMany(Assignment::class);
     }
 
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -81,9 +82,9 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'subject_teacher_mappings')
-            ->withTimestamps();
+        return $this->belongsToMany(Subject::class, 'subject_teacher_mappings');
     }
+
 
     public function subjectTeacherMappings()
     {

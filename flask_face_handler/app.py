@@ -324,41 +324,28 @@ def update_face():
         data = request.json
         student_id = data.get('student_id')
         institute_id = data.get('institute_id')
-        images = data.get('images')
+        image = data.get('image')  # Changed from 'images' to 'image'
 
-        if not student_id or not images or len(images) < 3:
-            return jsonify({'error': 'Need at least 3 images for update'}), 400
+        if not student_id or not image:
+            return jsonify({'error': 'Student ID and image are required'}), 400
 
         existing_face = FaceData.query.filter_by(student_id=student_id).first()
         if not existing_face:
             return jsonify({'error': 'Student not found in database'}), 404
 
-        all_histograms = []
-        valid_images = 0
+        img = decode_and_save_image(image, None)
+        if img is None:
+            return jsonify({'error': 'Invalid image provided'}), 400
 
-        for base64_img in images:
-            img = decode_and_save_image(base64_img, None)
-            if img is None:
-                continue
+        face_image = crop_face(img, student_id)
+        if face_image is None:
+            return jsonify({'error': 'No face detected in the image'}), 400
 
-            face_image = crop_face(img, student_id)
-            if face_image is None:
-                continue
+        hist = improved_lbp_histogram(face_image)
+        if hist is None:
+            return jsonify({'error': 'Could not process face features'}), 400
 
-            hist = improved_lbp_histogram(face_image)
-            if hist is None:
-                continue
-
-            all_histograms.append(hist)
-            valid_images += 1
-
-        if valid_images < 2:
-            return jsonify({'error': 'Not enough valid face images found'}), 400
-
-        # Calculate median histogram for better robustness
-        avg_histogram = np.median(all_histograms, axis=0).tolist()
-
-        existing_face.histogram = json.dumps(avg_histogram)
+        existing_face.histogram = json.dumps(hist)
         existing_face.institute_id = institute_id
         existing_face.created_at = datetime.utcnow()
 
@@ -368,8 +355,7 @@ def update_face():
             'success': True,
             'message': 'Face data updated successfully',
             'student_id': student_id,
-            'institute_id': institute_id,
-            'processed_images': valid_images
+            'institute_id': institute_id
         }), 200
 
     except Exception as e:

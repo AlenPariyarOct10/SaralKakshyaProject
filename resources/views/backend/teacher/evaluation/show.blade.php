@@ -71,7 +71,7 @@
 
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Batch</h4>
-                                    <p class="text-gray-800 dark:text-white">{{ $evaluation->batch->name }}</p>
+                                    <p class="text-gray-800 dark:text-white">{{ $evaluation->batch->batch }}</p>
                                 </div>
 
                                 <div>
@@ -87,7 +87,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <h5 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</h5>
-                                            <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->name }}</p>
+                                            <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->criteria }}</p>
                                         </div>
                                         <div>
                                             <h5 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Full Marks</h5>
@@ -95,7 +95,7 @@
                                         </div>
                                         <div>
                                             <h5 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Weight</h5>
-                                            <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->weight }}%</p>
+                                            <p class="text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->marks_weight }}</p>
                                         </div>
                                     </div>
                                     @if($evaluation->evaluationFormat->description)
@@ -194,27 +194,9 @@
                 <div class="card">
                     <div class="p-6">
                         <div class="space-y-3">
-                            @if(!$evaluation->is_finalized)
-                                <form action="{{ route('teacher.evaluation.finalize', $evaluation->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn-primary w-full flex items-center justify-center">
-                                        <i class="fas fa-check-circle mr-2"></i> Finalize Evaluation
-                                    </button>
-                                </form>
-
-                                <a href="{{ route('teacher.evaluation.edit', $evaluation->id) }}" class="btn-outline w-full flex items-center justify-center">
-                                    <i class="fas fa-edit mr-2"></i> Edit Evaluation
-                                </a>
-                            @endif
-
                             <button type="button" id="printEvaluationBtn" class="btn-secondary w-full flex items-center justify-center">
                                 <i class="fas fa-print mr-2"></i> Print Evaluation
                             </button>
-
-                            <button type="button" id="exportEvaluationBtn" class="px-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-file-export mr-2"></i> Export as Excel
-                            </button>
-
                             @if(!$evaluation->is_finalized)
                                 <button type="button" id="deleteEvaluationBtn" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center justify-center">
                                     <i class="fas fa-trash-alt mr-2"></i> Delete Evaluation
@@ -238,6 +220,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roll Number</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Obtained Marks</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Normalized Marks</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Comment</th>
@@ -249,15 +232,18 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $detail->student->profile_picture ?? '/images/default-avatar.png' }}" alt="{{ $detail->student }}">
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ ($detail->student->profile_picture) ? asset('/storage/'.$detail->student->profile_picture) : '/images/default-avatar.png' }}" alt="{{ $detail->student }}">
                                     </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-800 dark:text-white">{{ $detail->student }}</div>
-                                    </div>
+
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-800 dark:text-white">{{ $detail->student }}</div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-800 dark:text-white">{{ $detail->student->roll_number }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-800 dark:text-white">{{ $detail->student->fname }} {{ $detail->student->lname }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-800 dark:text-white">

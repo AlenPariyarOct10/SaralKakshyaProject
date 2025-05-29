@@ -79,7 +79,7 @@
                                     Evaluation Format
                                 </label>
                                 <div class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-700 dark:text-gray-300">
-                                    {{ $evaluation->evaluationFormat->name }}
+                                    {{ $evaluation->evaluationFormat->criteria }}
                                 </div>
                             </div>
 
@@ -136,7 +136,7 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-gray-600 dark:text-gray-400">Weight:</span>
-                                        <span class="text-sm font-medium text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->weight }}%</span>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-white">{{ $evaluation->evaluationFormat->marks_weight }}</span>
                                     </div>
                                     @if($evaluation->evaluationFormat->description)
                                         <div class="flex justify-between">
@@ -169,7 +169,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $detail->student->profile_picture ?? '/images/default-avatar.png' }}" alt="{{ $detail->student->full_name }}">
+                                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('/storage/'.$detail->student->profile_picture) ?? '/images/default-avatar.png' }}" alt="{{ $detail->student->full_name }}">
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-800 dark:text-white">{{ $detail->student->full_name }}</div>
@@ -208,16 +208,12 @@
                             </table>
                         </div>
                     </div>
-
                     <div class="mt-8 mb-4 flex justify-end space-x-3">
                         <a href="{{ route('teacher.evaluation.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             Cancel
                         </a>
-                        <button type="submit" name="save_draft" value="1" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-                            Save as Draft
-                        </button>
                         <button type="submit" name="finalize" value="1" class="btn-primary">
-                            Finalize Evaluation
+                            Save
                         </button>
                     </div>
                 </form>

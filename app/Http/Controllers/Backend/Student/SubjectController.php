@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,11 @@ class SubjectController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+        $batch = Batch::where('id', $user->batch_id)->first();
+
         $subjects = Subject::where('program_id', session('program_id'))
+            ->where('semester', $batch->semester)
             ->orderBy('code', 'ASC')
             ->get();
         return view('backend.student.subjects.index', compact('subjects'));

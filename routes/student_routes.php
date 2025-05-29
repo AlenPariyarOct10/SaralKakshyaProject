@@ -9,12 +9,12 @@ use App\Http\Controllers\Backend\Student\AttendanceController as StudentAttendan
 use App\Http\Controllers\Backend\Student\AssignmentController as StudentAssignmentController;
 use App\Http\Controllers\Backend\Student\SubjectController as StudentSubjectController;
 use App\Http\Controllers\Backend\Student\ResourceController as StudentResourceController;
+use App\Http\Controllers\Backend\Student\PredictionController as StudentPredictionController;
 
 Route::group(['prefix' => 'student'], function () {
 
     Route::POST('/attendance/getuser', [StudentAttendanceController::class, 'user_info_for_face_recognition'])->name('student.getInfo');
     Route::POST('/attendance/face/mark', [StudentAttendanceController::class, 'mark_attendance'])->name('student.face.mark');
-
 
     Route::middleware('guest:student')->group(function () {
         Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('student.login');
@@ -23,7 +23,6 @@ Route::group(['prefix' => 'student'], function () {
         Route::POST('/register', [StudentAuthController::class, 'register'])->name('student.register');
         Route::get('/complete-profile', [StudentAuthController::class, 'showCompleteProfile'])->name('student.complete-profile');
         Route::post('/complete-profile', [StudentAuthController::class, 'completeProfile'])->name('student.complete-profile.post');
-
 
         Route::get('/department/{id}/programs', [StudentAuthController::class, 'getDepartmentPrograms'])->name('auth.student.department.programs');
         Route::get('/program/batches', [StudentAuthController::class, 'getProgramBatches'])->name('auth.student.program.batches');
@@ -35,10 +34,18 @@ Route::group(['prefix' => 'student'], function () {
         Route::get('/profile', [StudentProfileController::class, "index"])->name('student.profile');
         Route::get('/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
         Route::post('/update_profile_picture', [StudentProfileController::class, 'update_profile_picture'])->name('student.update_profile_picture');
+
+        // Attendance routes
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
+        Route::get('/attendance/monthly', [StudentAttendanceController::class, 'getMonthlyAttendance'])->name('student.attendance.monthly');
         Route::get('/attendance/setup', [StudentAttendanceController::class, 'setup_index'])->name('student.attendance.setup.index');
         Route::post('/attendance/setup', [StudentAttendanceController::class, 'saveFacePhotos'])->name('student.saveFacePhotos');
         Route::post('/attendance/setup/update', [StudentAttendanceController::class, 'updateFacePhotos'])->name('student.updateFacePhotos');
+
+        ################################# Prediction #############################################
+        Route::get('/prediction', [StudentPredictionController::class, 'index'])->name('student.prediction.index');
+        Route::post('/prediction/predict', [StudentPredictionController::class, 'predict'])->name('student.prediction.predict');
+        Route::get('/prediction/recommendations', [StudentPredictionController::class, 'getRecommendations'])->name('student.prediction.recommendations');
 
         ################################# Assignment #############################################
         Route::get('/assignment/{id}', [StudentAssignmentController::class, 'show'])->name('student.assignment.show');
@@ -78,18 +85,20 @@ Route::group(['prefix' => 'student'], function () {
             'show' => 'student.announcement.show',
         ]);
 
-
         ################################# Subjects #############################################
         Route::get('/subjects', [StudentSubjectController::class, 'index'])->name('student.subjects.index');
         Route::get('/subject/{id}', [StudentSubjectController::class, 'show'])->name('student.subject.show');
         Route::get('/subject/{id}/resources', [StudentSubjectController::class, 'subjectResources'])->name('student.subject.resources');
         Route::get('/subject/{id}/assignments', [StudentSubjectController::class, 'subjectAssignments'])->name('student.subject.assignments');
 
-
         ################################## Resources #############################################
         Route::get('/resources', [StudentResourceController::class, 'index'])->name('student.resources.index');
         Route::get('/resource/{id}', [StudentResourceController::class, 'show'])->name('student.resource.show');
         Route::get('/resource/{id}/download', [StudentResourceController::class, 'download'])->name('student.resource.download');
 
+        ################################# Routine #############################################
+        Route::get('/routine', [App\Http\Controllers\Backend\Student\RoutineController::class, 'index'])->name('student.routine.index');
+        Route::get('/routine/download-pdf', [App\Http\Controllers\Backend\Student\RoutineController::class, 'downloadPdf'])->name('student.routine.download-pdf');
+        Route::get('/routine/data', [App\Http\Controllers\Backend\Student\RoutineController::class, 'getRoutineData'])->name('student.routine.data');
     });
 });

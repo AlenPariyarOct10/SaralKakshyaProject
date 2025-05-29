@@ -13,6 +13,7 @@ class AssignmentSubmission extends Model
         'assignment_id',
         'student_id',
         'marks',
+        'description',
         'status',
         'feedback',
         'submitted_at',

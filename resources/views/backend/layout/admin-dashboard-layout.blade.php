@@ -124,7 +124,7 @@
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>
                 </a>
-                <a href="{{route("admin.prediction.index")}}" class="sidebar-item  {{Route::is("admin.department.index")? "active":""}}">
+                <a href="{{route("admin.prediction.index")}}" class="sidebar-item  {{Route::is("admin.prediction.index")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Predictions</span>
                 </a>

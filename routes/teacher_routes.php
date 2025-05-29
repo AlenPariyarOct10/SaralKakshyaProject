@@ -34,12 +34,24 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::middleware(['auth:teacher'])->group(function () {
         Route::get('/dashboard', [TeacherDashboardController::class, "index"])->name('teacher.dashboard');
 
+        // Attendance routes
         Route::get('/attendance', [TeacherAttendanceController::class, "index"])->name('teacher.attendance.index');
+        Route::get('/attendance/students/{subjectId}', [TeacherAttendanceController::class, "getStudents"])->name('teacher.attendance.students');
+        Route::post('/attendance/store', [TeacherAttendanceController::class, "store"])->name('teacher.attendance.store');
+        Route::get('/attendance/history', [TeacherAttendanceController::class, "getHistory"])->name('teacher.attendance.history');
+        Route::get('/attendance/details', [TeacherAttendanceController::class, "getDetails"])->name('teacher.attendance.details');
 
         // Announcement
         Route::get('/announcements', [TeacherAnnouncementController::class, "index"])->name('teacher.announcement.index');
         Route::get('/announcements/create', [TeacherAnnouncementController::class, "create"])->name('teacher.announcement.create');
+        Route::get('/announcement/{id}', [TeacherAnnouncementController::class, "show"])->name('teacher.announcement.show');
+        Route::get('/announcement/{id}/edit', [TeacherAnnouncementController::class, "edit"])->name('teacher.announcement.edit');
+        Route::delete('/announcement/{id}/edit', [TeacherAnnouncementController::class, "destroy"])->name('teacher.announcement.destroy');
+        Route::put('/announcement/{id}/', [TeacherAnnouncementController::class, "update"])->name('teacher.announcement.update');
+        Route::put('/announcement/{id}/pin', [TeacherAnnouncementController::class, "setPin"])->name('teacher.announcement.pin');
+        Route::put('/announcement/{id}/unpin', [TeacherAnnouncementController::class, "setUnpin"])->name('teacher.announcement.unpin');
         Route::POST('/announcements', [TeacherAnnouncementController::class, "store"])->name('teacher.announcements.store');
+        Route::get('/announcements/attachment/{id}/delete', [TeacherAnnouncementController::class, "deleteAttachment"])->name('teacher.announcements.deleteAttachment');
 
         //Subject
         Route::get('/subject/{id}/chapters', [TeacherAssignmentController::class, "getChapters"])->name('teacher.subject.chapters');

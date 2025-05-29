@@ -10,14 +10,15 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-mongodb": "*",
+        "barryvdh/laravel-dompdf": "^3.1",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^12.0",
         "laravel/reverb": "^1.5",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6",
-        "maatwebsite/excel": "^3.1",
-        "ext-mongodb": "*"
+        "maatwebsite/excel": "^3.1"
     },
     "require-dev": {
         "beyondcode/laravel-er-diagram-generator": "^4.0",

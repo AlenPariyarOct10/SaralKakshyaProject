@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
+use App\Models\InstituteStudent;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +18,11 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::guard('student')->user();
-        return view('backend.student.profile', compact('user'));
+        $program = InstituteStudent::where('student_id', $user->id)
+            ->with('program')
+            ->first();
+        $batch = Batch::where('id', $user->batch_id)->first();
+        return view('backend.student.profile', compact('user', 'program', 'batch'));
     }
 
 

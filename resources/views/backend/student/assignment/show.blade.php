@@ -405,12 +405,14 @@
                                     $diffInDays = $now->startOfDay()->diffInDays($dueDateTime->startOfDay(), false);
                                 @endphp
 
-                                @if($diffInDays < 0)
-                                    <span class="text-xs text-red-600 font-medium">Overdue by {{ abs($diffInDays) }} days</span>
-                                @elseif($diffInDays == 0)
-                                    <span class="text-xs text-orange-600 font-medium">Due today</span>
-                                @else
-                                    <span class="text-xs text-green-600 font-medium">{{ abs($diffInDays) }} days remaining</span>
+                                @if(!isset($submission))
+                                    @if($diffInDays < 0)
+                                        <span class="text-xs text-red-600 font-medium">Overdue by {{ abs($diffInDays) }} days</span>
+                                    @elseif($diffInDays == 0)
+                                        <span class="text-xs text-orange-600 font-medium">Due today</span>
+                                    @else
+                                        <span class="text-xs text-green-600 font-medium">{{ abs($diffInDays) }} days remaining</span>
+                                    @endif
                                 @endif
                             </div>
 

@@ -1,219 +1,339 @@
-@extends("backend.layout.student-dashboard-layout")
+@extends("backend.layout.teacher-dashboard-layout")
 
-@section('content')
-    <!-- Main Content Area -->
-    <main class="scrollable-content p-4 md:p-6">
-        <!-- Announcements List -->
-        <div class="card mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 md:mb-0">Announcements</h3>
+@php
+    $user = \Illuminate\Support\Facades\Auth::user();
+@endphp
 
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="relative">
-                        <select id="classFilter" class="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                            <option value="">All Classes</option>
-                            <option value="math">Mathematics</option>
-                            <option value="physics">Physics</option>
-                            <option value="cs">Computer Science</option>
-                            <option value="history">History</option>
-                            <option value="english">English</option>
-                        </select>
-                    </div>
-
-                    <div class="relative">
-                        <input type="text" id="searchAnnouncement" placeholder="Search announcements..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Urgent Announcements -->
-            <div class="mb-6">
-                <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md mb-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-circle text-red-500 text-lg"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">End of Semester Exam Schedule</h3>
-                            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                <p>Final exams will be held from June 10-15, 2023. Please check the detailed schedule below and prepare accordingly. All students must arrive 30 minutes before their scheduled exam time.</p>
-                            </div>
-                            <div class="mt-2">
-                                <a href="#" class="text-sm font-medium text-red-800 dark:text-red-200 hover:underline">View Details</a>
-                                <span class="text-xs text-red-600 dark:text-red-300 ml-2">Posted on May 15, 2023</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Regular Announcements -->
-            <div class="space-y-4">
-                <!-- Announcement Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-base font-medium text-gray-900 dark:text-white">Science Fair Registration</h4>
-                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Science</span>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Registration for the annual science fair is now open. Students interested in participating should submit their project proposals by May 25, 2023.</p>
-                        <div class="mt-3 flex items-center justify-between">
-                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                <i class="far fa-calendar-alt mr-1"></i>
-                                <span>May 10, 2023</span>
-                            </div>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300">Read More</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Announcement Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-base font-medium text-gray-900 dark:text-white">Field Trip Permission</h4>
-                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">History</span>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Permission form for the upcoming museum field trip on May 30, 2023. Please have your parents sign the attached form and return it by May 25.</p>
-                        <div class="mt-3 flex items-center justify-between">
-                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                <i class="far fa-calendar-alt mr-1"></i>
-                                <span>April 20, 2023</span>
-                            </div>
-                            <div class="flex items-center">
-                                <a href="#" class="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 mr-3">Read More</a>
-                                <a href="#" class="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Announcement Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-base font-medium text-gray-900 dark:text-white">Summer Break Schedule</h4>
-                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">General</span>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Important dates and information regarding the upcoming summer break. The last day of school will be June 20, and classes will resume on September 5.</p>
-                        <div class="mt-3 flex items-center justify-between">
-                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                <i class="far fa-calendar-alt mr-1"></i>
-                                <span>April 28, 2023</span>
-                            </div>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300">Read More</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Announcement Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-base font-medium text-gray-900 dark:text-white">Math Competition Results</h4>
-                            <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100">Mathematics</span>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Congratulations to all participants in the regional math competition. Our school secured the second position overall, with three students winning individual medals.</p>
-                        <div class="mt-3 flex items-center justify-between">
-                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                <i class="far fa-calendar-alt mr-1"></i>
-                                <span>April 15, 2023</span>
-                            </div>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-center">
-                <button class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
-                    Load More Announcements
-                </button>
-            </div>
-        </div>
-
-        <!-- Calendar and Upcoming Events -->
-        <div class="card">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Upcoming Events</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Event Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
-                    <div class="p-4">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
-                                <i class="fas fa-calendar-day text-red-600 dark:text-red-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white">Final Exams</h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">June 10-15, 2023</p>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-300">End of semester examinations for all subjects. Check the detailed schedule for specific times and locations.</p>
-                    </div>
-                </div>
-
-                <!-- Event Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
-                    <div class="p-4">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
-                                <i class="fas fa-flask text-green-600 dark:text-green-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white">Science Fair</h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">June 5, 2023</p>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-300">Annual science fair showcasing student projects. Open to all students and parents from 9 AM to 3 PM in the main hall.</p>
-                    </div>
-                </div>
-
-                <!-- Event Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
-                    <div class="p-4">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
-                                <i class="fas fa-graduation-cap text-blue-600 dark:text-blue-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white">Graduation Ceremony</h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">June 25, 2023</p>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-300">Graduation ceremony for the senior class. The event will be held at the school auditorium starting at 10 AM.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+@section('username')
+    {{$user->fname}} {{$user->lname}}
 @endsection
 
-@section("scripts")
-    <script>
-        // Search functionality
-        const searchAnnouncement = document.getElementById('searchAnnouncement');
-        searchAnnouncement.addEventListener('input', () => {
-            // In a real app, you would filter the announcements based on the search term
-            console.log('Searching for:', searchAnnouncement.value);
-        });
+@section('fname')
+    {{$user->fname}}
+@endsection
+@section('lname')
+    {{$user->lname}}
+@endsection
+@section('profile_picture')
+    {{$user->profile_picture}}
+@endsection
 
-        // Class filter
-        const classFilter = document.getElementById('classFilter');
-        classFilter.addEventListener('change', () => {
-            // In a real app, you would filter the announcements based on the selected class
-            console.log('Filtering by class:', classFilter.value);
-        });
+@push("styles")
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .btn-primary {
+                @apply px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200;
+            }
+            .btn-secondary {
+                @apply px-6 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:ring-offset-2 transition-colors duration-200;
+            }
+            .card {
+                @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
+            }
+            .sidebar-item {
+                @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors duration-200;
+            }
+            .sidebar-item.active {
+                @apply bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-medium;
+            }
+            .form-input {
+                @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white;
+            }
+            .form-label {
+                @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+            }
+            .form-select {
+                @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white bg-white dark:bg-gray-700;
+            }
+            .form-checkbox {
+                @apply h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700;
+            }
+        }
+    </style>
 
-        // Load more button
-        const loadMoreButton = document.querySelector('button');
-        loadMoreButton.addEventListener('click', () => {
-            // In a real app, you would load more announcements
-            console.log('Loading more announcements...');
-        });
-    </script>
+@endpush
+
+@section('content')
+    <main class="scrollable-content p-4 md:p-6">
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Success !</strong>
+                <span class="block sm:inline">{{session('success')}}</span>
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+                <strong class="font-bold">Whoops!</strong>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <div class="mb-6">
+            <a href="{{ route('teacher.announcement.index') }}" class="flex items-center text-primary-600 hover:text-primary-800">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Announcements
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="mb-6">
+                @if($announcement->type == "regular")
+                    <div class="p-6 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-800">
+                                <i class="fas fa-bullhorn text-blue-600 dark:text-blue-300 text-xl"></i>
+                            </span>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ $announcement->title }}</h2>
+                                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                <span class="mr-4">
+                                    <i class="fas fa-user mr-1"></i> Posted by {{ ucfirst($announcement->creator_type) }}
+                                </span>
+                                    <span class="mr-4">
+                                    <i class="fas fa-calendar mr-1"></i> {{ $announcement->created_at->format('M d, Y h:i A') }}
+                                </span>
+                                    @if($announcement->is_pinned)
+                                        <span class="text-primary-600">
+                                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="prose dark:prose-invert max-w-none">
+                                    <p class="text-gray-700 dark:text-gray-300">
+                                        {{ $announcement->content }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @elseif($announcement->type == "important")
+                    <div class="p-6 border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-800">
+                                <i class="fas fa-clock text-yellow-600 dark:text-yellow-300 text-xl"></i>
+                            </span>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ $announcement->title }}</h2>
+                                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                <span class="mr-4">
+                                    <i class="fas fa-user mr-1"></i> Posted by {{ ucfirst($announcement->creator_type) }}
+                                </span>
+                                    <span class="mr-4">
+                                    <i class="fas fa-calendar mr-1"></i> {{ $announcement->created_at->format('M d, Y h:i A') }}
+                                </span>
+                                    @if($announcement->is_pinned)
+                                        <span class="text-primary-600">
+                                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="prose dark:prose-invert max-w-none">
+                                    <p class="text-gray-700 dark:text-gray-300">
+                                        {{ $announcement->content }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="p-6 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-800">
+                                <i class="fas fa-exclamation-circle text-red-600 dark:text-red-300 text-xl"></i>
+                            </span>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ $announcement->title }}</h2>
+                                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                <span class="mr-4">
+                                    <i class="fas fa-user mr-1"></i> Posted by {{ ucfirst($announcement->creator_type) }}
+                                </span>
+                                    <span class="mr-4">
+                                    <i class="fas fa-calendar mr-1"></i> {{ $announcement->created_at->format('M d, Y h:i A') }}
+                                </span>
+                                    @if($announcement->is_pinned)
+                                        <span class="text-primary-600">
+                                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="prose dark:prose-invert max-w-none">
+                                    <p class="text-gray-700 dark:text-gray-300">
+                                        {{ $announcement->content }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <!-- Attachments Section -->
+            @if($announcement->attachments && count($announcement->attachments) > 0)
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                        <i class="fas fa-paperclip mr-2"></i> Attachments
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach($announcement->attachments as $attachment)
+
+                            @php
+                                $fileExtension = pathinfo($attachment->title, PATHINFO_EXTENSION);
+                                $fileExtensionLower = strtolower($fileExtension);
+
+                                // Determine file type
+                                $isPdf = $fileExtensionLower === 'pdf';
+                                $isImage = in_array($fileExtensionLower, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
+
+                                // Document types
+                                $isWord = in_array($fileExtensionLower, ['doc', 'docx']);
+                                $isExcel = in_array($fileExtensionLower, ['xls', 'xlsx', 'csv']);
+                                $isPowerPoint = in_array($fileExtensionLower, ['ppt', 'pptx']);
+                                $isText = in_array($fileExtensionLower, ['txt', 'rtf']);
+                                $isZip = in_array($fileExtensionLower, ['zip', 'rar', '7z', 'tar', 'gz']);
+                            @endphp
+
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800">
+                                @if($isImage)
+                                    <div class="relative aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <img
+                                            src="{{ asset('storage/' . $attachment->path) }}"
+                                            alt="{{ $attachment->title }}"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                @elseif($isPdf)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-pdf text-red-500 text-5xl"></i>
+                                    </div>
+                                @elseif($isWord)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-word text-blue-600 text-5xl"></i>
+                                    </div>
+                                @elseif($isExcel)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-excel text-green-600 text-5xl"></i>
+                                    </div>
+                                @elseif($isPowerPoint)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-powerpoint text-orange-500 text-5xl"></i>
+                                    </div>
+                                @elseif($isText)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-alt text-gray-600 text-5xl"></i>
+                                    </div>
+                                @elseif($isZip)
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file-archive text-yellow-600 text-5xl"></i>
+                                    </div>
+                                @else
+                                    <div class="flex items-center justify-center aspect-video bg-gray-100 dark:bg-gray-900">
+                                        <i class="fas fa-file text-gray-500 text-5xl"></i>
+                                    </div>
+                                @endif
+
+                                <div class="p-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate" title="{{ $attachment->title }}">
+                                            {{ $attachment->title }}
+                                        </p>
+                                        <div class="flex space-x-2">
+                                            <a href="{{ asset('storage/' . $attachment->path) }}"
+                                               target="_blank"
+                                               class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
+                                               title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ asset('storage/' . $attachment->path) }}"
+                                               download="{{ $attachment->title }}"
+                                               class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
+                                               title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-1">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ strtoupper($fileExtension) }}
+                            </span>
+                                        @if($attachment->file_size)
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ round($attachment->file_size / 1024, 2) }} KB
+                                </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            @if(auth()->check() && ( auth()->user()->id == $announcement->creator_id))
+                <div class="mt-6 flex space-x-4">
+                    <a href="{{ route('teacher.announcement.edit', $announcement->id) }}" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                        <i class="fas fa-edit mr-2"></i> Edit
+                    </a>
+                    <form action="{{ route('teacher.announcement.destroy', $announcement->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+                            <i class="fas fa-trash mr-2"></i> Delete
+                        </button>
+                    </form>
+                    @if(!$announcement->pinned)
+                        <form action="{{ route('teacher.announcement.pin', $announcement->id) }}" method="POST">
+                            @method("PUT")
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                                <i class="fas fa-thumbtack mr-2"></i> Unpin
+                            </button>
+                        </form>
+                    @else
+                        <form action="{{ route('teacher.announcement.pin', $announcement->id) }}" method="POST">
+                            @method("PUT")
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                                <i class="fas fa-thumbtack mr-2"></i> Pin
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            @endif
+
+            @if(isset($relatedAnnouncements) && count($relatedAnnouncements) > 0)
+                <div class="mt-10">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Related Announcements</h3>
+                    <div class="space-y-4">
+                        @foreach($relatedAnnouncements as $related)
+                            <a href="{{ route('announcements.show', $related->id) }}" class="block p-4 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <span class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800">
+                                            <i class="fa fa-bullhorn text-gray-500 dark:text-gray-400" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-md font-medium text-gray-800 dark:text-white">{{ $related->title }}</h4>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Posted by {{ ucfirst($related->creator_type) }}</span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $related->created_at->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+    </main>
 @endsection

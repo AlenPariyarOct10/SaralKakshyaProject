@@ -55,24 +55,22 @@
                 <span>Resources</span>
             </a>
 
-            <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                <a href="{{route('teacher.profile.index')}}" class="sidebar-item {{(Route::is('teacher.profile.*')?'active':'')}}">
-                    <i class="fas fa-user"></i>
+            <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                <!-- Profile Link -->
+                <a href="{{ route('teacher.profile.index') }}"
+                   class="flex items-center px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ Route::is('teacher.profile.*') ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+                    <i class="fas fa-user mr-2"></i>
                     <span>Profile</span>
                 </a>
-                <a href="{{route('teacher.setting.index')}}" class="sidebar-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-                <form action="{{ route('teacher.logout') }}" method="POST"
-                      class="sidebar-item text-red-500 dark:text-red-400">
+                <!-- Logout Form -->
+                <form action="{{ route('teacher.logout') }}" method="POST" class="px-4">
                     @csrf
-                    <button type="submit" class="flex items-center">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Logout Now
+                    <button type="submit"
+                            class="w-full flex items-center text-red-600 dark:text-red-400 py-2 rounded-md transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        <span>Logout Now</span>
                     </button>
                 </form>
-
             </div>
         </nav>
     </aside>
@@ -98,45 +96,6 @@
                         <i class="fas fa-sun hidden dark:block"></i>
                     </button>
 
-                    <!-- Notifications -->
-                    <div class="relative">
-                        <button id="notificationBtn"
-                                class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-bell"></i>
-                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
-
-                        <!-- Notification Dropdown (Hidden by default) -->
-                        <div id="notificationDropdown"
-                             class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 hidden">
-                            <div class="p-4 border-b dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
-                            </div>
-                            <div class="max-h-96 overflow-y-auto">
-                                <a href="#"
-                                   class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">New assignment
-                                        posted</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 minutes ago</p>
-                                </a>
-                                <a href="#"
-                                   class="block p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">Live class
-                                        scheduled</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 hour ago</p>
-                                </a>
-                                <a href="#" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">Attendance
-                                        marked</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yesterday</p>
-                                </a>
-                            </div>
-                            <div class="p-2 text-center border-t dark:border-gray-700">
-                                <a href="#" class="text-sm text-primary-600 hover:underline">View all
-                                    notifications</a>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Profile Dropdown -->
                     <div class="relative">
@@ -232,26 +191,16 @@
     });
 
     // Dropdowns
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationDropdown = document.getElementById('notificationDropdown');
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
-
-    notificationBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notificationDropdown.classList.toggle('hidden');
-        profileDropdown.classList.add('hidden');
-    });
 
     profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         profileDropdown.classList.toggle('hidden');
-        notificationDropdown.classList.add('hidden');
     });
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', () => {
-        notificationDropdown.classList.add('hidden');
         profileDropdown.classList.add('hidden');
     });
 </script>

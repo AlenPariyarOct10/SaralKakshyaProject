@@ -15,6 +15,15 @@ class Subject extends Model
         return $this->hasMany(SubjectEvaluationFormat::class, 'subject_id', 'id');
     }
 
+    public function subjectTeacherMappings()
+    {
+        return $this->hasMany(\App\Models\SubjectTeacherMapping::class);
+    }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'id');
+    }
+
     public function batch()
     {
         return $this->belongsTo(Batch::class, 'batch_id', 'id');

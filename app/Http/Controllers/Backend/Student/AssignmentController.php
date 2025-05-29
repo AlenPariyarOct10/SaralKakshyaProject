@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AssignmentController extends Controller
 {
@@ -28,22 +29,87 @@ class AssignmentController extends Controller
         // Get the student's batch ID
         $batchId = $student->batch ? $student->batch->id : null;
 
+        if (!$batchId) {
+            return view('backend.student.assignment.index', [
+                'user' => $user,
+                'submittedAssignments' => collect(),
+                'pendingAssignments' => collect(),
+                'assignmentStats' => [
+                    'total' => 0,
+                    'submitted' => 0,
+                    'pending' => 0,
+                    'graded' => 0,
+                    'overdue' => 0,
+                    'due_soon' => 0,
+                    'this_month' => 0
+                ]
+            ]);
+        }
+
         // Fetch assignments for the student's batch
-        $assignments = $batchId ? Assignment::with(['subject', 'batch', 'assignment_submissions'])
+        $assignments = Assignment::with(['subject', 'batch', 'assignmentSubmissions', 'attachments'])
             ->where('batch_id', $batchId)
             ->where('status', 'active')
-            ->get() : collect();
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        // Get submitted assignment IDs for this student
+        $submittedAssignmentIds = AssignmentSubmission::where('student_id', $user->id)
+            ->pluck('assignment_id')
+            ->toArray();
 
         // Separate submitted and pending assignments
-        $submittedAssignments = $assignments->filter(function ($assignment) use ($user) {
-            return $assignment->assignmentSubmissions()->where('student_id', $user->id)->exists();
+        $submittedAssignments = $assignments->filter(function ($assignment) use ($submittedAssignmentIds) {
+            return in_array($assignment->id, $submittedAssignmentIds);
         });
 
-        $pendingAssignments = $assignments->filter(function ($assignment) use ($user) {
-            return !$assignment->assignmentSubmissions()->where('student_id', $user->id)->exists();
+        $pendingAssignments = $assignments->filter(function ($assignment) use ($submittedAssignmentIds) {
+            return !in_array($assignment->id, $submittedAssignmentIds);
         });
 
-        return view('backend.student.assignment.index', compact('user', 'submittedAssignments', 'pendingAssignments'));
+        // Calculate assignment statistics
+        $now = Carbon::now();
+        $weekFromNow = $now->copy()->addWeek();
+        $startOfMonth = $now->copy()->startOfMonth();
+
+        // Count overdue assignments (pending assignments past due date)
+        $overdueCount = $pendingAssignments->filter(function($assignment) use ($now) {
+            return $assignment->due_date && Carbon::parse($assignment->due_date)->isPast();
+        })->count();
+
+        // Count assignments due soon (within next 7 days)
+        $dueSoonCount = $pendingAssignments->filter(function($assignment) use ($now, $weekFromNow) {
+            if (!$assignment->due_date) return false;
+            $dueDate = Carbon::parse($assignment->due_date);
+            return $dueDate->isFuture() && $dueDate->lte($weekFromNow);
+        })->count();
+
+        // Count graded assignments
+        $gradedCount = AssignmentSubmission::where('student_id', $user->id)
+            ->where('status', 'graded')
+            ->count();
+
+        // Count assignments created this month
+        $thisMonthCount = $assignments->filter(function($assignment) use ($startOfMonth) {
+            return Carbon::parse($assignment->created_at)->gte($startOfMonth);
+        })->count();
+
+        $assignmentStats = [
+            'total' => $assignments->count(),
+            'submitted' => $submittedAssignments->count(),
+            'pending' => $pendingAssignments->count(),
+            'graded' => $gradedCount,
+            'overdue' => $overdueCount,
+            'due_soon' => $dueSoonCount,
+            'this_month' => $thisMonthCount
+        ];
+
+        return view('backend.student.assignment.index', compact(
+            'user',
+            'submittedAssignments',
+            'pendingAssignments',
+            'assignmentStats'
+        ));
     }
 
     public function create()
@@ -54,7 +120,7 @@ class AssignmentController extends Controller
         $assignments = $batchId ? Assignment::with(['subject', 'batch'])
             ->where('batch_id', $batchId)
             ->where('status', 'active')
-            ->whereDoesntHave('assignment_submissions', function ($query) use ($user) {
+            ->whereDoesntHave('assignmentSubmissions', function ($query) use ($user) {
                 $query->where('student_id', $user->id);
             })
             ->get() : collect();
@@ -68,6 +134,7 @@ class AssignmentController extends Controller
 
         $validator = Validator::make($request->all(), [
             'assignment_id' => 'required|exists:assignments,id',
+            'description' => 'nullable|string|max:255',
             'attachments' => 'required|array|min:1',
             'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,png|max:10240',
         ]);
@@ -88,6 +155,7 @@ class AssignmentController extends Controller
             'assignment_id' => $assignment->id,
             'student_id' => $user->id,
             'submitted_at' => now(),
+            'description' => $request->description,
             'status' => 'submitted',
         ]);
 
@@ -104,6 +172,7 @@ class AssignmentController extends Controller
             ]);
         }
 
+        // Mark related notifications as seen
         Notification::where('notifiable_id', $user->id)
             ->where('notifiable_type', Student::class)
             ->where('parent_type', Assignment::class)
@@ -122,10 +191,9 @@ class AssignmentController extends Controller
             ->where('parent_type', Assignment::class)
             ->firstOrFail();
 
-            $assignment = Assignment::where('id', $attachment->parent_id)
-                ->where('batch_id', $user->batch ? $user->batch->id : null)
-                ->firstOrFail();
-
+        $assignment = Assignment::where('id', $attachment->parent_id)
+            ->where('batch_id', $user->batch ? $user->batch->id : null)
+            ->firstOrFail();
 
         $filePath = storage_path('app/public/' . $attachment->path);
         if (!file_exists($filePath)) {
@@ -167,6 +235,7 @@ class AssignmentController extends Controller
 
         $submittedStatus = $submission ? true : false;
 
+        // Mark related notifications as seen
         Notification::where('notifiable_id', $user->id)
             ->where('notifiable_type', Student::class)
             ->where('parent_type', Assignment::class)
@@ -208,11 +277,13 @@ class AssignmentController extends Controller
         }
 
         if ($request->hasFile('file')) {
+            // Delete old attachments
             foreach ($submission->attachments as $attachment) {
                 Storage::disk('public')->delete($attachment->path);
                 $attachment->delete();
             }
 
+            // Upload new file
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('assignments/submissions', $fileName, 'public');
@@ -240,6 +311,7 @@ class AssignmentController extends Controller
             ->where('status', 'submitted')
             ->firstOrFail();
 
+        // Delete associated files
         foreach ($submission->attachments as $attachment) {
             Storage::disk('public')->delete($attachment->path);
             $attachment->delete();
@@ -248,5 +320,69 @@ class AssignmentController extends Controller
         $submission->delete();
 
         return redirect()->route('student.assignment.index')->with('success', 'Assignment submission deleted successfully.');
+    }
+
+    /**
+     * Get assignment statistics for API calls
+     */
+    public function getStats()
+    {
+        $user = Auth::user();
+        $batchId = $user->batch ? $user->batch->id : null;
+
+        if (!$batchId) {
+            return response()->json([
+                'total' => 0,
+                'submitted' => 0,
+                'pending' => 0,
+                'graded' => 0,
+                'overdue' => 0,
+                'due_soon' => 0,
+                'this_month' => 0
+            ]);
+        }
+
+        $assignments = Assignment::where('batch_id', $batchId)
+            ->where('status', 'active')
+            ->get();
+
+        $submittedCount = AssignmentSubmission::where('student_id', $user->id)->count();
+        $gradedCount = AssignmentSubmission::where('student_id', $user->id)
+            ->where('status', 'graded')
+            ->count();
+
+        $now = Carbon::now();
+        $weekFromNow = $now->copy()->addWeek();
+        $startOfMonth = $now->copy()->startOfMonth();
+
+        $submittedAssignmentIds = AssignmentSubmission::where('student_id', $user->id)
+            ->pluck('assignment_id')
+            ->toArray();
+
+        $pendingAssignments = $assignments->whereNotIn('id', $submittedAssignmentIds);
+
+        $overdueCount = $pendingAssignments->filter(function($assignment) use ($now) {
+            return $assignment->due_date && Carbon::parse($assignment->due_date)->isPast();
+        })->count();
+
+        $dueSoonCount = $pendingAssignments->filter(function($assignment) use ($now, $weekFromNow) {
+            if (!$assignment->due_date) return false;
+            $dueDate = Carbon::parse($assignment->due_date);
+            return $dueDate->isFuture() && $dueDate->lte($weekFromNow);
+        })->count();
+
+        $thisMonthCount = $assignments->filter(function($assignment) use ($startOfMonth) {
+            return Carbon::parse($assignment->created_at)->gte($startOfMonth);
+        })->count();
+
+        return response()->json([
+            'total' => $assignments->count(),
+            'submitted' => $submittedCount,
+            'pending' => $pendingAssignments->count(),
+            'graded' => $gradedCount,
+            'overdue' => $overdueCount,
+            'due_soon' => $dueSoonCount,
+            'this_month' => $thisMonthCount
+        ]);
     }
 }

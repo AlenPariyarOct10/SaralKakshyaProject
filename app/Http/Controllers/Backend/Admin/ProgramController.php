@@ -106,6 +106,15 @@ class ProgramController extends Controller
         ]);
     }
 
+    public function show(string $id)
+    {
+        $user = Auth::guard('admin')->user();
+        $program = Program::with('department')->find($id);
+        $allDepartments = Department::where('institute_id', $program->institute_id)->get();
+
+        return view('backend.admin.program.show', compact('program', 'user', 'allDepartments'));
+    }
+
     public function destroy(string $id)
     {
         try {

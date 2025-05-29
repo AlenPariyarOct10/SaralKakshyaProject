@@ -81,7 +81,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Date of Birth</label>
-                            <p class="text-gray-800 dark:text-white">{{($user->dob)?$user->dob:"Not Set"}}</p>
+                            <p class="text-gray-800 dark:text-white">{{($user->dob)?$user->dob->format('M d, Y'):"Not Set"}}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
@@ -116,29 +116,22 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Student ID</label>
-                            <p class="text-gray-800 dark:text-white">STU001</p>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Program</label>
-                            <p class="text-gray-800 dark:text-white">Bachelor of Science</p>
+                            <p class="text-gray-800 dark:text-white">{{$program->program->name}}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Major</label>
-                            <p class="text-gray-800 dark:text-white">Computer Science</p>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Department</label>
+                            <p class="text-gray-800 dark:text-white">{{$program->program->department->name}}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Year</label>
-                            <p class="text-gray-800 dark:text-white">3rd Year</p>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Batch</label>
+                            <p class="text-gray-800 dark:text-white">{{$program->batch->batch}}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">GPA</label>
-                            <p class="text-gray-800 dark:text-white">3.8/4.0</p>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Semester</label>
+                            <p class="text-gray-800 dark:text-white">{{$program->batch->semester}}</p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Advisor</label>
-                            <p class="text-gray-800 dark:text-white">Prof. David Wilson</p>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -257,7 +250,7 @@
                         </div>
                         <div>
                             <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
-                            <input type="date" id="dob" name="dob" value="{{$user->dob}}" class="form-input">
+                            <input type="date" id="dob" name="dob" value="{{$user->dob->format('M Y, d')}}" class="form-input">
                         </div>
                         <div>
                             <label for="emailPersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>

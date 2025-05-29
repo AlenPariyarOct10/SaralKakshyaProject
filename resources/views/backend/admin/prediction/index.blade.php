@@ -88,9 +88,17 @@
     <main class="scrollable-content p-4 md:p-6">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Student Performance Prediction</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Student Performance Prediction {{session('prediction_result')}}</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">Using Logistic Regression to predict student outcomes</p>
         </div>
+
+        <x-show-success-failure-badge></x-show-success-failure-badge>
+
+        @if(session('training_error'))
+            <div class="status-error">
+                <i class="fas fa-exclamation-circle mr-2"></i> {{ session('training_error') }}
+            </div>
+        @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Model Training Panel -->
@@ -185,15 +193,6 @@
                                     <input type="number" id="attendance_total" name="attendance_total" class="form-input" placeholder="100" min="1" required>
                                 </div>
 
-                                <!-- Presentations -->
-                                <div>
-                                    <label for="presentation_done" class="form-label">Presentations Done</label>
-                                    <input type="number" id="presentation_done" name="presentation_done" class="form-input" placeholder="0" min="0" required>
-                                </div>
-                                <div>
-                                    <label for="presentation_total" class="form-label">Presentations Total</label>
-                                    <input type="number" id="presentation_total" name="presentation_total" class="form-input" placeholder="5" min="1" required>
-                                </div>
 
                                 <!-- Mid-term Marks -->
                                 <div>
@@ -222,9 +221,7 @@
                                 </button>
                             </div>
                         </form>
-
-                        @if(session('prediction_result'))
-                            hello
+                        @if(session('predicted'))
                             <div class="prediction-result {{ session('prediction_result') ? 'prediction-pass' : 'prediction-fail' }}">
                                 @if(session('prediction_result'))
                                     <div class="flex items-center justify-center">
@@ -239,6 +236,7 @@
                                 @endif
                             </div>
                         @endif
+
                     </div>
                 </div>
             </div>

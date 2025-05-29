@@ -81,23 +81,23 @@
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
+                <a href="{{route("student.prediction.index")}}" class="sidebar-item {{ Route::is('student.prediction.index') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Prediction</span>
+                </a>
                 <a href="{{route("student.assignment.index")}}" class="sidebar-item {{ Route::is('student.assignment.index') ? 'active' : '' }}">
                     <i class="fas fa-book"></i>
                     <span>Assignments</span>
                 </a>
-                <a href="{{route('student.announcement.index')}}" class="sidebar-item">
+                <a href="{{route('student.announcement.index')}}" class="sidebar-item {{ Route::is('student.announcement.index') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
-                <a href="{{route('student.resources.index')}}" class="sidebar-item">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Resources</span>
-                </a>
-                <a href="{{route('student.subjects.index')}}" class="sidebar-item">
+                <a href="{{route('student.subjects.index')}}" class="sidebar-item {{ Route::is('student.subjects.index') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Subjects</span>
                 </a>
-                <a href="{{route('student.announcement.index')}}" class="sidebar-item">
+                <a href="{{route('student.routine.index')}}" class="sidebar-item {{ Route::is('student.routine.index') ? 'active' : '' }}">
                     <i class="fa-solid fa-clock"></i>
                     <span>Routine</span>
                 </a>
@@ -106,10 +106,6 @@
                     <a href="{{route('student.profile')}}" class="sidebar-item {{ Route::is('student.profile') ? 'active' : '' }}">
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
-                    </a>
-                    <a href="settings.html" class="sidebar-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
                     </a>
                     <form action="{{ route('student.logout') }}" method="get" class="sidebar-item text-red-500 dark:text-red-400">
                         <button type="submit" class="flex items-center">

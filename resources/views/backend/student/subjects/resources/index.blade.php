@@ -8,6 +8,10 @@
         <div class="max-w-7xl mx-auto">
             <!-- Page Title and Actions -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <a class="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600" href="{{ route('student.subjects.index') }}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Go Back
+                </a>
 {{--                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ $subject->name }} Resources</h1>--}}
                 <div class="mt-4 md:mt-0 flex flex-col md:flex-row gap-4">
                     <div class="relative">
@@ -30,6 +34,8 @@
                     </div>
                 </div>
             </div>
+
+
 
             <!-- Subject Info Card -->
 {{--            <div class="card mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border dark:border-gray-700">--}}
@@ -102,14 +108,10 @@
                                     <div class="flex justify-between items-center">
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
                                             <span class="font-medium">Views:</span> {{ $resource->views_count }}
-                                            <span class="ml-2 font-medium">Downloads:</span> {{ $resource->download_count }}
                                         </div>
                                         <div class="flex space-x-2">
                                             <a href="{{ route('student.resource.show', $resource->id) }}" class="px-3 py-1 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600">
                                                 <i class="fas fa-eye mr-1"></i> View
-                                            </a>
-                                            <a href="{{ route('student.resource.download', $resource->id) }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                                                <i class="fas fa-download mr-1"></i> Download
                                             </a>
                                         </div>
                                     </div>

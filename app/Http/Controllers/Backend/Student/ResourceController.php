@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attachment;
+use App\Models\Resource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResourceController extends Controller
 {
@@ -36,7 +39,11 @@ class ResourceController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $resource = Resource::find($id);
+        $resource->views_count = $resource->views + 1;
+        $resource->save();
+        $user = Auth::user();
+        return view('backend.student.subjects.resources.show', compact('resource', 'user'));
     }
 
     /**
@@ -49,7 +56,6 @@ class ResourceController extends Controller
 
     public function download(string $id)
     {
-        //
     }
 
     /**

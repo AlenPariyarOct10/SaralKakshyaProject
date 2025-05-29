@@ -88,6 +88,7 @@ Route::group(['prefix' => 'admin'], function () {
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
         Route::get('/programs/{id}/edit', [AdminProgramController::class, 'edit'])->name('admin.programs.edit');
+        Route::get('/programs/{id}/', [AdminProgramController::class, 'show'])->name('admin.programs.show');
         Route::put('/programs/{id}', [AdminProgramController::class, 'update'])->name('admin.programs.update');
         Route::post('/programs', [AdminProgramController::class, 'store'])->name('admin.programs.store');
         Route::delete('/programs/{id}', [AdminProgramController::class, 'destroy'])->name('admin.programs.destroy');
@@ -97,6 +98,13 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Program Batch Controller
         Route::POST('/program/batch', [AdminBatchController::class, 'store'])->name('admin.program.batch');
+        Route::PUT('/program/{id}', [AdminProgramController::class, 'update'])->name('admin.program.put');
+        Route::get('/program/batch/create', [AdminBatchController::class, 'create'])->name('admin.program.batch.create');
+
+
+        //Academic Institute
+        Route::get('/program/section/create', [AdminBatchController::class, 'create'])->name('admin.program.section.create');
+
 
         //Testimonial
         Route::get('/testimonial', [AdminTestimonialController::class, "index"])->name('admin.testimonial.index');
@@ -185,6 +193,18 @@ Route::group(['prefix' => 'admin'], function () {
         Route::PUT('/sessions/{id}', [AdminInstituteSessionController::class, 'update'])->name('admin.session.update');
         Route::delete('/sessions/{session}', [AdminInstituteSessionController::class, 'destroy'])
             ->name('admin.sessions.destroy');
+
+
+        // Attendance routes
+        Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
+        Route::get('/attendance/create', [AdminAttendanceController::class, "create"])->name('admin.attendance.create');
+        Route::post('/attendance', [AdminAttendanceController::class, "store"])->name('admin.attendance.store');
+        Route::get('/attendance/{id}', [AdminAttendanceController::class, "show"])->name('admin.attendance.show');
+        Route::get('/attendance/{id}/edit', [AdminAttendanceController::class, "edit"])->name('admin.attendance.edit');
+        Route::put('/attendance/{id}', [AdminAttendanceController::class, "update"])->name('admin.attendance.update');
+        Route::delete('/attendance/{id}', [AdminAttendanceController::class, "destroy"])->name('admin.attendance.destroy');
+        Route::get('/attendance/export/csv', [AdminAttendanceController::class, "export"])->name('admin.attendance.export');
+        Route::post('/attendance/bulk', [AdminAttendanceController::class, "bulkStore"])->name('admin.attendance.bulk');
 
 
         /*

@@ -1,6 +1,7 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
 @section('content')
+    <x-show-success-failure-badge></x-show-success-failure-badge>
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
         <!-- Create Announcement Form -->
@@ -12,7 +13,7 @@
                 </a>
             </div>
 
-            <form action="{{ route('teacher.announcements.store') }}" method="POST">
+            <form action="{{ route('teacher.announcements.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="space-y-6">
                     <!-- Title -->
@@ -29,44 +30,26 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Target Recipients -->
-                        <div>
-                            <label for="recipients" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Recipients</label>
-                            <select id="recipients" name="recipients" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                                <option value="all">All Students</option>
-                                <option value="math">Mathematics Class</option>
-                                <option value="physics">Physics Class</option>
-                                <option value="cs">Computer Science Class</option>
-                                <option value="history">History Class</option>
-                                <option value="english">English Class</option>
-                            </select>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                        <!-- Publish Date -->
-                        <div>
-                            <label for="publishDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Publish Date</label>
-                            <input type="date" id="publishDate" name="publish_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Status -->
-                        <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                            <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                                <option value="published">Published</option>
-                                <option value="draft">Draft</option>
-                            </select>
-                        </div>
 
                         <!-- Priority -->
                         <div>
-                            <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                            <select id="priority" name="priority" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                                <option value="normal">Normal</option>
-                                <option value="high">High</option>
+                            <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                            <select id="type" name="type" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white" required>
+                                <option value="regular">Regular</option>
+                                <option value="important">Important</option>
                                 <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="program_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program</label>
+                            <select id="program_id" name="program_id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white" required>
+                                <option value="">Select Program</option>
+                                @foreach($programs as $program)
+                                    <option value="{{$program->id}}">{{$program->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -88,33 +71,8 @@
                         <div id="fileList" class="mt-2 space-y-1"></div>
                     </div>
 
-                    <!-- Notification Options -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notification Options</label>
-                        <div class="space-y-2">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="emailNotification" name="email_notification" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <label for="emailNotification" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Send email notification to recipients</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" id="pushNotification" name="push_notification" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <label for="pushNotification" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Send push notification to mobile app</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" id="smsNotification" name="sms_notification" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <label for="smsNotification" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Send SMS notification (charges may apply)</label>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-4">
-                        <button type="button" id="previewAnnouncement" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
-                            Preview
-                        </button>
-                        <button type="button" id="saveAsDraft" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
-                            Save as Draft
-                        </button>
                         <button type="submit" class="btn-primary">
                             Publish Announcement
                         </button>
@@ -123,56 +81,13 @@
             </form>
         </div>
 
-        <!-- Tips and Guidelines -->
-        <div class="card">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Tips for Effective Announcements</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-                    <h4 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Best Practices</h4>
-                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 list-disc pl-5">
-                        <li>Keep titles clear and concise</li>
-                        <li>Include all relevant details in the content</li>
-                        <li>Use formatting to highlight important information</li>
-                        <li>Specify the target audience accurately</li>
-                        <li>Set appropriate priority levels</li>
-                    </ul>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-                    <h4 class="text-sm font-medium text-gray-800 dark:text-white mb-2">Notification Guidelines</h4>
-                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 list-disc pl-5">
-                        <li>Use email notifications for detailed announcements</li>
-                        <li>Push notifications are best for urgent matters</li>
-                        <li>SMS should be reserved for critical information only</li>
-                        <li>Consider timing when scheduling announcements</li>
-                        <li>Avoid sending too many notifications in a short period</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </main>
 @endsection
 
 @section("scripts")
     <script>
-        // Set today's date as default for publish date
-        const publishDate = document.getElementById('publishDate');
-        const today = new Date().toISOString().split('T')[0];
-        publishDate.value = today;
 
-        // Preview announcement
-        const previewAnnouncement = document.getElementById('previewAnnouncement');
-        previewAnnouncement.addEventListener('click', () => {
-            // In a real app, you would show a preview of the announcement
-            alert('Preview functionality would be implemented here.');
-        });
 
-        // Save as draft
-        const saveAsDraft = document.getElementById('saveAsDraft');
-        saveAsDraft.addEventListener('click', () => {
-            document.getElementById('status').value = 'draft';
-            // In a real app, you would submit the form with draft status
-            alert('Announcement saved as draft.');
-        });
 
         // File upload handling
         const attachmentsInput = document.getElementById('attachments');
