@@ -24,7 +24,7 @@ class ClassRoutineController extends Controller
     {
         try {
             // Get pagination parameters
-            $perPage = $request->input('per_page', 10);
+            $perPage = $request->input('per_page', 5);
             $page = $request->input('page', 1);
 
             // Start building the query
@@ -34,6 +34,11 @@ class ClassRoutineController extends Controller
                 'subjectTeacherMapping.subject.program.department'
             ]);
 
+            // Filter by institute_id
+            $query->whereHas('subjectTeacherMapping', function($q) {
+                $q->where('institute_id', session('institute_id'));
+            });
+
             // Apply search filter
             if ($request->has('search') && $request->search != '') {
                 $search = $request->search;
@@ -41,11 +46,9 @@ class ClassRoutineController extends Controller
                     $q->whereHas('subjectTeacherMapping.teacher', function($q) use ($search) {
                         $q->where('fname', 'like', "%{$search}%")
                             ->orWhere('lname', 'like', "%{$search}%");
-                    })
-                        ->orWhereHas('subjectTeacherMapping.subject', function($q) use ($search) {
-                            $q->where('name', 'like', "%{$search}%");
-                        })
-                        ->orWhere('day', 'like', "%{$search}%")
+                    })->orWhereHas('subjectTeacherMapping.subject', function($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })->orWhere('day', 'like', "%{$search}%")
                         ->orWhere('notes', 'like', "%{$search}%");
                 });
             }
@@ -60,7 +63,7 @@ class ClassRoutineController extends Controller
             // Execute the query with pagination
             $routines = $query->paginate($perPage, ['*'], 'page', $page);
 
-            // Transform the results to include department name
+            // Transform the results
             $transformed = $routines->getCollection()->map(function($routine) {
                 return [
                     'id' => $routine->id,
@@ -86,7 +89,7 @@ class ClassRoutineController extends Controller
                 ];
             });
 
-            // Return the paginated response
+            // Return response
             return response()->json([
                 'status' => 'success',
                 'data' => $transformed,
@@ -108,6 +111,7 @@ class ClassRoutineController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Show the form for creating a new resource.

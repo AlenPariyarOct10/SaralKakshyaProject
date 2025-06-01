@@ -32,13 +32,15 @@ class InstituteController extends Controller
             'id' => 'required|exists:institutes,id'
         ]);
 
-        // Remove ->first() since findOrFail() already returns a single model
         $institute = Institute::withTrashed()->findOrFail($request->id);
 
-        $institute->deleted_at = now();
-        $institute->save();
-        $message = "";
-
+        if ($institute->trashed()) {
+            $institute->restore();
+            $message = "Institute Activated";
+        } else {
+            $institute->delete();
+            $message = "Institute Disabled";
+        }
 
         return response()->json([
             'success' => true,
@@ -46,6 +48,7 @@ class InstituteController extends Controller
             'data' => $institute
         ]);
     }
+
 
 
     public function get_institutes(Request $request)

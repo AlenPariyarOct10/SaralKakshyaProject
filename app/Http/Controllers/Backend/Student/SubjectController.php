@@ -22,6 +22,8 @@ class SubjectController extends Controller
             ->where('semester', $batch->semester)
             ->orderBy('code', 'ASC')
             ->get();
+
+
         return view('backend.student.subjects.index', compact('subjects'));
     }
 

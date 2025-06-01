@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Announcement;
+use App\Models\Program;
+use App\Models\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +17,25 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::guard('teacher')->user();
-        return view('backend.teacher.dashboard', compact('user'));
+        $teacherId = $user->id;
+
+        $programs = Program::whereHas('subjects.subjectTeacherMappings', function ($query) use ($teacherId) {
+            $query->where('teacher_id', $teacherId);
+        })->get();
+
+        $programIds = $programs->pluck('id')->toArray();
+        $totalSubjects = $this->totalSubjects()->count();
+        $totalAssignments = $user->assignments()->count();
+        $totalResources = Resource::where('teacher_id', $user->id)->count();
+        $activityLogs = $user->activityLogs()->orderBy('created_at', 'desc')->take(5)->get();
+
+        // Filter announcements by these department IDs
+        $announcements = Announcement::where('institute_id', session()->get('institute_id'))
+            ->whereIn('program_id', $programIds)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('backend.teacher.dashboard', compact('activityLogs','user', 'totalAssignments','announcements', 'totalSubjects', 'totalResources'));
     }
 
     /**
@@ -64,4 +85,26 @@ class DashboardController extends Controller
     {
         //
     }
+
+
+
+
+
+
+
+
+
+
+//    DASHBOARD
+    public function totalSubjects()
+    {
+        $user = Auth::guard('teacher')->user();
+        $teacherId = $user->id;
+
+        $subjects = $user->subjectTeacherMappings()->with('subject')->get()->pluck('subject');
+
+
+        return $subjects;
+    }
+
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\Attachment;
 use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -157,5 +158,42 @@ class AssignmentSubmissionController extends Controller
         )->findOrFail($attachmentId);
 
         return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+    }
+
+
+    public function viewAttachment($attachmentId)
+    {
+        $teacherId = Auth::guard('teacher')->id();
+
+        $attachment = \App\Models\Attachment::whereHasMorph(
+            'parent',
+            [AssignmentSubmission::class],
+            function($q) use ($teacherId) {
+                $q->whereHas('assignment', function($q) use ($teacherId) {
+                    $q->where('teacher_id', $teacherId);
+                });
+            }
+        )->findOrFail($attachmentId);
+
+        // Return the file directly
+        return Storage::disk('public')->response($attachment->path, $attachment->title);
+    }
+
+    public function gradeAssignment(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'marks' => 'required|numeric|min:0|max:100',
+            'feedback' => 'nullable|string',
+            'status' => 'required|in:submitted,graded',
+        ]);
+
+        $teacherId = Auth::guard('teacher')->id();
+
+        $submittion = AssignmentSubmission::findOrFail($id);
+
+        $submittion->update($validated);
+
+        return redirect()->route('teacher.assignment.submission.show', $submittion->id)
+            ->with('success', 'Submission graded successfully.');
     }
 }

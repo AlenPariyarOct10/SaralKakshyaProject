@@ -89,18 +89,9 @@
 
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-500 text-green-700 px-4 py-3 mb-3 rounded relative" role="alert">
-                <strong class="font-bold">Success !</strong>
-                <span class="block sm:inline">{{session('success')}}</span>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-500 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
-                <strong class="font-bold">Error !</strong>
-                <span class="block sm:inline">{{session('error')}}</span>
-            </div>
-        @endif
+
+            <x-show-success-failure-badge/>
+
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
@@ -125,9 +116,10 @@
                 <button id="manageSectionBtn" class="bg-yellow-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-yellow-600">
                     <i class="fas fa-plus mr-2"></i> Manage Sections
                 </button>
-                <button id="manageBatchBtn" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
+
+                <a href="{{route('admin.batches.index')}}" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
                     <i class="fas fa-plus mr-2"></i> Manage Batch
-                </button>
+                </a>
                 <button id="addProgramBtn" class="btn-primary flex items-center justify-center">
                     <i class="fas fa-plus mr-2"></i> Add New Program
                 </button>
@@ -189,23 +181,6 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="px-6 py-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Showing <span class="font-medium text-gray-700 dark:text-gray-300">1</span> to <span class="font-medium text-gray-700 dark:text-gray-300">5</span> of <span class="font-medium text-gray-700 dark:text-gray-300">12</span> programs
-                </div>
-                <div class="flex items-center space-x-1">
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Previous page">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="p-2 rounded-md bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400" aria-label="Page 1">1</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 2">2</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Page 3">3</button>
-                    <button class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Next page">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
         </div>
     </main>
 @endsection
@@ -704,7 +679,6 @@
 
             // Batch Modal
             const manageBatchModal = document.getElementById('manageBatchModal');
-            const manageBatchBtn = document.getElementById('manageBatchBtn');
             const closeManageBatchModal = document.querySelectorAll('.closeManageBatchModal');
 
             // Edit Program Modal
@@ -735,10 +709,7 @@
                 programModal.classList.add('hidden');
             });
 
-            // Manage Batch Modal
-            manageBatchBtn.addEventListener('click', () => {
-                manageBatchModal.classList.remove("hidden");
-            });
+
 
             // Close Manage Batch Model
             closeManageBatchModal.forEach((item) => {

@@ -113,7 +113,7 @@
                 <div>
                     <select id="departmentFilter" class="form-input py-2">
                         <option value="">All Departments</option>
-                        @foreach($departments as $department)
+                        @foreach($allDepartments as $department)
                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                         @endforeach
                     </select>
@@ -149,7 +149,6 @@
                         <th scope="col" class="table-header">Department</th>
                         <th scope="col" class="table-header">Program</th>
                         <th scope="col" class="table-header">Semester</th>
-                        <th scope="col" class="table-header">Subjects</th>
                         <th scope="col" class="table-header">Status</th>
                         <th scope="col" class="table-header">Actions</th>
                     </tr>
@@ -161,7 +160,6 @@
                             <td class="table-cell">{{ $batch->program->department->name }}</td>
                             <td class="table-cell">{{ $batch->program->name }}</td>
                             <td class="table-cell">{{ $batch->semester }}</td>
-                            <td class="table-cell">{{ $batch->subjects->count() }}</td>
                             <td class="table-cell">
                                 @if($batch->status == "active")
                                     <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
@@ -196,23 +194,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td class="table-cell font-medium text-center" colspan="7">No Batches Found</td>
+                            <td class="table-cell font-medium text-center" colspan="6">No Batches Found</td>
                         </tr>
                     @endforelse
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="px-6 py-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Showing <span class="font-medium text-gray-700 dark:text-gray-300">{{ $batches->firstItem() ?? 0 }}</span> to
-                    <span class="font-medium text-gray-700 dark:text-gray-300">{{ $batches->lastItem() ?? 0 }}</span> of
-                    <span class="font-medium text-gray-700 dark:text-gray-300">{{ $batches->total() ?? 0 }}</span> batches
-                </div>
-                <div>
-                    {{ $batches->links() }}
-                </div>
             </div>
         </div>
     </main>
@@ -231,16 +217,15 @@
                     </button>
                 </div>
 
-                <form id="batchForm" action="{{ route('admin.batches.store') }}" method="POST">
-                    @csrf
+                <form id="batchForm">
                     <input type="hidden" id="batchId" name="id">
-                    <input type="hidden" id="formMethod" name="_method" value="POST">
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
 
                     <div class="mb-4">
                         <label for="department" class="form-label">Department</label>
                         <select id="department" name="department_id" class="form-input" required>
                             <option value="">Select Department</option>
-                            @foreach($departments as $department)
+                            @foreach($allDepartments as $department)
                                 <option value="{{ $department->id }}">{{ $department->name }}</option>
                             @endforeach
                         </select>
@@ -258,6 +243,16 @@
                         <select id="semester" name="semester" class="form-input" required disabled>
                             <option value="">Select Program First</option>
                         </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="start_date" class="form-input" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="end_date" class="form-input" required>
                     </div>
 
                     <div class="mb-4">
@@ -302,7 +297,6 @@
                                 <th scope="col" class="table-header">Subject Code</th>
                                 <th scope="col" class="table-header">Subject Name</th>
                                 <th scope="col" class="table-header">Credit Hours</th>
-                                <th scope="col" class="table-header">Type</th>
                             </tr>
                             </thead>
                             <tbody id="subjectsTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -366,7 +360,6 @@
             const modalTitle = document.getElementById('modalTitle');
             const batchForm = document.getElementById('batchForm');
             const batchId = document.getElementById('batchId');
-            const formMethod = document.getElementById('formMethod');
             const departmentSelect = document.getElementById('department');
             const programSelect = document.getElementById('program');
             const semesterSelect = document.getElementById('semester');
@@ -403,8 +396,6 @@
                 modalTitle.textContent = 'Add New Batch';
                 batchForm.reset();
                 batchId.value = '';
-                formMethod.value = 'POST';
-                batchForm.action = "{{ route('admin.batches.store') }}";
                 programSelect.disabled = true;
                 semesterSelect.disabled = true;
                 programSelect.innerHTML = '<option value="">Select Department First</option>';
@@ -456,6 +447,26 @@
                 semesterSelect.innerHTML = '<option value="">Select Semester</option>';
                 semesterSelect.disabled = !this.value;
 
+                // Fetch subjects for this batch
+
+                // console.log(this.value);
+
+                fetch(`/admin/programs/${this.value}/semesters`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data) {
+                            const totalSemester = data;
+                            console.log(totalSemester);
+                            for (let i = 1; i <= totalSemester; i++) {
+                                semesterSelect.innerHTML += `<option value="${i}">Semester ${i}</option>`;
+                            }
+                        }
+
+                    })
+                    .catch(error => {
+
+                    });
+
                 if (!this.value) return;
 
                 const selectedOption = this.options[this.selectedIndex];
@@ -480,8 +491,6 @@
 
                     modalTitle.textContent = 'Edit Batch';
                     batchId.value = id;
-                    formMethod.value = 'PUT';
-                    batchForm.action = `/admin/batches/${id}`;
 
                     // Set department and trigger change event to load programs
                     departmentSelect.value = departmentId;
@@ -528,8 +537,7 @@
                                     <tr>
                                         <td class="table-cell">${subject.code}</td>
                                         <td class="table-cell">${subject.name}</td>
-                                        <td class="table-cell">${subject.credit_hours}</td>
-                                        <td class="table-cell">${subject.type}</td>
+                                        <td class="table-cell">${subject.credit}</td>
                                     </tr>
                                 `;
                             });
@@ -583,10 +591,10 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
+                        if (data.status === "success") {
                             Toast.fire({
                                 icon: 'success',
-                                title: 'Batch deleted successfully'
+                                title: data.message || 'Batch deleted successfully'
                             });
                             // Remove the row from the table
                             document.querySelector(`.delete-batch-btn[data-id="${batchToDelete}"]`)
@@ -613,26 +621,31 @@
                 e.preventDefault();
 
                 const formData = new FormData(this);
-                const method = formMethod.value;
-                const url = this.action;
+                const isEdit = batchId.value !== '';
+                const url = isEdit ? `/admin/batches/${batchId.value}` : '/admin/program/batch';
+                const method = isEdit ? 'PUT' : 'POST';
 
                 fetch(url, {
-                    method: method === 'PUT' ? 'POST' : method, // Laravel requires POST for PUT/PATCH
+                    method: method,
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
                     },
-                    body: formData
+                    body: JSON.stringify(Object.fromEntries(formData))
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
+                        if (data.status === "success") {
                             Toast.fire({
                                 icon: 'success',
-                                title: method === 'POST' ? 'Batch created successfully' : 'Batch updated successfully'
+                                title: data.message || (isEdit ? 'Batch updated successfully' : 'Batch created successfully')
                             });
                             batchModal.classList.add('hidden');
                             // Refresh the page to show updated data
-                            location.reload();
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
                         } else {
                             throw new Error(data.message || 'Operation failed');
                         }
@@ -679,21 +692,51 @@
                 const program = programFilter.value;
                 const status = statusFilter.value;
 
-                // Send filter request to server
-                const url = new URL(window.location.href);
-                if (searchTerm) url.searchParams.set('search', searchTerm);
-                if (department) url.searchParams.set('department', department);
-                if (program) url.searchParams.set('program', program);
-                if (status) url.searchParams.set('status', status);
+                const rows = document.querySelectorAll('#batchesTableBody tr');
 
-                window.location.href = url.toString();
+                rows.forEach(row => {
+                    if (row.cells.length === 1 && row.cells[0].colSpan === 6) {
+                        // This is the "No Batches Found" row
+                        return;
+                    }
+
+                    const batchName = row.cells[0].textContent.toLowerCase();
+                    const departmentName = row.cells[1].textContent;
+                    const programName = row.cells[2].textContent;
+                    const statusText = row.cells[4].textContent.trim().toLowerCase();
+
+                    const matchesSearch = batchName.includes(searchTerm);
+                    const matchesDepartment = !department || row.querySelector('button').getAttribute('data-department') === department;
+                    const matchesProgram = !program || row.querySelector('button').getAttribute('data-program') === program;
+                    const matchesStatus = !status || statusText.includes(status.toLowerCase());
+
+                    if (matchesSearch && matchesDepartment && matchesProgram && matchesStatus) {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                });
+
+                // Check if all rows are hidden
+                const visibleRows = document.querySelectorAll('#batchesTableBody tr:not(.hidden)');
+                const noResultsRow = document.querySelector('#batchesTableBody tr.no-results');
+
+                if (visibleRows.length === 0 && !noResultsRow) {
+                    const tbody = document.getElementById('batchesTableBody');
+                    const newRow = document.createElement('tr');
+                    newRow.className = 'no-results';
+                    newRow.innerHTML = '<td class="table-cell font-medium text-center" colspan="6">No matching batches found</td>';
+                    tbody.appendChild(newRow);
+                } else if (visibleRows.length > 0 && noResultsRow) {
+                    noResultsRow.remove();
+                }
             }
 
             // Search Input
             let searchTimeout;
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(filterBatches, 500);
+                searchTimeout = setTimeout(filterBatches, 300);
             });
 
             // Program Filter

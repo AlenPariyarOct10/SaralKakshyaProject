@@ -359,6 +359,8 @@
         </div>
     </div>
 
+
+
     <!-- Add Saturdays as Holiday Modal -->
     <div id="saturdayHolidayModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="w-full max-w-lg mx-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -402,6 +404,7 @@
         </div>
     </div>
 
+
 @endsection
 
 @section('scripts')
@@ -422,20 +425,22 @@
             {
                 id: '{{ $session->id }}',
                 title: '{{ ucfirst($session->status ?? "Session") }}',
-                start: '{{ $session->date }}T{{ $session->start_time }}',
-                end: '{{ $session->date }}T{{ $session->end_time }}',
+                start: '{{ \Carbon\Carbon::parse($session->date)->format("Y-m-d") }}T{{ $session->start_time }}',
+                end: '{{ \Carbon\Carbon::parse($session->date)->format("Y-m-d") }}T{{ $session->end_time }}',
                 backgroundColor: getEventColor('{{ $session->status ?? "class" }}'),
                 borderColor: getEventColor('{{ $session->status ?? "class" }}'),
                 extendedProps: {
                     status: '{{ $session->status ?? "class" }}',
-                    notes: '{{ addslashes($session->notes ?? "") }}'
+                    notes: {!! json_encode($session->notes ?? "") !!}
                 }
-            },
+            }@if(!$loop->last),@endif
             @endforeach
         ];
 
+        console.log(sessionsData);
+
         function getEventColor(status) {
-            switch(status) {
+            switch( (status.toLowerCase()) ) {
                 case 'class': return '#3b82f6';      // Blue
                 case 'holiday': return '#ef4444';    // Red
                 case 'exam': return '#f59e0b';       // Amber
@@ -1005,7 +1010,7 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data) {
                         alert('Sessions created successfully!');
                         hideSessionModal();
                         location.reload();

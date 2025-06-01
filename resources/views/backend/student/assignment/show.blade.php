@@ -195,10 +195,10 @@
                                                 </p>
                                             </div>
 
-                                            @if(isset($submission->grade))
+                                            @if(isset($submission->marks))
                                                 <div class="bg-green-100 dark:bg-green-800/30 px-3 py-1 rounded-full">
                                                     <span class="text-green-800 dark:text-green-300 font-medium">
-                                                        Grade: {{ $submission->grade }}/{{ $assignment->full_marks }}
+                                                        Grade: {{ $submission->marks }}/{{ $assignment->full_marks }}
                                                     </span>
                                                 </div>
                                             @else
@@ -443,10 +443,10 @@
                             @if(isset($submission) && $submission)
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Grade Status</h4>
-                                    @if(isset($submission->grade))
+                                    @if(isset($submission->marks))
                                         <p class="text-green-600 dark:text-green-400 font-medium">
-                                            {{ $submission->grade }}/{{ $assignment->full_marks }}
-                                            ({{ round(($submission->grade / $assignment->full_marks) * 100) }}%)
+                                            {{ $submission->marks }}/{{ $assignment->full_marks }}
+                                            ({{ round(($submission->marks / $assignment->full_marks) * 100) }}%)
                                         </p>
                                     @else
                                         <p class="text-yellow-600 dark:text-yellow-400 font-medium">Not Graded Yet</p>

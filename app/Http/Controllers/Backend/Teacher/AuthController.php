@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Attachment;
 use App\Models\Institute;
 use App\Models\SystemSetting;
@@ -54,6 +55,19 @@ class AuthController extends Controller
 
             if ($isApproved) {
                 Session::put('institute_id', $instituteId);
+
+                ActivityLog::create([
+                    'user_id'     => $teacher->id,
+                    'user_type'   => 'teacher',
+                    'action_type' => 'login',
+                    'description' => 'Teacher logged in',
+                    'model_type'  => get_class($teacher),
+                    'model_id'    => $teacher->id,
+                    'url'         => $request->fullUrl(),
+                    'ip_address'  => $request->ip(),
+                    'user_agent'  => $request->userAgent(),
+                ]);
+
                 return redirect()->route('teacher.dashboard');
             } else {
                 Auth::guard('teacher')->logout();
@@ -95,6 +109,18 @@ class AuthController extends Controller
         $teacher->institutes()->attach($request->institute);
 
         Session::put('teacher_id', $teacher->id);
+
+        ActivityLog::create([
+            'user_id'     => $teacher->id,
+            'user_type'   => 'teacher',
+            'action_type' => 'login',
+            'description' => 'Teacher registered',
+            'model_type'  => get_class($teacher),
+            'model_id'    => $teacher->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
 
         // Redirect to Phase 2
         return redirect()->route('teacher.register.step2');
@@ -158,10 +184,25 @@ class AuthController extends Controller
     }
 
     // Handle logout functionality
-    public function logout()
+    public function logout(Request $request)
     {
+        $user = Auth::guard('teacher')->user();
+        ActivityLog::create([
+            'user_id'     => $user->id,
+            'user_type'   => 'teacher',
+            'action_type' => 'login',
+            'description' => 'Teacher logged out',
+            'model_type'  => get_class(Auth::guard('teacher')->user()),
+            'model_id'    => $user->id,
+            'url'         => $request->fullUrl(),
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
         Session::forget('institute_id');
         Auth::guard('teacher')->logout(); // Logout the teacher
+
+
+
         return redirect()->route('teacher.login');
     }
 }

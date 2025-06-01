@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{$system_name}} - @yield("title") </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="{{asset("js/sweetalert.js")}}"></script>
     @vite(['resources/js/app.js', 'resources/css/app.css'])
 
     <!-- Tailwind is already configured in tailwind.config.js -->
@@ -116,10 +117,6 @@
                                    class="active block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <i class="fas fa-user mr-2"></i> Profile
                                 </a>
-                                <a href="settings.html"
-                                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <i class="fas fa-cog mr-2"></i> Settings
-                                </a>
                                 <div class="border-t dark:border-gray-700"></div>
                                 <form action="
                                         @if(auth('admin')->check()) {{ route('admin.logout') }}
@@ -148,6 +145,17 @@
 </div>
 
 <script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        iconColor: 'white',
+        customClass: {
+            popup: 'colored-toast',
+        },
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+    });
     // window.addEventListener('DOMContentLoaded', () => {
     //     if (window.Echo) {
     //         Echo.channel('notifications.teachers')

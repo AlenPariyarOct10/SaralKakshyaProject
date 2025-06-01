@@ -37,6 +37,7 @@ Route::group(['prefix' => 'teacher'], function () {
         // Attendance routes
         Route::get('/attendance', [TeacherAttendanceController::class, "index"])->name('teacher.attendance.index');
         Route::get('/attendance/students/{subjectId}', [TeacherAttendanceController::class, "getStudents"])->name('teacher.attendance.students');
+        Route::get('/attendance/students/', [TeacherAttendanceController::class, "getAllStudents"])->name('teacher.attendance.allstudents');
         Route::post('/attendance/store', [TeacherAttendanceController::class, "store"])->name('teacher.attendance.store');
         Route::get('/attendance/history', [TeacherAttendanceController::class, "getHistory"])->name('teacher.attendance.history');
         Route::get('/attendance/details', [TeacherAttendanceController::class, "getDetails"])->name('teacher.attendance.details');
@@ -93,6 +94,8 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/assignment/submission/{id}', [AssignmentSubmissionController::class, "show"])->name('teacher.assignment.submission.show');
         Route::get('/assignment/submission/{id}/edit', [AssignmentSubmissionController::class, "edit"])->name('teacher.assignment.submission.edit');
         Route::get('/assignment/submission/{id}/download', [AssignmentSubmissionController::class, "download"])->name('teacher.assignment.submission.download');
+        Route::get('/assignment/submission/{id}/view', [AssignmentSubmissionController::class, "viewAttachment"])->name('teacher.assignment.submission.view');
+        Route::put('/assignment/submission/{id}/', [AssignmentSubmissionController::class, "gradeAssignment"])->name('teacher.assignment.submission.grade');
 
         Route::get('/assignment/{assignment}/edit', [TeacherAssignmentController::class, "edit"])->name('teacher.assignment.edit');
         Route::PUT('/assignment/{assignment}', [TeacherAssignmentController::class, "update"])->name('teacher.assignment.update');

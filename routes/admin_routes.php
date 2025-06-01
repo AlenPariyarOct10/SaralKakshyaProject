@@ -84,7 +84,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/subjects/{subject}/chapters', [ChapterController::class, 'store'])
             ->name('admin.subjects.chapters.store');
 // In your web.php routes file
-        Route::get('/admin/programs/{program}/semesters', [AdminSubjectController::class, 'getSemesters'])->name('admin.programs.semesters');
+        Route::get('/programs/{program}/semesters', [AdminSubjectController::class, 'getSemesters'])->name('admin.programs.semesters');
 //        Programs
         Route::get('/programs', [AdminProgramController::class, 'index'])->name('admin.programs.index');
         Route::get('/programs/{id}/edit', [AdminProgramController::class, 'edit'])->name('admin.programs.edit');
@@ -206,6 +206,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/attendance/export/csv', [AdminAttendanceController::class, "export"])->name('admin.attendance.export');
         Route::post('/attendance/bulk', [AdminAttendanceController::class, "bulkStore"])->name('admin.attendance.bulk');
 
+
+        // Batch Management Routes
+        Route::get('/batches', [AdminBatchController::class, 'index'])->name('admin.batches.index');
+        Route::get('/batches/{id}', [AdminBatchController::class, 'show'])->name('admin.batches.show');
+        Route::get('/batches/{id}/edit', [AdminBatchController::class, 'edit'])->name('admin.batches.edit');
+        Route::put('/batches/{id}', [AdminBatchController::class, 'update'])->name('admin.batches.update');
+        Route::delete('/batches/{id}', [AdminBatchController::class, 'destroy'])->name('admin.batches.destroy');
+        Route::get('/batches/{id}/subjects', [AdminBatchController::class, 'getSubjects'])->name('admin.batches.subjects');
+        Route::get('/batches/get-batches', [AdminBatchController::class, 'getBatches'])->name('admin.batches.getBatches');
 
         /*
          * API

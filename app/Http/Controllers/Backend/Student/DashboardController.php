@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
+use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +16,29 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::guard('student')->user();
-        return view('backend.student.dashboard', compact('user'));
+
+        $activityLog = ActivityLog::where('user_id', $user->id)
+            ->where('user_type', 'student')
+            ->orderBy('id', 'desc')->take(8)->get();
+
+        $announcements = Announcement::query()
+            ->where(function ($query) use ($user) {
+                $query->whereNull('institute_id')
+                    ->orWhere('institute_id', session('institute_id'));
+            })
+            ->where(function ($query) {
+                $query->whereNull('department_id')
+                    ->orWhere('department_id', session('department_id'));
+            })
+            ->where(function ($query) {
+                $query->whereNull('program_id')
+                    ->orWhere('program_id', session('program_id'));
+            })
+            ->orderBy('pinned', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('backend.student.dashboard', compact('user', 'activityLog', 'announcements'));
     }
 
     /**

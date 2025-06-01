@@ -15,8 +15,6 @@
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{\Illuminate\Support\Facades\Auth::user()->fname}} - Super Admin!</h1>
             <p class="text-gray-600 dark:text-gray-400">Here's an overview of your system.</p>
         </div>
-
-
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <!-- Admin Stats Card -->

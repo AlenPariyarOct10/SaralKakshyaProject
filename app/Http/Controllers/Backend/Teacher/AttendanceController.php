@@ -76,6 +76,24 @@ class AttendanceController extends Controller
         }
     }
 
+
+
+    public function getAllStudents(Request $request)
+    {
+        $teacher = Auth::guard('teacher')->user();
+
+        $attendances = Attendance::where('institute_id', session()
+            ->get('institute_id'))
+            ->with('student')
+            ->where('attendee_type', 'student')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'attendances' => $attendances,
+        ]);
+    }
+
     /**
      * Store attendance records
      */

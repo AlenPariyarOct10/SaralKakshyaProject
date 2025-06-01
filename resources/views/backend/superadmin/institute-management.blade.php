@@ -178,7 +178,7 @@
                                 {{$institute->created_at}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($institute->deleted_at)
+                                @if($institute->deleted_at != null )
                                     <button class="toggle-status-btn text-sm text-gray-500 dark:text-gray-400"
                                             data-id="{{ $institute->id }}"
                                             title="Activate">
@@ -210,74 +210,7 @@
 
 @section("scripts")
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Event delegation for all toggle buttons
-            document.addEventListener('click', async function(e) {
-                if (e.target.closest('.toggle-status-btn')) {
-                    const button = e.target.closest('.toggle-status-btn');
-                    const instituteId = button.dataset.id;
 
-                    try {
-                        // Set loading state
-                        const originalHTML = button.innerHTML;
-                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        button.disabled = true;
-
-                        const response = await fetch('/superadmin/api/institute/toggle-status', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                            },
-                            body: JSON.stringify({ id: instituteId })
-                        });
-
-                        const data = await response.json();
-
-                        if (!response.ok) throw new Error(data.message || 'Request failed');
-
-                        // Update UI
-                        if (data.success) {
-                            // Update button appearance
-                            if (data.data.action === 'activate') {
-                                button.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i> Disable';
-                                button.title = 'Disable';
-                                button.closest('tr').classList.remove('bg-gray-100');
-                            } else {
-                                button.innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i> Activate';
-                                button.title = 'Activate';
-                                button.closest('tr').classList.add('bg-gray-100');
-                            }
-
-                            // Show success message
-                            showToast('success', data.message);
-                        }
-
-                    } catch (error) {
-                        console.error('Error:', error);
-                        showToast('error', error.message || 'Failed to toggle status');
-                    } finally {
-                        button.disabled = false;
-                    }
-                }
-            });
-
-            // Toast notification helper
-            function showToast(type, message) {
-                const toast = document.createElement('div');
-                toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md text-white ${
-                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                }`;
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
-            }
-        });
 
         document.addEventListener('DOMContentLoaded', function() {
             // Elements

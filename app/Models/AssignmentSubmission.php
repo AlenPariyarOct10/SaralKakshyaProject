@@ -57,12 +57,12 @@ class AssignmentSubmission extends Model
 
     public function getFeedbackAttribute($value)
     {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+        return $value? $value: null;
     }
 
     public function getMarksAttribute($value)
     {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+        return $value ? $value : null;
     }
 
 }

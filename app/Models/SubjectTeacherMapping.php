@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class SubjectTeacherMapping extends Model
 {
     protected $table = 'subject_teacher_mappings';
+
     protected $fillable = [
         'teacher_id',
         'subject_id',
         'assigned_by',
         'assigned_at',
         'start_time',
-        'end_time'
+        'end_time',
+        'institute_id'
     ];
 
     public function teacher()

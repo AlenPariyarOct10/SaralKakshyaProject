@@ -20,6 +20,7 @@ class InstituteSessionController extends Controller
         $user = auth()->user(); // assuming Admin is logged in
         $institute = Institute::where('created_by', $user->id)->first();
         $sessions = $institute->sessions()->get();
+
         return view('backend.admin.session.index', compact('user', 'institute', 'sessions'));
     }
 
@@ -47,30 +48,38 @@ class InstituteSessionController extends Controller
 
         foreach ($data['dates'] as $date) {
             $sessionData = [
-                'date' => $date,
                 'start_time' => $data['start_time'] ?? null,
                 'end_time' => $data['end_time'] ?? null,
                 'status' => $data['status'] ?? null,
                 'notes' => $data['notes'] ?? null,
-
                 'institute_id' => Auth::user()->institute->id,
-                'creator_type' => "admin",
+                'creator_type' => 'admin',
                 'creator_id' => Auth::user()->id,
                 'specific_group' => null,
                 'specific_group_id' => null,
             ];
 
-            $session = InstituteSession::create($sessionData);
+            // Update if exists, else create
+            $session = InstituteSession::updateOrCreate(
+                [
+                    'date' => $date,
+                    'institute_id' => Auth::user()->institute->id, // ensure uniqueness per institute
+                ],
+                $sessionData
+            );
+
             $createdSessions[] = $session;
         }
 
         return response([
             'status' => 'success',
-            'message' => 'Sessions created successfully',
+            'message' => 'Sessions processed successfully',
             'created_sessions' => $createdSessions,
             'count' => count($createdSessions),
+            'success' => true
         ]);
     }
+
 
     /**
      * Store a newly created resource in storage.

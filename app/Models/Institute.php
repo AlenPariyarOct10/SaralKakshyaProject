@@ -10,7 +10,7 @@ class Institute extends Model
 {
     use SoftDeletes;
     protected $table = 'institutes';
-    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by', 'deleted_at'];
+    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by'];
 
     protected $casts = ['deleted_at' => 'datetime'];
 

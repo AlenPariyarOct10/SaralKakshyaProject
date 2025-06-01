@@ -4,6 +4,7 @@
 @section('username', $user->fname . ' ' . $user->lname)
 
 @section('content')
+    program {{ session('program_id') }}
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto">
             <!-- Page Title and Actions -->
@@ -68,11 +69,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Filter functionality
-            document.getElementById('typeFilter').addEventListener('change', filterResources);
             document.getElementById('searchInput').addEventListener('input', filterResources);
 
             function filterResources() {
-                const type = document.getElementById('typeFilter').value;
                 const search = document.getElementById('searchInput').value.toLowerCase();
                 let visibleCount = 0;
                 const totalResources = document.querySelectorAll('.resource-card').length;
@@ -104,12 +103,6 @@
 
             // Resource preview modal functionality
             const modal = document.getElementById('resourceModal');
-            const closeModal = document.getElementById('closeModal');
-
-            // Close modal when clicking the close button
-            closeModal.addEventListener('click', function() {
-                modal.classList.add('hidden');
-            });
 
             // Close modal when clicking outside the modal content
             window.addEventListener('click', function(event) {

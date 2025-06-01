@@ -16,7 +16,7 @@ class DashboardPendingApprovals extends Component
         try{
             $admin = Admin::where('id', $id)->first();
             $admin->is_approved = 1;
-            $admin->approved_by = Auth::user()->id;
+            $admin->approved_by = Auth::guard('super_admin')->user()->id;
             $admin->approved_at = date('Y-m-d H:i:s');
             $admin->save();
             session()->flash('success', 'Admin approved successfully.');

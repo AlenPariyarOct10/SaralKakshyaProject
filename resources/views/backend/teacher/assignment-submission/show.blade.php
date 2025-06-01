@@ -76,9 +76,6 @@
                 <a href="{{ route('teacher.assignment.submission.index', \Illuminate\Support\Facades\Auth::user()->id) }}" class="btn-secondary flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Submissions
                 </a>
-                <a href="{{ route('teacher.assignment.submission.edit', $submission->id) }}" class="btn-primary flex items-center">
-                    <i class="fas fa-check-square mr-2"></i> Grade Submission
-                </a>
             </div>
         </div>
 
@@ -145,22 +142,33 @@
                             @if($submission->attachments->count() > 0)
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($submission->attachments as $attachment)
-                                        <a href="{{ route('teacher.assignment.submission.download', $attachment->id) }}"
-                                           class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                        <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded">
                                                 <i class="fas {{ getFileIcon($attachment->path) }} text-gray-500 dark:text-gray-400"></i>
                                             </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $attachment->original_name }}</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatFileSize($attachment->size) }}</p>
+                                            <div class="ml-3 flex-grow">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $attachment->title }}</p>
                                             </div>
-                                        </a>
+                                            <div class="flex space-x-2 ml-2">
+                                                <a href="{{ route('teacher.assignment.submission.view',$attachment->id) }}"
+                                                   class="text-blue-500 hover:text-blue-700"
+                                                   title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('teacher.assignment.submission.download', $attachment->id) }}"
+                                                   class="text-green-500 hover:text-green-700"
+                                                   title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        </div>
                                     @endforeach
                                 </div>
                             @else
                                 <p class="text-gray-500 dark:text-gray-400">No attachments found</p>
                             @endif
                         </div>
+
                     </div>
                 </div>
 
@@ -181,6 +189,7 @@
                             @if($submission->assignment->attachments->count() > 0)
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($submission->assignment->attachments as $attachment)
+
                                         <a href="{{ route('teacher.assignment.download', $attachment->id) }}"
                                            class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-gray-200 dark:bg-gray-600 rounded">
@@ -191,6 +200,7 @@
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatFileSize($attachment->size) }}</p>
                                             </div>
                                         </a>
+
                                     @endforeach
                                 </div>
                             @else
@@ -209,7 +219,7 @@
 
                         <div class="flex items-center mb-6">
                             <div class="flex-shrink-0 h-16 w-16">
-                                <img class="h-16 w-16 rounded-full" src="{{ $submission->student->profile_picture ?? '/placeholder.svg?height=64&width=64' }}" alt="{{ $submission->student->full_name }}">
+                                <img class="h-16 w-16 rounded-full" src="{{ asset("storage/".$submission->student->profile_picture) ?? '/placeholder.svg?height=64&width=64' }}" alt="{{ $submission->student->full_name }}">
                             </div>
                             <div class="ml-4">
                                 <h4 class="text-lg font-medium text-gray-900 dark:text-white">{{ $submission->student->full_name }}</h4>
@@ -224,7 +234,7 @@
                             </div>
                             <div>
                                 <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Batch</h4>
-                                <p class="text-base text-gray-900 dark:text-white">{{ $submission->student->batch->name ?? 'N/A' }}</p>
+                                <p class="text-base text-gray-900 dark:text-white">{{ $submission->student->batch->batch ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Program</h4>
@@ -263,8 +273,8 @@
                                     <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                                     <select id="status" name="status"
                                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                                        <option value="submitted" {{ $submission->status == 'submitted' ? 'selected' : '' }}>Submitted</option>
-                                        <option value="graded" {{ $submission->status == 'graded' ? 'selected' : '' }}>Graded</option>
+                                        <option value="submitted" >Submitted</option>
+                                        <option value="graded" selected>Graded</option>
                                     </select>
                                 </div>
 

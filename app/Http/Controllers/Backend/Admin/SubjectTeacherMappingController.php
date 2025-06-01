@@ -28,7 +28,7 @@ class SubjectTeacherMappingController extends Controller
                 'subject.program.department:id,name',
                 'subject.program.sections:id,program_id,section_name', // Add program sections
                 'assignedBy:id,fname,lname'
-            ])
+            ])->where('institute_id', session('institute_id'))
                 ->latest();
 
             // Apply search filter
@@ -178,6 +178,7 @@ class SubjectTeacherMappingController extends Controller
         $mapping->teacher_id = $request->teacher_id;
         $mapping->assigned_by = auth()->user()->id;
         $mapping->assigned_at = now();
+        $mapping->institute_id = session('institute_id');
         $mapping->save();
 
         return response()->json(['status'=>'success','message' => 'Subject-Teacher mapping created successfully.']);
