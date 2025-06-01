@@ -77,27 +77,27 @@
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{route("student.attendance.index")}}" class="sidebar-item {{ Route::is('student.attendance.index') ? 'active' : '' }}">
+                <a href="{{route("student.attendance.index")}}" class="sidebar-item {{ Route::is('student.attendance.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="{{route("student.prediction.index")}}" class="sidebar-item {{ Route::is('student.prediction.index') ? 'active' : '' }}">
+                <a href="{{route("student.prediction.index")}}" class="sidebar-item {{ Route::is('student.prediction.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Prediction</span>
                 </a>
-                <a href="{{route("student.assignment.index")}}" class="sidebar-item {{ Route::is('student.assignment.index') ? 'active' : '' }}">
+                <a href="{{route("student.assignment.index")}}" class="sidebar-item {{ Route::is('student.assignment.*') ? 'active' : '' }}">
                     <i class="fas fa-book"></i>
                     <span>Assignments</span>
                 </a>
-                <a href="{{route('student.announcement.index')}}" class="sidebar-item {{ Route::is('student.announcement.index') ? 'active' : '' }}">
+                <a href="{{route('student.announcement.index')}}" class="sidebar-item {{ Route::is('student.announcement.*') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
-                <a href="{{route('student.subjects.index')}}" class="sidebar-item {{ Route::is('student.subjects.index') ? 'active' : '' }}">
+                <a href="{{route('student.subjects.index')}}" class="sidebar-item {{ Route::is('student.subjects.*') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Subjects</span>
                 </a>
-                <a href="{{route('student.routine.index')}}" class="sidebar-item {{ Route::is('student.routine.index') ? 'active' : '' }}">
+                <a href="{{route('student.routine.index')}}" class="sidebar-item {{ Route::is('student.routine.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-clock"></i>
                     <span>Routine</span>
                 </a>

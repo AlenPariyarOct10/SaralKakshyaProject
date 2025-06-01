@@ -116,45 +116,45 @@
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{route("admin.programs.index")}}" class="sidebar-item  {{Route::is("admin.programs.index")? "active":""}}">
+                <a href="{{route("admin.programs.index")}}" class="sidebar-item  {{Route::is("admin.programs.*")? "active":""}}">
                     <i class="fas fa-book"></i>
                     <span>Programs</span>
                 </a>
-                <a href="{{route("admin.department.index")}}" class="sidebar-item  {{Route::is("admin.department.index")? "active":""}}">
+                <a href="{{route("admin.department.index")}}" class="sidebar-item  {{Route::is("admin.department.*")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>
                 </a>
-                <a href="{{route("admin.prediction.index")}}" class="sidebar-item  {{Route::is("admin.prediction.index")? "active":""}}">
+                <a href="{{route("admin.prediction.index")}}" class="sidebar-item  {{Route::is("admin.prediction.*")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Predictions</span>
                 </a>
-                <a href="{{route("admin.session.index")}}" class="sidebar-item  {{Route::is("admin.session.index")? "active":""}}">
+                <a href="{{route("admin.session.index")}}" class="sidebar-item  {{Route::is("admin.session.*")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Session</span>
                 </a>
-                <a href="{{route("admin.routine-planner.index")}}" class="sidebar-item  {{Route::is("admin.routine-planner.index")? "active":""}}">
+                <a href="{{route("admin.routine-planner.index")}}" class="sidebar-item  {{Route::is("admin.routine-planner.*")? "active":""}}">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span>Class Routine</span>
                 </a>
-                <a href="{{route("admin.subjects.index")}}" class="sidebar-item  {{Route::is("admin.subjects.index")? "active":""}}">
+                <a href="{{route("admin.subjects.index")}}" class="sidebar-item  {{Route::is("admin.subjects.*")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Subjects</span>
                 </a>
-                <a href="{{route("admin.attendance.index")}}" class="sidebar-item {{Route::is("admin.attendance.index")? "active":""}}">
+                <a href="{{route("admin.attendance.index")}}" class="sidebar-item {{Route::is("admin.attendance.*")? "active":""}}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
 
-                <a href="{{route("admin.announcement.index")}}" class="sidebar-item {{Route::is("admin.announcement.index")? "active":""}}">
+                <a href="{{route("admin.announcement.index")}}" class="sidebar-item {{Route::is("admin.announcement.*")? "active":""}}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>
                 <div class="pt-4 mt-4 border-t dark:border-gray-700">
-                    <a href="{{route("admin.student.index")}}" class="sidebar-item {{Route::is("admin.student.index")? "active":""}}">
+                    <a href="{{route("admin.student.index")}}" class="sidebar-item {{Route::is("admin.student.*")? "active":""}}">
                         <i class="fa-solid fa-graduation-cap"></i>
                         <span>Students</span>
                     </a>
-                    <a href="{{route("admin.teacher.index")}}" class="sidebar-item {{Route::is("admin.teacher.index")? "active":""}}">
+                    <a href="{{route("admin.teacher.index")}}" class="sidebar-item {{Route::is("admin.teacher.*")? "active":""}}">
                         <i class="fa-solid fa-chalkboard-user"></i>
                         <span>Teachers</span>
                     </a>

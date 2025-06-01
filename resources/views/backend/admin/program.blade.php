@@ -104,11 +104,7 @@
                 <div>
                     <select id="departmentFilter" class="form-input py-2">
                         <option value="">All Departments</option>
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Business">Business</option>
-                        <option value="Arts">Arts</option>
-                        <option value="Science">Science</option>
+
                     </select>
                 </div>
             </div>
@@ -485,6 +481,33 @@
 
 @section("scripts")
     <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                const response = await fetch('/admin/department/getAllDepartments', {
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const departments = await response.json();
+
+                console.log(departments);
+
+                departments.forEach(department => {
+                    const option = document.createElement('option');
+                    option.value = department.name;
+                    option.textContent = department.name;
+                    document.getElementById('departmentFilter').appendChild(option);
+                });
+
+            } catch (error) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Error saving sections: ' + error.message
+                });
+            }
+        });
         document.addEventListener('DOMContentLoaded', function() {
             // Toast notification setup (if you're using SweetAlert or similar)
             const Toast = Swal.mixin({

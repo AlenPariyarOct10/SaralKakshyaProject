@@ -455,12 +455,15 @@
                             return Promise.reject('No semesters found'); // Prevent subject fetch
                         }
 
+                        console.log("hello");
+
                         // Generate semester options in descending order
-                        for (let i = totalSemesters.total_semesters; i >= 1; i--) {
+                        for (let i = totalSemesters; i >= 1; i--) {
                             const option = document.createElement('option');
                             option.value = i;
                             option.textContent = `${i} Semester`;
                             semesterSelect.appendChild(option);
+
                         }
 
                         // Now fetch subjects for this program

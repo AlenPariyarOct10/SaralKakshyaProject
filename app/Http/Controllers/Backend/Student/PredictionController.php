@@ -34,6 +34,8 @@ class PredictionController extends Controller
             ->where('is_approved', true)
             ->first();
 
+
+
         if (!$instituteStudent) {
             return view('backend.student.prediction.index', [
                 'autoFillData' => null,

@@ -104,6 +104,7 @@ class SubjectController extends Controller
                 'created_by' => auth()->id(),
                 'max_internal_marks' => $request->max_internal_marks,
                 'max_external_marks' => $request->max_external_marks,
+
             ]);
 
             // Insert evaluation formats
@@ -114,6 +115,10 @@ class SubjectController extends Controller
                     'full_marks' => $request->full_marks[$index],
                     'pass_marks' => $request->pass_marks[$index],
                     'marks_weight' => $request->marks_weight[$index],
+                    'institute_id' => session()->get('institute_id'),
+                    'program_id' => $request->program_id,
+                    'semester' => $request->semester,
+
                 ]);
             }
 
@@ -195,6 +200,7 @@ class SubjectController extends Controller
             'status' => $request->status,
             'max_internal_marks' => $request->max_internal_marks,
             'max_external_marks' => $request->max_external_marks,
+
         ]);
 
         foreach ($request->criteria as $index => $criteria) {
@@ -214,6 +220,9 @@ class SubjectController extends Controller
                     'full_marks' => $request->full_marks[$index],
                     'pass_marks' => $request->pass_marks[$index],
                     'marks_weight' => $request->marks_weight[$index],
+                    'institute_id' => session()->get('institute_id'),
+                    'program_id' => $request->program_id,
+                    'semester' => $request->semester
                 ]);
             }
         }
