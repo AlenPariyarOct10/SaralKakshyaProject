@@ -24,57 +24,25 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <!-- Total Students Card -->
-            <div class="card">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Students</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">128</h3>
-                    </div>
-                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                        <i class="fas fa-users text-blue-500 dark:text-blue-300"></i>
-                    </div>
-                </div>
-                <div class="mt-4">
-                            <span class="text-sm text-green-500">
-                                <i class="fas fa-arrow-up mr-1"></i> 12%
-                            </span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last month</span>
-                </div>
-            </div>
 
-            <!-- Upcoming Classes Card -->
-            <div class="card">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Upcoming Classes</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">4</h3>
-                    </div>
-                    <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
-                        <i class="fas fa-calendar text-green-500 dark:text-green-300"></i>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Next class in 2 hours</span>
-                </div>
-            </div>
+
 
             <!-- Pending Assignments Card -->
             <div class="card">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Assignments</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">7</h3>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Assignments</p>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{$assignments->count()}}</h3>
                     </div>
                     <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
                         <i class="fas fa-book text-yellow-500 dark:text-yellow-300"></i>
                     </div>
                 </div>
-                <div class="mt-4">
-                            <span class="text-sm text-red-500">
-                                <i class="fas fa-exclamation-circle mr-1"></i> 2 due today
-                            </span>
-                </div>
+{{--                <div class="mt-4">--}}
+{{--                            <span class="text-sm text-red-500">--}}
+{{--                                <i class="fas fa-exclamation-circle mr-1"></i> 2 due today--}}
+{{--                            </span>--}}
+{{--                </div>--}}
             </div>
 
             <!-- Attendance Card -->
@@ -82,18 +50,18 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Attendance Rate</p>
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">92%</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{$rate}}%</h3>
                     </div>
                     <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
                         <i class="fas fa-chart-line text-purple-500 dark:text-purple-300"></i>
                     </div>
                 </div>
-                <div class="mt-4">
-                            <span class="text-sm text-green-500">
-                                <i class="fas fa-arrow-up mr-1"></i> 3%
-                            </span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last week</span>
-                </div>
+{{--                <div class="mt-4">--}}
+{{--                            <span class="text-sm text-green-500">--}}
+{{--                                <i class="fas fa-arrow-up mr-1"></i> 3%--}}
+{{--                            </span>--}}
+{{--                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">from last week</span>--}}
+{{--                </div>--}}
             </div>
         </div>
 

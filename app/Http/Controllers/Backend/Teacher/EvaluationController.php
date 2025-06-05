@@ -35,6 +35,7 @@ class EvaluationController extends Controller
             ->distinct()
             ->get();
 
+
         // Get subjects taught by the teacher
         $subjects = Subject::select('subjects.*')
             ->join('subject_teacher_mappings', 'subject_teacher_mappings.subject_id', '=', 'subjects.id')
@@ -134,6 +135,7 @@ class EvaluationController extends Controller
             ->with('program')
             ->distinct()
             ->get();
+
 
         return view('backend.teacher.evaluation.create', compact('batches'));
     }
@@ -246,6 +248,12 @@ class EvaluationController extends Controller
             ->get();
 
         return view('backend.teacher.evaluation.show', compact('evaluation', 'evaluationDetails'));
+    }
+
+    public function getFormatBySubject($id)
+    {
+        $formats = SubjectEvaluationFormat::where('subject_id', $id)->get();
+        return response()->json($formats);
     }
 
     /**

@@ -13,6 +13,7 @@
 @endphp
 @section('username', $user->fname . ' ' . $user->lname)
 
+
 @section('content')
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto">
@@ -434,10 +435,20 @@
                 calendarGrid.appendChild(emptyDay);
             }
 
+            // Today's date
+            const today = new Date();
+
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
+                const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                let dayData = data[day] || { status: null, type: 'no_class' };
+
+                // Prevent showing absent/auto_absent for future days
+                if (dateObj > today && (dayData.status === 'absent' || dayData.status === 'auto_absent')) {
+                    dayData.status = null;
+                }
+
                 const dayCell = document.createElement('div');
-                const dayData = data[day] || { status: null, type: 'no_class' };
 
                 let statusClass = '';
                 let status = '';

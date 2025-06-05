@@ -129,6 +129,8 @@ Route::group(['prefix' => 'teacher'], function () {
 
         Route::get('/evaluation/create', [TeacherEvaluationController::class, 'create'])
             ->name('teacher.evaluation.create');
+        Route::get('/evaluation/getFormatBySubject/{id}', [TeacherEvaluationController::class, 'getFormatBySubject'])
+            ->name('teacher.evaluation.getFormatBySubject');
         Route::post('/evaluation', [TeacherEvaluationController::class, 'store'])
             ->name('teacher.evaluation.store');
         Route::get('/evaluation/{id}', [TeacherEvaluationController::class, 'show'])

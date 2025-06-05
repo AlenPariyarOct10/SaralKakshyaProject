@@ -15,6 +15,11 @@ class Subject extends Model
         return $this->hasMany(SubjectEvaluationFormat::class, 'subject_id', 'id');
     }
 
+    public function evaluationDetails()
+    {
+        return $this->hasMany(StudentEvaluationDetail::class, 'evaluation_format_id');
+    }
+
     public function subjectTeacherMappings()
     {
         return $this->hasMany(\App\Models\SubjectTeacherMapping::class);

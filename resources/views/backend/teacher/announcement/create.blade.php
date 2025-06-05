@@ -1,5 +1,8 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
+@section('title', 'Create Announcement')
+
+
 @section('content')
     <x-show-success-failure-badge></x-show-success-failure-badge>
     <!-- Main Content Area -->

@@ -179,9 +179,6 @@
                                     <a href="{{route('student.profile')}}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <i class="fas fa-user w-5 mr-2"></i> Profile
                                     </a>
-                                    <a href="settings.html" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <i class="fas fa-cog w-5 mr-2"></i> Settings
-                                    </a>
                                     <div class="border-t dark:border-gray-700"></div>
                                     <form action="{{route('student.logout')}}" method="get">
                                         <button type="submit" class="flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">

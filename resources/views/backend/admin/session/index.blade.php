@@ -539,6 +539,7 @@
                 .fc-day-today {
                     background-color: #fef3c7 !important;
                 }
+
                 .dark .fc-day-today {
                     background-color: #451a03 !important;
                 }

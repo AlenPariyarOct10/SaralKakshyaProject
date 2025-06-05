@@ -49,9 +49,7 @@
                     <label for="formatFilter" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Evaluation Format</label>
                     <select id="formatFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                         <option value="">All Formats</option>
-                        @foreach($evaluationFormats as $format)
-                            <option value="{{ $format->id }}">{{ $format->criteria ?? $format->name }}</option>
-                        @endforeach
+
                     </select>
                 </div>
 
@@ -204,6 +202,7 @@
             });
             subjectFilter.addEventListener('change', () => {
                 currentPage = 1;
+                loadEvaluationFormat();
                 loadEvaluations();
             });
             formatFilter.addEventListener('change', () => {
@@ -222,6 +221,28 @@
             if (cancelDelete) cancelDelete.addEventListener('click', () => toggleModal(deleteConfirmationModal));
             if (confirmDelete) confirmDelete.addEventListener('click', handleDeleteEvaluation);
 
+
+            async function loadEvaluationFormat()
+            {
+                const subjectId = subjectFilter.value;
+
+                const response = await fetch(`/teacher/evaluation/getFormatBySubject/${subjectId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch evaluations');
+
+                const data = await response.json();
+                data.forEach(format => {
+                    const option = document.createElement('option');
+                    option.value = format.id;
+                    option.textContent = format.criteria;
+                    formatFilter.appendChild(option);
+                });
+            }
             // Functions
             async function loadEvaluations() {
                 try {
@@ -341,7 +362,7 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 ${!evaluation.is_finalized ? `
-                                    <a href="/teacher/evaluation/{id}/edit/${evaluation.id}" class="text-yellow-600 hover:text-yellow-800" title="Edit Evaluation">
+                                    <a href="/teacher/evaluation/${evaluation.id}/edit" class="text-yellow-600 hover:text-yellow-800" title="Edit Evaluation">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 ` : ''}

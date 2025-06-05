@@ -8,6 +8,8 @@
     {{$user->fname}}
 @endsection
 
+@section('title', 'Prediction')
+
 @section('lname')
     {{$user->lname}}
 @endsection

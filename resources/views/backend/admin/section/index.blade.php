@@ -90,7 +90,7 @@
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
 
-            <x-show-success-failure-badge/>
+        <x-show-success-failure-badge/>
 
         <!-- Action Bar -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
@@ -157,9 +157,9 @@
                             </td>
                             <td class="table-cell">
                                 <div class="flex items-center space-x-2">
-                                    <a class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" href="{{ route('admin.programs.show', $program->id) }}">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
+                                    <button class="edit-program-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Edit program">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     <button class="delete-program-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{$program->id}}" aria-label="Delete program">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
@@ -388,6 +388,73 @@
         </div>
     </div>
 
+    <!--Edit Program Modal -->
+    <div id="editProgramModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Edit Program</h3>
+                    <button id="closeEditModal" class="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="editProgramForm">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="programId" name="id" value="">
+
+                    <div class="mb-4">
+                        <label for="editProgramName" class="form-label">Program Name</label>
+                        <input type="text" id="editProgramName" name="name" class="form-input" placeholder="Enter program name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="editDepartment" class="form-label">Department</label>
+                        <select id="editDepartment" name="department_id" class="form-input" required>
+                            <option value="">Select Department</option>
+                            @forelse($allDepartments as $deprtment)
+                                <option value="{{$deprtment->id}}">{{$deprtment->name}}</option>
+                            @empty
+                                <option value="">No Departments Found</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="editTotalSemesters" class="form-label">Total Semesters</label>
+                            <input type="number" id="editTotalSemesters" name="total_semesters" class="form-input" min="1" placeholder="Semesters" required>
+                        </div>
+
+                        <div>
+                            <label for="editDurationYears" class="form-label">Duration (Years)</label>
+                            <input type="number" id="editDurationYears" name="duration" class="form-input" min="1" placeholder="Years" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="editProgramStatus" class="form-label">Status</label>
+                        <select id="editProgramStatus" name="status" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="editProgramDescription" class="form-label">Description (Optional)</label>
+                        <textarea id="editProgramDescription" name="description" class="form-input" rows="3" placeholder="Enter program description"></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-6">
+                        <button type="button" id="cancelEditBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" id="saveEditBtn" class="btn-primary">Update Program</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
@@ -413,459 +480,5 @@
 @endsection
 
 @section("scripts")
-    <script>
-        document.addEventListener('DOMContentLoaded', async function () {
-            try {
-                const response = await fetch('/admin/department/getAllDepartments', {
-                    method: 'get',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
 
-                const departments = await response.json();
-
-                console.log(departments);
-
-                departments.forEach(department => {
-                    const option = document.createElement('option');
-                    option.value = department.name;
-                    option.textContent = department.name;
-                    document.getElementById('departmentFilter').appendChild(option);
-                });
-
-            } catch (error) {
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Error saving sections: ' + error.message
-                });
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toast notification setup (if you're using SweetAlert or similar)
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-
-            // Manage Section Modal
-            const manageSectionModal = document.getElementById('manageSectionModal');
-            const closeManageSectionBtn = document.getElementById('closeManageSectionModal');
-            const cancelSectionBtn = document.getElementById('cancelSectionBtn');
-            const sectionDepartmentSelect = document.getElementById('sectionDepartment');
-            const sectionProgramSelect = document.getElementById('sectionProgram');
-            const sectionNameInput = document.getElementById('sectionName');
-            const addSectionBtn = document.getElementById('addSectionButton');
-            const sectionList = document.getElementById('sectionList');
-            const noSectionsMessage = document.getElementById('noSectionsMessage');
-            const sectionsData = document.getElementById('sectionsData');
-            const sectionForm = document.getElementById('manageSectionForm');
-
-            let sections = [];
-
-            // Open/close modal logic
-            window.openManageSectionModal = function() {
-                manageSectionModal.classList.remove('hidden');
-            };
-
-            function closeSectionModal() {
-                manageSectionModal.classList.add('hidden');
-                resetSectionForm();
-            }
-
-            closeManageSectionBtn.addEventListener('click', closeSectionModal);
-            cancelSectionBtn.addEventListener('click', closeSectionModal);
-
-            // Department change handler
-            sectionDepartmentSelect.addEventListener('change', function() {
-                const departmentId = this.value;
-                sectionProgramSelect.disabled = !departmentId;
-
-                if (!departmentId) {
-                    sectionProgramSelect.innerHTML = '<option value="">Select Department First</option>';
-                    return;
-                }
-
-                // Fetch programs for selected department
-                fetch(`/admin/department/get_department_programs?department_id=${departmentId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        sectionProgramSelect.innerHTML = '<option value="">Select Program</option>';
-                        data.forEach(program => {
-                            sectionProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`;
-                        });
-                    })
-                    .catch(error => console.error('Error loading programs:', error));
-            });
-
-            // Add section handler
-            addSectionBtn.addEventListener('click', function() {
-                const sectionName = sectionNameInput.value.trim();
-                const programId = sectionProgramSelect.value;
-
-                if (!sectionName) {
-                    alert('Please enter a section name');
-                    return;
-                }
-
-                if (!programId) {
-                    alert('Please select a program first');
-                    return;
-                }
-
-                // Add section to list
-                sections.push({
-                    name: sectionName,
-                    program_id: programId
-                });
-
-                updateSectionList();
-                sectionNameInput.value = '';
-                sectionNameInput.focus();
-            });
-
-            // Update section list display
-            function updateSectionList() {
-                if (sections.length === 0) {
-                    noSectionsMessage.classList.remove('hidden');
-                    sectionList.innerHTML = '';
-                    sectionList.appendChild(noSectionsMessage);
-                    return;
-                }
-
-                noSectionsMessage.classList.add('hidden');
-                sectionList.innerHTML = '';
-
-                sections.forEach((section, index) => {
-                    const sectionItem = document.createElement('div');
-                    sectionItem.className = 'flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0';
-                    sectionItem.innerHTML = `
-                        <span>${section.name}</span>
-                        <button type="button" class="text-red-500 hover:text-red-700" data-index="${index}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    `;
-                    sectionList.appendChild(sectionItem);
-                });
-
-                // Add event listeners to delete buttons
-                document.querySelectorAll('#sectionList button').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        sections.splice(index, 1);
-                        updateSectionList();
-                    });
-                });
-
-                // Update hidden input with sections data
-                sectionsData.value = JSON.stringify(sections);
-            }
-
-            // Form submission handler
-            sectionForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-
-                if (sections.length === 0) {
-                    alert('Please add at least one section');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/admin/department/section', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            program_id: sectionProgramSelect.value,
-                            sections: sections
-                        })
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok && result.success) {
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Sections saved successfully!'
-                        });
-                        closeSectionModal();
-                        // Optional: Refresh sections list in parent page
-                        if (typeof window.refreshSections === 'function') {
-                            window.refreshSections();
-                        }
-                    } else {
-                        throw new Error(result.message || 'Failed to save sections');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Error saving sections: ' + error.message
-                    });
-                }
-            });
-
-            // Reset form
-            function resetSectionForm() {
-                sectionForm.reset();
-                sections = [];
-                sectionProgramSelect.innerHTML = '<option value="">Select Department First</option>';
-                sectionProgramSelect.disabled = true;
-                updateSectionList();
-            }
-
-            // Program Modal
-            const programModal = document.getElementById('programModal');
-            const addProgramBtn = document.getElementById('addProgramBtn');
-            const closeModal = document.getElementById('closeModal');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const modalTitle = document.getElementById('modalTitle');
-            const programForm = document.getElementById('programForm');
-
-            // Batch Modal
-            const manageBatchModal = document.getElementById('manageBatchModal');
-            const closeManageBatchModal = document.querySelectorAll('.closeManageBatchModal');
-
-
-            // Delete Modal
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModal = document.getElementById('closeDeleteModal');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
-            // Open Add Program Modal
-            addProgramBtn.addEventListener('click', () => {
-                modalTitle.textContent = 'Add New Program';
-                programForm.reset();
-                programModal.classList.remove('hidden');
-            });
-
-            // Close Program Modal
-            closeModal.addEventListener('click', () => {
-                programModal.classList.add('hidden');
-            });
-
-            cancelBtn.addEventListener('click', () => {
-                programModal.classList.add('hidden');
-            });
-
-
-
-            // Close Manage Batch Model
-            closeManageBatchModal.forEach((item) => {
-                item.addEventListener('click', () => {
-                    manageBatchModal.classList.add("hidden");
-                });
-            });
-
-
-
-
-            // Close Delete Modal
-            closeDeleteModal.addEventListener('click', () => {
-                deleteModal.classList.add('hidden');
-            });
-
-            cancelDeleteBtn.addEventListener('click', () => {
-                deleteModal.classList.add('hidden');
-            });
-
-            // Delete Program
-            let programToDelete = null;
-            const deleteButtons = document.querySelectorAll('.delete-program-btn');
-
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    programToDelete = button.getAttribute('data-id');
-                    deleteModal.classList.remove('hidden');
-                });
-            });
-
-            confirmDeleteBtn.addEventListener('click', () => {
-                if (!programToDelete) return;
-
-                fetch(`/admin/programs/${programToDelete}`, {
-                    method: 'DELETE',
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Accept": "application/json",
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Program deleted successfully'
-                            });
-                            // Remove the row from the table
-                            document.querySelector(`.delete-program-btn[data-id="${programToDelete}"]`)
-                                .closest('tr').remove();
-                        } else {
-                            throw new Error(data.message || 'Delete failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Toast.fire({
-                            icon: 'error',
-                            title: error.message
-                        });
-                    })
-                    .finally(() => {
-                        deleteModal.classList.add('hidden');
-                        programToDelete = null;
-                    });
-            });
-
-            // Batch Department Change
-            $("#batchDepartment").on("change", function () {
-                let departmentId = $(this).val();
-                $("#batchProgram").html('<option value="">Select Program</option>');
-                $("#batchSemester").html('<option value="">Select Semester</option>');
-
-                if (departmentId === "") return;
-
-                $.ajax({
-                    url: "{{route('admin.department.get_department_programs')}}",
-                    type: "GET",
-                    data: {
-                        department_id: departmentId,
-                        _token: $('meta[name="csrf-token"]').attr("content")
-                    },
-                    success: function (response) {
-                        let programDropdown = $("#batchProgram");
-                        programDropdown.empty().append('<option value="">Select Program</option>');
-
-                        response.forEach((item) => {
-                            programDropdown.append(
-                                `<option value="${item.id}" data-semesters="${item.total_semesters}">
-                                    ${item.name}
-                                </option>`
-                            );
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error:", error);
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Failed to load programs'
-                        });
-                    }
-                });
-            });
-
-            // Batch Program Change
-            $("#batchProgram").on("change", function () {
-                let semesterDropdown = $("#batchSemester");
-                semesterDropdown.empty().append('<option value="">Select Semester</option>');
-
-                let selectedOption = $(this).find(":selected");
-                if (selectedOption.val() === "") return;
-
-                let totalSemesters = selectedOption.data("semesters");
-                if (!totalSemesters || isNaN(totalSemesters)) return;
-
-                for (let i = 1; i <= totalSemesters; i++) {
-                    semesterDropdown.append(`<option value="${i}">Semester ${i}</option>`);
-                }
-            });
-
-            // Add Batch Button
-            $("#addBatchButton").click(function () {
-                let department = $("#batchDepartment").val();
-                let program = $("#batchProgram").val();
-                let semester = $("#batchSemester").val();
-                let status = $("#batchStatus").val();
-                let batchTitle = $("#batchTitle").val();
-
-                if (!department || !program || !semester || !batchTitle || !status ||
-                    department === "" || program === "" || semester === "") {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Please fill all required fields'
-                    });
-                    return;
-                }
-
-                $.ajax({
-                    url: "{{ route('admin.program.batch') }}",
-                    type: "POST",
-                    data: {
-                        department_id: department,
-                        program_id: program,
-                        semester: semester,
-                        batch: batchTitle,
-                        status: status,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            Toast.fire({
-                                icon: 'success',
-                                title: response.message || 'Batch added successfully'
-                            });
-                            $("#batchTitle").val("");
-
-                            // Update the all batches textarea
-                            let currentBatches = $("#allBatches").val();
-                            if (currentBatches === "No batches yes") {
-                                $("#allBatches").val(batchTitle);
-                            } else {
-                                $("#allBatches").val(currentBatches + ", " + batchTitle);
-                            }
-                        } else {
-                            throw new Error(response.message || 'Failed to add batch');
-                        }
-                    },
-                    error: function (xhr) {
-                        let errorMsg = xhr.responseJSON?.message || 'An error occurred';
-                        Toast.fire({
-                            icon: 'error',
-                            title: errorMsg
-                        });
-                    }
-                });
-            });
-
-            // Search and Filter
-            const searchInput = document.getElementById('searchPrograms');
-            const departmentFilter = document.getElementById('departmentFilter');
-
-            function filterPrograms() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const department = departmentFilter.value;
-
-                const rows = document.querySelectorAll('#programsTableBody tr');
-
-                rows.forEach(row => {
-                    const programName = row.querySelector('td:first-child').textContent.toLowerCase();
-                    const programDepartment = row.querySelector('td:nth-child(2)').textContent;
-
-                    const matchesSearch = programName.includes(searchTerm);
-                    const matchesDepartment = department === '' || programDepartment === department;
-
-                    if (matchesSearch && matchesDepartment) {
-                        row.classList.remove('hidden');
-                    } else {
-                        row.classList.add('hidden');
-                    }
-                });
-            }
-
-            searchInput.addEventListener('input', filterPrograms);
-            departmentFilter.addEventListener('change', filterPrograms);
-        });
-    </script>
 @endsection

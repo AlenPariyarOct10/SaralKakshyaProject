@@ -1,5 +1,7 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
+@section('title', 'View Students Attendance')
+
 @section('content')
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
@@ -33,7 +35,7 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student Name</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Method</th>
@@ -142,7 +144,7 @@
                 return `
                     <tr data-attendance-id="${record.id}">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-800 dark:text-white">${record.attendee_id}</div>
+                            <div class="text-sm font-medium text-gray-800 dark:text-white">${record.student.fname} ${record.student.lname}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-500 dark:text-gray-400">${record.date}</div>

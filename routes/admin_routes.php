@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\TestEvent;
+use App\Http\Controllers\Backend\Admin\Api\SectionController as AdminSectionControllerApi;
 use App\Http\Controllers\Backend\Admin\ChapterController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\Admin\AuthController as AdminAuthController;
@@ -22,6 +23,8 @@ use App\Http\Controllers\Backend\Admin\ClassRoutineController as AdminClassRouti
 use App\Http\Controllers\Backend\Admin\ForgotPasswordController as AdminForgotPasswordController;
 use App\Http\Controllers\Backend\Admin\ResetPasswordController as AdminResetPasswordController;
 use App\Http\Controllers\Backend\Admin\InstituteSessionController as AdminInstituteSessionController;
+use App\Http\Controllers\Backend\Admin\EvaluationController as AdminEvaluationController;
+
 
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware('guest:admin')->group(function () {
@@ -69,6 +72,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Section
         Route::get('/sections/getBySubject/{id}', [AdminDepartmentController::class, 'getBySubject'])->name('admin.section.getBySubject');
+        Route::get('/sections/{id}/edit', [AdminSectionControllerApi::class, 'edit'])->name('admin.section.edit');
+        Route::PUT('/sections/{id}/', [AdminSectionControllerApi::class, 'update'])->name('admin.section.update');
+        Route::delete('/sections/{id}/', [AdminSectionControllerApi::class, 'destroy'])->name('admin.section.destroy');
 
         //Subjects
         Route::get('/subjects', [AdminSubjectController::class, 'index'])->name('admin.subjects.index');
@@ -206,6 +212,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/attendance/export/csv', [AdminAttendanceController::class, "export"])->name('admin.attendance.export');
         Route::post('/attendance/bulk', [AdminAttendanceController::class, "bulkStore"])->name('admin.attendance.bulk');
 
+
+        ########################################### Evaluations #############################################
+        Route::get('/evaluations', [AdminEvaluationController::class, 'index'])->name('admin.evaluations.index');
+        Route::get('/evaluations/results', [AdminEvaluationController::class, 'evaluation'])->name('admin.evaluations.evaluation');
+        Route::get('/evaluations/download-pdf', [AdminEvaluationController::class, 'downloadResultsPdf'])->name('admin.evaluations.download-pdf');
 
         // Batch Management Routes
         Route::get('/batches', [AdminBatchController::class, 'index'])->name('admin.batches.index');

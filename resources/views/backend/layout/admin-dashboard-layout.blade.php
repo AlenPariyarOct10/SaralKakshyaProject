@@ -120,6 +120,10 @@
                     <i class="fas fa-book"></i>
                     <span>Programs</span>
                 </a>
+                <a href="{{route("admin.evaluations.index")}}" class="sidebar-item  {{Route::is("admin.evaluations.*")? "active":""}}">
+                    <i class="fas fa-book"></i>
+                    <span>Evaluations</span>
+                </a>
                 <a href="{{route("admin.department.index")}}" class="sidebar-item  {{Route::is("admin.department.*")? "active":""}}">
                     <i class="fa-solid fa-building"></i>
                     <span>Departments</span>

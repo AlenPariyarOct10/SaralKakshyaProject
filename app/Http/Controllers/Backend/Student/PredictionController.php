@@ -7,7 +7,9 @@ use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Attendance;
 use App\Models\InstituteStudent;
+use App\Models\Batch;
 use App\Models\InstituteSession;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -58,18 +60,12 @@ class PredictionController extends Controller
     {
         $instituteId = $instituteStudent->institute_id;
         $batchId = $instituteStudent->batch_id;
-
-        // Get current semester/academic period (you may need to adjust this based on your system)
-        $currentDate = Carbon::now();
-        $academicYearStart = Carbon::create($currentDate->year, 9, 1); // Assuming academic year starts in September
-        if ($currentDate->month < 9) {
-            $academicYearStart->subYear();
-        }
+        $batch = Batch::find($batchId);
 
         // 1. Assignment Performance
         $assignments = Assignment::where('batch_id', $batchId)
             ->where('status', 'active')
-            ->where('assigned_date', '>=', $academicYearStart->format('Y-m-d'))
+            ->where('assigned_date', '>=', $batch->start_date)
             ->get();
 
         $totalAssignments = $assignments->count();
@@ -80,7 +76,7 @@ class PredictionController extends Controller
         foreach ($assignments as $assignment) {
             $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
                 ->where('student_id', $studentId)
-                ->where('status', 'submitted')
+                ->whereBetween('submitted_at', [$batch->start_date, $batch->end_date])
                 ->first();
 
             if ($submission) {
@@ -93,34 +89,77 @@ class PredictionController extends Controller
         }
 
         // 2. Attendance Performance
+        $today = Carbon::today();
+        $batchStart = Carbon::parse($batch->start_date);
+        $batchEnd = Carbon::parse($batch->end_date);
+
+// Determine effective end date for calculation
+        $effectiveEndDate = $today->lt($batchEnd) ? $today : $batchEnd;
+
+// 1. Get holiday dates within the adjusted date range
+        $holidayDates = InstituteSession::where('institute_id', $instituteId)
+            ->where('status', 'holiday')
+            ->whereBetween('date', [$batchStart, $effectiveEndDate])
+            ->pluck('date')
+            ->toArray();
+
+// 2. Get class session days (excluding holidays)
         $classSessions = InstituteSession::where('institute_id', $instituteId)
             ->where('status', 'class')
-            ->where('date', '>=', $academicYearStart->format('Y-m-d'))
-            ->where('date', '<=', $currentDate->format('Y-m-d'))
+            ->whereBetween('date', [$batchStart, $effectiveEndDate])
             ->get();
 
         $totalClassDays = $classSessions->count();
+
+// 3. Get student's present and late attendance records within range
         $attendanceRecords = Attendance::where('attendee_id', $studentId)
             ->where('attendee_type', 'student')
             ->where('institute_id', $instituteId)
-            ->where('date', '>=', $academicYearStart->format('Y-m-d'))
-            ->where('date', '<=', $currentDate->format('Y-m-d'))
+            ->whereIn('status', ['present', 'late'])
+            ->whereBetween('date', [$batchStart, $effectiveEndDate])
+            ->whereNotIn('date', $holidayDates)
             ->get();
 
-        $presentDays = $attendanceRecords->whereIn('status', ['present', 'late'])->count();
+        $presentDays = $attendanceRecords->count();
 
-        // 3. Midterm Performance (mock data - you may need to adjust based on your exam system)
-        // For now, we'll use assignment average as a proxy for midterm performance
-        $midtermMarks = $totalAssignmentMarks > 0 ?
-            round(($obtainedAssignmentMarks / $totalAssignmentMarks) * 100) : 0;
-        $midtermTotal = 100;
+        // 3. Get actual exam marks from evaluation details
+        $student = Student::find($studentId);
 
-        // 4. Preboard Performance (mock data - you may need to adjust based on your exam system)
-        // For now, we'll use a slightly higher performance than assignments as preboard
-        $preboardMarks = $totalAssignmentMarks > 0 ?
-            round((($obtainedAssignmentMarks / $totalAssignmentMarks) * 100) * 1.1) : 0;
-        $preboardMarks = min($preboardMarks, 100); // Cap at 100
-        $preboardTotal = 100;
+        // Initialize exam marks
+        $midtermMarks = 0;
+        $midtermTotal = 0;
+        $preboardMarks = 0;
+        $preboardTotal = 0;
+
+        if ($student) {
+            $student->load(['studentEvaluationDetails.evaluationFormat']);
+
+            foreach ($student->studentEvaluationDetails as $eval) {
+                $examType = $eval->evaluationFormat->criteria ?? 'N/A';
+                $marks = $eval->obtained_marks ?? 0;
+                $fullMarks = $eval->evaluationFormat->full_marks ?? 0;
+
+                if (strtolower($examType) === 'midterm') {
+                    $midtermMarks += $marks;
+                    $midtermTotal += $fullMarks;
+                } elseif (strtolower($examType) === 'preboard') {
+                    $preboardMarks += $marks;
+                    $preboardTotal += $fullMarks;
+                }
+            }
+        }
+
+        // If no exam data found, use assignment average as fallback (like before)
+        if ($midtermTotal == 0 && $totalAssignmentMarks > 0) {
+            $midtermMarks = round(($obtainedAssignmentMarks / $totalAssignmentMarks) * 100);
+            $midtermTotal = 100;
+        }
+
+        if ($preboardTotal == 0 && $totalAssignmentMarks > 0) {
+            $preboardMarks = round((($obtainedAssignmentMarks / $totalAssignmentMarks) * 100) * 1.1);
+            $preboardMarks = min($preboardMarks, 100);
+            $preboardTotal = 100;
+        }
 
         return [
             'assignments_done' => $submittedAssignments,
@@ -128,14 +167,14 @@ class PredictionController extends Controller
             'attendance_present' => $presentDays,
             'attendance_total' => max($totalClassDays, 1), // Prevent division by zero
             'midterm_marks' => $midtermMarks,
-            'midterm_total' => $midtermTotal,
+            'midterm_total' => max($midtermTotal, 1), // Prevent division by zero
             'preboard_marks' => $preboardMarks,
-            'preboard_total' => $preboardTotal,
+            'preboard_total' => max($preboardTotal, 1), // Prevent division by zero
             'performance_summary' => [
                 'assignment_ratio' => $totalAssignments > 0 ? round(($submittedAssignments / $totalAssignments) * 100, 1) : 0,
                 'attendance_ratio' => $totalClassDays > 0 ? round(($presentDays / $totalClassDays) * 100, 1) : 0,
-                'midterm_ratio' => round(($midtermMarks / $midtermTotal) * 100, 1),
-                'preboard_ratio' => round(($preboardMarks / $preboardTotal) * 100, 1),
+                'midterm_ratio' => $midtermTotal > 0 ? round(($midtermMarks / $midtermTotal) * 100, 1) : 0,
+                'preboard_ratio' => $preboardTotal > 0 ? round(($preboardMarks / $preboardTotal) * 100, 1) : 0,
             ]
         ];
     }

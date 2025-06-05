@@ -228,12 +228,7 @@
             <div class="p-6">
                 <!-- Batches Tab -->
                 <div id="batches-tab" class="tab-content active">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Program Batches</h3>
-                        <button id="addBatchBtn" class="btn-primary flex items-center text-sm">
-                            <i class="fas fa-plus mr-2"></i> Add Batch
-                        </button>
-                    </div>
+
 
                     @if($program->batches->count() > 0)
                         <div class="overflow-x-auto">
@@ -243,7 +238,6 @@
                                     <th scope="col" class="table-header">Batch</th>
                                     <th scope="col" class="table-header">Semester</th>
                                     <th scope="col" class="table-header">Status</th>
-                                    <th scope="col" class="table-header">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -258,16 +252,8 @@
                                                 <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
                                             @endif
                                         </td>
-                                        <td class="table-cell">
-                                            <div class="flex items-center space-x-2">
-                                                <button class="edit-batch-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{ $batch->id }}" aria-label="Edit batch">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="delete-batch-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{ $batch->id }}" aria-label="Delete batch">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        </td>
+
+
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -289,12 +275,6 @@
 
                 <!-- Sections Tab -->
                 <div id="sections-tab" class="tab-content">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Program Sections</h3>
-                        <button id="addSectionBtn" class="btn-primary flex items-center text-sm">
-                            <i class="fas fa-plus mr-2"></i> Add Section
-                        </button>
-                    </div>
 
                     @if($program->sections->count() > 0)
                         <div class="overflow-x-auto">
@@ -363,7 +343,6 @@
                                     <th scope="col" class="table-header">Semester</th>
                                     <th scope="col" class="table-header">Credit Hours</th>
                                     <th scope="col" class="table-header">Status</th>
-                                    <th scope="col" class="table-header">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -380,16 +359,7 @@
                                                 <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
                                             @endif
                                         </td>
-                                        <td class="table-cell">
-                                            <div class="flex items-center space-x-2">
-                                                <button class="edit-subject-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{ $subject->id }}" aria-label="Edit subject">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="delete-subject-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{ $subject->id }}" aria-label="Delete subject">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        </td>
+
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -883,67 +853,7 @@
                 deleteModal.classList.add('hidden');
             });
 
-            // Button Click Handlers
-            const addBatchBtn = document.getElementById('addBatchBtn');
-            if (addBatchBtn) {
-                addBatchBtn.addEventListener('click', () => {
-                    // Open batch modal or redirect to batch creation page
-                    window.location.href = "{{ route('admin.program.batch.create', $program->id) }}";
-                });
-            }
 
-            const createBatchBtn = document.getElementById('createBatchBtn');
-            if (createBatchBtn) {
-                createBatchBtn.addEventListener('click', () => {
-                    window.location.href = "{{ route('admin.program.batch.create', $program->id) }}";
-                });
-            }
-
-            const addSectionBtn = document.getElementById('addSectionBtn');
-            if (addSectionBtn) {
-                addSectionBtn.addEventListener('click', () => {
-                    // Open section modal or redirect to section creation page
-                    window.location.href = "{{ route('admin.program.section.create', $program->id) }}";
-                });
-            }
-
-            const createSectionBtn = document.getElementById('createSectionBtn');
-            if (createSectionBtn) {
-                createSectionBtn.addEventListener('click', () => {
-                    window.location.href = "{{ route('admin.program.section.create', $program->id) }}";
-                });
-            }
-
-
-            const createSubjectBtn = document.getElementById('createSubjectBtn');
-            if (createSubjectBtn) {
-                createSubjectBtn.addEventListener('click', () => {
-{{--                    window.location.href = "{{ route('admin.program.subjects.create', $program->id) }}";--}}
-                });
-            }
-
-            const addAssignmentBtn = document.getElementById('addAssignmentBtn');
-            if (addAssignmentBtn) {
-                addAssignmentBtn.addEventListener('click', () => {
-                    // Open assignment modal or redirect to assignment creation page
-
-                });
-            }
-
-            const createAssignmentBtn = document.getElementById('createAssignmentBtn');
-            if (createAssignmentBtn) {
-                createAssignmentBtn.addEventListener('click', () => {
-
-                });
-            }
-
-            // Edit/Delete buttons for each item
-            document.querySelectorAll('.edit-batch-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const batchId = this.getAttribute('data-id');
-                    window.location.href = `/admin/batches/${batchId}/edit`;
-                });
-            });
 
             document.querySelectorAll('.delete-batch-btn').forEach(btn => {
                 btn.addEventListener('click', function() {

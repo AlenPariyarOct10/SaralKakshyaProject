@@ -4,6 +4,10 @@
     {{$user->fname}} {{$user->lname}}
 @endsection
 
+@section("title")
+    Evaluation
+@endsection
+
 @section('fname')
     {{$user->fname}}
 @endsection
@@ -86,161 +90,80 @@
 @section('content')
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+            <!-- Search & Filter -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+
+                <!-- Department Filter -->
+                <div class="relative w-full max-w-md">
+                    <select id="departmentFilter" class="w-full pl-4 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-gray-700"><option value="">All Departments</option></select>
+                </div>
+                <!-- Program Filter -->
+                <div class="relative w-full max-w-md">
+                    <select id="programFilter" class="w-full pl-4 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-gray-700">
+                        <option value="">All Programs</option>
+                    </select>
+                </div>
+                <!-- Semester Filter -->
+                <div class="relative w-full max-w-md">
+                    <select id="semesterFilter" class="w-full pl-4 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-gray-700">
+                        <option value="">All Semester</option>
+                    </select>
+                </div>
+
+                <button id="downloadPdfBtn" class="btn-primary flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
+
+
+        </div>
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Student Performance Prediction {{session('prediction_result')}}</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Student Evaluations</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">Using Logistic Regression to predict student outcomes</p>
         </div>
 
         <x-show-success-failure-badge></x-show-success-failure-badge>
 
-        @if(session('training_error'))
-            <div class="status-error">
-                <i class="fas fa-exclamation-circle mr-2"></i> {{ session('training_error') }}
-            </div>
-        @endif
+                    <!-- Resukt Table -->
+                    <div class="lg:col-span-2 w-full">
+                        <div class="card">
+                            <div class="p-6">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Student Results</h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Model Training Panel -->
-            <div class="lg:col-span-1">
-                <div class="card">
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Train Model</h2>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">
-                            Train the logistic regression model using historical student performance data.
-                        </p>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Student</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Midterm</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Preboard</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Assignment</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Attendance</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Total</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Status</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">Rank</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="resultsTable" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            <!-- Results will be loaded dynamically -->
+                                            <tr>
+                                                <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                                    Please select filters to view student results
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        <form action="{{ route('admin.prediction.train') }}" method="POST" id="trainForm">
-                            @csrf
-                            <button type="submit" class="btn-primary w-full flex items-center justify-center" id="trainButton">
-                                <i class="fas fa-cogs mr-2"></i> Train Now
-                            </button>
-                        </form>
-
-                        <div class="mt-4" id="trainingStatus">
-                            @if(session('training_success'))
-                                <div class="status-success">
-                                    <i class="fas fa-check-circle mr-2"></i> {{ session('training_success') }}
-                                </div>
-                            @elseif(session('training_error'))
-                                <div class="status-error">
-                                    <i class="fas fa-exclamation-circle mr-2"></i> {{ session('training_error') }}
-                                </div>
-                            @else
-                                <div class="status-info">
-                                    <i class="fas fa-info-circle mr-2"></i> Model ready for training
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <h3 class="text-md font-medium text-gray-800 dark:text-white mb-3">Model Information</h3>
-
-                            <div class="space-y-3 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-400">Last Trained:</span>
-                                    <span class="font-medium text-gray-800 dark:text-gray-200" id="lastTrained">
-                                        {{ $lastTrained ?? 'Never' }}
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-400">Training Data Size:</span>
-                                    <span class="font-medium text-gray-800 dark:text-gray-200" id="trainingSize">
-                                        {{ $trainingSize ?? '0' }} records
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-400">Model Accuracy:</span>
-                                    <span class="font-medium text-gray-800 dark:text-gray-200" id="modelAccuracy">
-                                        {{ $modelAccuracy ?? 'N/A' }}
-                                    </span>
-                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Prediction Panel -->
-            <div class="lg:col-span-2">
-                <div class="card">
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Predict Student Result</h2>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">
-                            Enter student performance metrics to predict their likelihood of passing.
-                        </p>
-
-                        <form action="{{ route('admin.prediction.predict') }}" method="POST" id="predictionForm">
-                            @csrf
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Assignments -->
-                                <div>
-                                    <label for="assignments_done" class="form-label">Assignments Done</label>
-                                    <input type="number" id="assignments_done" name="assignments_done" class="form-input" placeholder="0" min="0" required>
-                                </div>
-                                <div>
-                                    <label for="assignments_total" class="form-label">Assignments Total</label>
-                                    <input type="number" id="assignments_total" name="assignments_total" class="form-input" placeholder="10" min="1" required>
-                                </div>
-
-                                <!-- Attendance -->
-                                <div>
-                                    <label for="attendance_present" class="form-label">Attendance Present</label>
-                                    <input type="number" id="attendance_present" name="attendance_present" class="form-input" placeholder="0" min="0" required>
-                                </div>
-                                <div>
-                                    <label for="attendance_total" class="form-label">Attendance Total</label>
-                                    <input type="number" id="attendance_total" name="attendance_total" class="form-input" placeholder="100" min="1" required>
-                                </div>
-
-
-                                <!-- Mid-term Marks -->
-                                <div>
-                                    <label for="midterm_marks" class="form-label">Mid-term Marks Obtained</label>
-                                    <input type="number" id="midterm_marks" name="midterm_marks" class="form-input" placeholder="0" min="0" required>
-                                </div>
-                                <div>
-                                    <label for="midterm_total" class="form-label">Mid-term Total Marks</label>
-                                    <input type="number" id="midterm_total" name="midterm_total" class="form-input" placeholder="100" min="1" required>
-                                </div>
-
-                                <!-- Preboard Marks -->
-                                <div>
-                                    <label for="preboard_marks" class="form-label">Preboard Marks Obtained</label>
-                                    <input type="number" id="preboard_marks" name="preboard_marks" class="form-input" placeholder="0" min="0" required>
-                                </div>
-                                <div>
-                                    <label for="preboard_total" class="form-label">Preboard Total Marks</label>
-                                    <input type="number" id="preboard_total" name="preboard_total" class="form-input" placeholder="100" min="1" required>
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <button type="submit" class="btn-primary w-full flex items-center justify-center" id="predictButton">
-                                    <i class="fas fa-chart-line mr-2"></i> Predict
-                                </button>
-                            </div>
-                        </form>
-                        @if(session('predicted'))
-                            <div class="prediction-result {{ session('prediction_result') ? 'prediction-pass' : 'prediction-fail' }}">
-                                @if(session('prediction_result'))
-                                    <div class="flex items-center justify-center">
-                                        <span class="text-2xl mr-2">✅</span>
-                                        <span>Likely to Pass ({{ number_format(session('prediction_probability') * 100, 1) }}% probability)</span>
-                                    </div>
-                                @else
-                                    <div class="flex items-center justify-center">
-                                        <span class="text-2xl mr-2">❌</span>
-                                        <span>Likely to Fail ({{ number_format((1 - session('prediction_probability')) * 100, 1) }}% probability)</span>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
-
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 @endsection
 
@@ -250,6 +173,238 @@
             const trainForm = document.getElementById('trainForm');
             const trainButton = document.getElementById('trainButton');
             const trainingStatus = document.getElementById('trainingStatus');
+
+            const departmentFilter = document.getElementById('departmentFilter');
+            const programFilter = document.getElementById('programFilter');
+            const semesterFilter = document.getElementById('semesterFilter');
+            const resultsTable = document.getElementById('resultsTable');
+
+
+            // Add this to your existing script
+            document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+                const semester = semesterFilter.value;
+                const programId = programFilter.value;
+                const departmentId = departmentFilter.value;
+                const instituteId = {{ session('institute_id'); }};
+
+                if (!semester || !programId) {
+                    alert('Please select program and semester to download results');
+                    return;
+                }
+
+                // Show loading state on the button
+                const btn = this;
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating PDF...';
+                btn.disabled = true;
+
+                const url = `/admin/evaluations/download-pdf?institute_id=${instituteId}&program_id=${programId}&semester=${semester}`;
+
+                // Trigger download
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to generate PDF');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `evaluation-results-sem-${semester}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to generate PDF: ' + error.message);
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    });
+            });
+
+
+            fetch("/admin/department/getAllDepartments")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // parse JSON
+                })
+                .then(data => {
+                    data.forEach(department => {
+                        const option = document.createElement('option');
+                        option.value = department.id;
+                        option.textContent = department.name;
+                        departmentFilter.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                });
+
+            departmentFilter.addEventListener('change', loadProgramsByDepartment);
+            programFilter.addEventListener('change', loadSemestersByProgram);
+            semesterFilter.addEventListener('change', loadEvaluations);
+
+            function loadProgramsByDepartment() {
+                const departmentId = departmentFilter.value;
+                fetch(`/admin/department/get_department_programs?department_id=${departmentId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(program => {
+                            const option = document.createElement('option');
+                            option.value = program.id;
+                            option.textContent = program.name;
+                            programFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                    });
+            }
+
+            function loadSemestersByProgram() {
+                const programId = programFilter.value;
+                semesterFilter.innerHTML = '<option value="">All Semester</option>';
+
+                fetch(`/admin/programs/${programId}/semesters`)
+                    .then(response => response.json())
+                    .then(data => {
+                        for(let i=1; i<=data; i++){
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = "Semester " + i;
+                            semesterFilter.appendChild(option);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                    });
+            }
+
+            function loadEvaluations() {
+                const tableBody = resultsTable;
+                const semester = semesterFilter.value;
+                const programId = programFilter.value;
+                const departmentId = departmentFilter.value;
+                const instituteId = {{ session('institute_id'); }};
+
+                if (!semester || !programId) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                Please select program and semester to view results
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Show loading state
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center">
+                                <svg class="animate-spin h-5 w-5 mr-3 text-primary-600" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Loading results...
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                const url = `/admin/evaluations/results?institute_id=${instituteId}&program_id=${programId}&semester=${semester}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch evaluation results');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        tableBody.innerHTML = '';
+
+                        if (!data.results || data.results.length === 0) {
+                            tableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                        No evaluation records found
+                                    </td>
+                                </tr>
+                            `;
+                            return;
+                        }
+
+                        // Process each student's data
+                        data.results.forEach((student, index) => {
+                            // Create table row
+                            const row = document.createElement('tr');
+                            row.className = `hover:bg-gray-50 dark:hover:bg-gray-700 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} dark:bg-gray-800`;
+
+                            const statusClass = student.status === 'Pass' ?
+                                'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
+                                'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+
+                            // Format exam details
+                            let preboard = '';
+                            if (student.preboard !== null) {
+                                preboard = `Preboard: ${student.preboard}, `;
+                            }
+
+                            let midterm = '';
+                            if (student.midterm !== null) {
+                                midterm = `Midterm: ${student.midterm}, `;
+                            }
+
+
+                            row.innerHTML = `
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${student.student_name}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">${student.exam_details.Midterm.obtained_marks} / ${student.exam_details.Midterm.full_marks}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">${student.exam_details.Preboard.obtained_marks} / ${student.exam_details.Preboard.full_marks}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${student.assignment.obtained_marks}/${student.assignment.full_marks} %</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${student.attendance.obtained_marks}/${student.attendance.full_marks} %</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${student.total.obtained_marks}/${student.total.full_marks}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                        ${student.status}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${student.rank}</td>
+                            `;
+
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-red-500 dark:text-red-400">
+                                    <div class="flex items-center justify-center">
+                                        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Error loading evaluation data
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+            }
+
+            // Add event listeners
+            departmentFilter.addEventListener('change', loadProgramsByDepartment);
+            programFilter.addEventListener('change', loadSemestersByProgram);
+            semesterFilter.addEventListener('change', loadEvaluations);
 
             // Handle training form submission
             if (trainForm) {

@@ -277,6 +277,9 @@
                             <button type="button" id="add-evaluation-format" class="btn-secondary flex items-center">
                                 <i class="fas fa-plus mr-2"></i> Add Another Evaluation Format
                             </button>
+                            <button type="button" id="add-system-evaluation-format" class="btn-primary flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Add System Supported Format
+                            </button>
                         </div>
                     </div>
                     <!-- Form Actions -->
@@ -506,6 +509,91 @@
                         semesterSelect.disabled = false;
                     });
 
+            });
+
+
+            $('#add-system-evaluation-format').on('click', function() {
+                // Clear existing formats first
+                $('#evaluation-formats').empty();
+                evaluationCount = 1;
+
+                // Add Midterm format
+                const midtermFormat = `
+        <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" value="Midterm" required>
+            </div>
+            <div>
+                <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" value="100" min="1" required>
+            </div>
+            <div>
+                <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" value="40" min="1" required>
+            </div>
+            <div>
+                <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" value="5" min="1" required>
+                    <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+                $('#evaluation-formats').append(midtermFormat);
+                evaluationCount++;
+
+                // Add Preboard format
+                const preboardFormat = `
+        <div class="evaluation-format grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="criteria_${evaluationCount}" class="form-label">Criteria <span class="text-red-500">*</span></label>
+                <input type="text" id="criteria_${evaluationCount}" name="criteria[]" class="form-input" value="Preboard" required>
+            </div>
+            <div>
+                <label for="full_marks_${evaluationCount}" class="form-label">Full Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="full_marks_${evaluationCount}" name="full_marks[]" class="form-input" value="100" min="1" required>
+            </div>
+            <div>
+                <label for="pass_marks_${evaluationCount}" class="form-label">Pass Marks <span class="text-red-500">*</span></label>
+                <input type="number" id="pass_marks_${evaluationCount}" name="pass_marks[]" class="form-input" value="40" min="1" required>
+            </div>
+            <div>
+                <label for="marks_weight_${evaluationCount}" class="form-label">Marks Weight <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <input type="number" id="marks_weight_${evaluationCount}" name="marks_weight[]" class="form-input marks-weight" value="5" min="1" required>
+                    <button type="button" class="remove-evaluation ml-2 p-2 text-red-500 hover:text-red-700 focus:outline-none" title="Remove">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+                $('#evaluation-formats').append(preboardFormat);
+                evaluationCount++;
+
+                // Recalculate total weight
+                calculateTotalWeight();
+
+                // Attach remove handlers to the new formats
+                $('.remove-evaluation').off('click').on('click', function() {
+                    $(this).closest('.evaluation-format').remove();
+                    calculateTotalWeight();
+                });
+
+                // Show success message
+                Toast.fire({
+                    icon: 'success',
+                    title: 'System supported formats added successfully!'
+                });
+
+                // Reset the reuse format dropdown since we're using system formats
+                $('#reuse_format').val('');
             });
 
             document.getElementById('reuse_format').addEventListener('change', function() {

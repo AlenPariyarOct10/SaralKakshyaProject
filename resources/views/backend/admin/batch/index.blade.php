@@ -181,6 +181,8 @@
                                             data-semester="{{ $batch->semester }}"
                                             data-batch="{{ $batch->batch }}"
                                             data-status="{{ $batch->status }}"
+                                            data-start-date="{{ $batch->start_date }}"
+                                            data-end-date="{{ $batch->end_date }}"
                                             aria-label="Edit batch">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -488,6 +490,8 @@
                     const semester = button.getAttribute('data-semester');
                     const batchName = button.getAttribute('data-batch');
                     const status = button.getAttribute('data-status');
+                    const startDate = button.getAttribute('data-start-date');
+                    const endDate = button.getAttribute('data-end-date');
 
                     modalTitle.textContent = 'Edit Batch';
                     batchId.value = id;
@@ -495,6 +499,10 @@
                     // Set department and trigger change event to load programs
                     departmentSelect.value = departmentId;
                     departmentSelect.dispatchEvent(new Event('change'));
+
+                    // Set the date fields
+                    document.getElementById('startDate').value = startDate;
+                    document.getElementById('endDate').value = endDate;
 
                     // We need to wait for programs to load before setting program value
                     setTimeout(() => {

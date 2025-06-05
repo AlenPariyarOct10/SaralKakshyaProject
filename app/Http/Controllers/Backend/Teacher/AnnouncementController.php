@@ -128,6 +128,9 @@ class AnnouncementController extends Controller
         })->get();
 
         $announcement = Announcement::findOrFail($id);
+
+
+
         return view('backend.teacher.announcement.show', compact('user','programs', 'announcement'));
     }
 

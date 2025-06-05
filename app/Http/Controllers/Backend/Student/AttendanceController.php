@@ -43,7 +43,10 @@ class AttendanceController extends Controller
                 'holidays' => [],
                 'classSessions' => [],
                 'currentMonth' => Carbon::now()->format('F Y'),
-                'calendarData' => []
+                'calendarData' => [],
+                'monthlyTrend' => [],
+                'startDate' => null,
+                'endDate' => null,
             ]);
         }
 
@@ -60,12 +63,19 @@ class AttendanceController extends Controller
             $endDate = Carbon::parse($endDate);
         }
 
+        $today = Carbon::today();
+
         // Get class sessions from InstituteSession where type = 'class'
         $classSessions = InstituteSession::where('institute_id', $instituteId)
             ->where('status', 'class')
             ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('date', 'asc')
             ->get();
+
+        // Filter class sessions only up to today for attendance calculation
+        $classSessionsUpToToday = $classSessions->filter(function ($session) use ($today) {
+            return Carbon::parse($session->date)->lte($today);
+        });
 
         // Get holidays from InstituteSession where type = 'holiday'
         $holidays = InstituteSession::where('institute_id', $instituteId)
@@ -81,10 +91,10 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        // Create a comprehensive attendance analysis
-        $attendanceAnalysis = $this->analyzeAttendance($classSessions, $attendanceRecords, $holidays);
+        // Create a comprehensive attendance analysis (only up to today)
+        $attendanceAnalysis = $this->analyzeAttendance($classSessionsUpToToday, $attendanceRecords, $holidays);
 
-        // Prepare calendar data
+        // Prepare calendar data (can include full month)
         $calendarData = $this->prepareCalendarData($classSessions, $attendanceRecords, $holidays, $startDate);
 
         // Get monthly trend data (last 6 months)

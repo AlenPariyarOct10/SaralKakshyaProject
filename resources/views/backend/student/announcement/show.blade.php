@@ -85,7 +85,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                        {{ $attachment->original_name }}
+                                        {{ $attachment->title ?? 'Untitled' }}
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $attachment->size_formatted }}

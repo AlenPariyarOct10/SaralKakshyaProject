@@ -1,5 +1,7 @@
 @extends("backend.layout.teacher-dashboard-layout")
 
+@section('title', 'View Announcements')
+
 @section('content')
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
@@ -8,22 +10,15 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 md:mb-0">Announcements</h3>
 
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="relative">
-                        <select id="classFilter" class="w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                            <option value="">All Classes</option>
-                            <option value="math">Mathematics</option>
-                            <option value="physics">Physics</option>
-                            <option value="cs">Computer Science</option>
-                            <option value="history">History</option>
-                            <option value="english">English</option>
-                        </select>
-                    </div>
-
+                <div class="flex flex-row md:flex-row gap-4">
                     <div class="relative">
                         <input type="text" id="searchAnnouncement" placeholder="Search announcements..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                     </div>
+                    <a href="{{route('teacher.announcement.create')}}" class="mt-4 md:mt-0 btn-primary flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Create New Announcement
+                    </a>
                 </div>
+
             </div>
 
 

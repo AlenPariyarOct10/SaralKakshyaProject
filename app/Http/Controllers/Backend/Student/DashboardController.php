@@ -5,6 +5,12 @@ namespace App\Http\Controllers\Backend\Student;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Announcement;
+use App\Models\Assignment;
+use App\Models\Attendance;
+use App\Models\ClassRoutine;
+use App\Models\InstituteSession;
+use App\Models\InstituteStudent;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,6 +22,16 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::guard('student')->user();
+        $instituteId = session('institute_id');
+
+        $assignments = Assignment::with(['subject', 'batch', 'assignmentSubmissions', 'attachments'])
+            ->where('batch_id', $user->batch_id)
+            ->where('status', 'active')
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        $rate = $this->monthlyAttendanceRate();
+
 
         $activityLog = ActivityLog::where('user_id', $user->id)
             ->where('user_type', 'student')
@@ -38,8 +54,55 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('backend.student.dashboard', compact('user', 'activityLog', 'announcements'));
+        return view('backend.student.dashboard', compact('assignments','rate','user', 'activityLog', 'announcements'));
     }
+
+    public function monthlyAttendanceRate()
+    {
+        $user = Auth::user();
+        $studentId = $user->id;
+
+        $instituteStudent = InstituteStudent::where('student_id', $studentId)
+            ->where('is_approved', true)
+            ->first();
+
+        if (!$instituteStudent) {
+            return 0;
+        }
+
+        $instituteId = $instituteStudent->institute_id;
+        $today = Carbon::today();
+        $startOfMonth = $today->copy()->startOfMonth();
+
+        // Get valid class session dates within the current month up to today
+        $classSessions = InstituteSession::where('institute_id', $instituteId)
+            ->where('status', 'class')
+            ->whereBetween('date', [$startOfMonth, $today])
+            ->pluck('date')
+            ->toArray();
+
+        $totalClassDays = count($classSessions);
+
+        if ($totalClassDays === 0) {
+            return 0;
+        }
+
+        // Get attendance records for present or late days
+        $presentDays = Attendance::where('attendee_id', $studentId)
+            ->where('attendee_type', 'student')
+            ->where('institute_id', $instituteId)
+            ->whereBetween('date', [$startOfMonth, $today])
+            ->whereIn('status', ['present', 'late'])
+            ->whereIn('date', $classSessions)
+            ->count();
+
+        // Calculate percentage
+        $attendancePercentage = ($presentDays / $totalClassDays) * 100;
+
+        return round($attendancePercentage, 2); // e.g. 85.75%
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

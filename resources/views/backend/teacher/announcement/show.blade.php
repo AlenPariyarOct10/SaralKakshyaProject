@@ -4,6 +4,8 @@
     $user = \Illuminate\Support\Facades\Auth::user();
 @endphp
 
+@section("title", $announcement->title)
+
 @section('username')
     {{$user->fname}} {{$user->lname}}
 @endsection
@@ -91,7 +93,7 @@
                                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ $announcement->title }}</h2>
                                 <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
                                 <span class="mr-4">
-                                    <i class="fas fa-user mr-1"></i> Posted by {{ ucfirst($announcement->creator_type) }}
+                                    <i class="fas fa-user mr-1"></i> Posted by {{ ucfirst($announcement->creator_type) }} ({{$announcement->teacher}})
                                 </span>
                                     <span class="mr-4">
                                     <i class="fas fa-calendar mr-1"></i> {{ $announcement->created_at->format('M d, Y h:i A') }}
