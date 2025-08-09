@@ -212,9 +212,7 @@
                     <button class="tab-button active" data-tab="batches">
                         <i class="fas fa-layer-group mr-2"></i> Batches <span class="ml-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5">{{ $program->batches->count() }}</span>
                     </button>
-                    <button class="tab-button" data-tab="sections">
-                        <i class="fas fa-th-large mr-2"></i> Sections <span class="ml-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5">{{ $program->sections->count() }}</span>
-                    </button>
+
                     <button class="tab-button" data-tab="subjects">
                         <i class="fas fa-book mr-2"></i> Subjects <span class="ml-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5">{{ $program->subjects->count() }}</span>
                     </button>
@@ -273,58 +271,6 @@
                     @endif
                 </div>
 
-                <!-- Sections Tab -->
-                <div id="sections-tab" class="tab-content">
-
-                    @if($program->sections->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col" class="table-header">Section Name</th>
-                                    <th scope="col" class="table-header">Status</th>
-                                    <th scope="col" class="table-header">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @foreach($program->sections as $section)
-                                    <tr>
-                                        <td class="table-cell font-medium">{{ $section->section_name }}</td>
-                                        <td class="table-cell">
-                                            @if($section->status == 1)
-                                                <span class="badge bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Active</span>
-                                            @else
-                                                <span class="badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
-                                            @endif
-                                        </td>
-                                        <td class="table-cell">
-                                            <div class="flex items-center space-x-2">
-                                                <button class="edit-section-btn p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full" data-id="{{ $section->id }}" aria-label="Edit section">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="delete-section-btn p-1.5 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full" data-id="{{ $section->id }}" aria-label="Delete section">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <div class="mb-3 text-gray-400 dark:text-gray-500">
-                                <i class="fas fa-th-large text-5xl"></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No Sections Found</h3>
-                            <p class="text-gray-500 dark:text-gray-400 mb-4">There are no sections associated with this program yet.</p>
-                            <button id="createSectionBtn" class="btn-primary">
-                                <i class="fas fa-plus mr-2"></i> Create First Section
-                            </button>
-                        </div>
-                    @endif
-                </div>
 
                 <!-- Subjects Tab -->
                 <div id="subjects-tab" class="tab-content">
@@ -530,13 +476,7 @@
                         <input type="text" id="sectionName" name="section_name" class="form-input" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="sectionStatus" class="form-label">Status</label>
-                        <select id="sectionStatus" name="status" class="form-input" required>
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                    </div>
+
 
                     <div class="flex justify-end space-x-2">
                         <button type="button" class="btn-secondary" onclick="closeEditSectionModal()">Cancel</button>
@@ -697,62 +637,9 @@
             const closeEditSectionModal = document.getElementById('closeEditSectionModal');
             const editSectionForm = document.getElementById('editSectionForm');
 
-            document.querySelectorAll('.edit-section-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const sectionId = btn.getAttribute('data-id');
-                    try {
-                        const response = await fetch(`/admin/sections/${sectionId}/edit`);
-                        const data = await response.json();
-
-                        document.getElementById('editSectionId').value = data.id;
-                        document.getElementById('sectionName').value = data.section_name;
-                        document.getElementById('sectionStatus').value = data.status;
-
-                        editSectionModal.classList.remove('hidden');
-                    } catch (error) {
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Failed to load section data'
-                        });
-                    }
-                });
-            });
 
             closeEditSectionModal.addEventListener('click', () => {
                 editSectionModal.classList.add('hidden');
-            });
-
-            editSectionForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const sectionId = document.getElementById('editSectionId').value;
-                const formData = new FormData(editSectionForm);
-
-                try {
-                    const response = await fetch(`/admin/sections/${sectionId}`, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Section updated successfully'
-                        });
-                        location.reload();
-                    } else {
-                        throw new Error(data.message || 'Failed to update section');
-                    }
-                } catch (error) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: error.message
-                    });
-                }
             });
 
             // Delete Functionality

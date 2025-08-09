@@ -18,7 +18,7 @@
 @section('profile_picture')
     {{$user->profile_picture}}
 @endsection
-
+@section("title", "Create Subject")
 @push("styles")
     <script>
         tailwind.config = {

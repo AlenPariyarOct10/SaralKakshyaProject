@@ -2,7 +2,7 @@
 @extends('backend.layout.student-dashboard-layout')
 @php $user = Auth::user(); @endphp
 @section('username', $user->fname . ' ' . $user->lname)
-
+@section("title", "Assignment")
 @section('content')
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto">

@@ -1,5 +1,8 @@
 @extends("backend.layout.admin-dashboard-layout")
 
+@section("title")
+    Class Routines
+@endsection
 
 @section('content')
     <div class="container mx-auto p-4 overflow-scroll">

@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{$system->name}} - {{$system->description}}</title>
+    <title>{{$system->name}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{asset('js/swiper.js')}}"></script>
     <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
+    <link rel="shortcut icon" href="{{asset("assets/images/logo-square.png")}}" type="image/x-icon">
 
     <script>
         tailwind.config = {
@@ -272,15 +273,6 @@
 
         <div class="mt-16">
             <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-                <div class="relative">
-                    <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Virtual Classrooms</p>
-                    <div class="mt-2 ml-16 text-base text-gray-500">
-                        Conduct live classes with interactive whiteboards, screen sharing, and breakout rooms for group activities.
-                    </div>
-                </div>
 
                 <div class="relative">
                     <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
@@ -302,15 +294,7 @@
                     </div>
                 </div>
 
-                <div class="relative">
-                    <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Communication Tools</p>
-                    <div class="mt-2 ml-16 text-base text-gray-500">
-                        Built-in messaging, announcements, and discussion forums for seamless communication.
-                    </div>
-                </div>
+
 
                 <div class="relative">
                     <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">

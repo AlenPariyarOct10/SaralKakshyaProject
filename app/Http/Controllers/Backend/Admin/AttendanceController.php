@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\Institute;
 use App\Models\Program;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -310,5 +311,88 @@ class AttendanceController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Bulk attendance marked successfully!']);
+    }
+
+    /**
+     * Show the location setup page
+     */
+    public function showLocationSetup()
+    {
+        $user = Auth::guard('admin')->user();
+        $instituteId = session()->get('institute_id');
+        $institute = Institute::find($instituteId);
+
+        return view('backend.admin.location.show', compact('user', 'institute'));
+    }
+
+    /**
+     * Update the institute location
+     */
+    public function updateLocation(Request $request)
+    {
+        $request->validate([
+            'institute_id' => 'required|exists:institutes,id',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'threshold' => 'required|integer|min:10|max:1000'
+        ]);
+
+        $institute = Institute::findOrFail($request->institute_id);
+
+        // Check if user has permission to update this institute
+        if (session()->get('institute_id') != $institute->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update this institute.'
+            ], 403);
+        }
+
+        $institute->update([
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'threshold' => $request->threshold
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location updated successfully',
+            'data' => [
+                'latitude' => $institute->latitude,
+                'longitude' => $institute->longitude,
+                'threshold' => $institute->threshold,
+                'updated_at' => $institute->updated_at->format('M d, Y h:i A')
+            ]
+        ]);
+    }
+
+    /**
+     * Delete the institute location
+     */
+    public function deleteLocation(Request $request)
+    {
+        $request->validate([
+            'institute_id' => 'required|exists:institutes,id'
+        ]);
+
+        $institute = Institute::findOrFail($request->institute_id);
+
+        // Check if user has permission to update this institute
+        if (session()->get('institute_id') != $institute->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update this institute.'
+            ], 403);
+        }
+
+        $institute->update([
+            'latitude' => null,
+            'longitude' => null,
+            'threshold' => null
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location reset successfully'
+        ]);
     }
 }

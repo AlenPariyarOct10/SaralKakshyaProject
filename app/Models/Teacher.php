@@ -59,6 +59,17 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         return $this->belongsTo(User::class);
     }
 
+    public function teachingBatches()
+    {
+        // Get all subject IDs this teacher is assigned to
+        $subjectIds = $this->subjectTeacherMappings()->pluck('subject_id');
+
+        // Get unique batches through the subjects
+        return Batch::whereHas('subjects', function($query) use ($subjectIds) {
+            $query->whereIn('id', $subjectIds);
+        })->get();
+    }
+
     public function availabilities()
     {
         return $this->hasMany(TeacherAvailability::class);

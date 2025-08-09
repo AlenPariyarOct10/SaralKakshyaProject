@@ -13,7 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{asset('css/swiper.css')}}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    <link rel="shortcut icon" href="{{asset("assets/images/logo-square.png")}}" type="image/x-icon">
     @livewireStyles
     <script src="{{asset('js/sweetalert.js')}}"></script>
     <script src="{{asset('js/swiper.js')}}"></script>

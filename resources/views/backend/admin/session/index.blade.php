@@ -15,9 +15,6 @@
 @endsection
 
 @section('content')
-    <!-- Include FullCalendar CSS -->
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
-
     <!-- Main Content Area -->
     <main class="scrollable-content p-4 md:p-6">
         <!-- Session Management Header -->
@@ -27,9 +24,6 @@
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage all sessions for {{$institute->name}}</p>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
-                <button onclick="toggleView()" class="btn-secondary" id="viewToggleBtn">
-                    <i class="fas fa-table mr-2"></i> Table View
-                </button>
                 <button onclick="addAllSaturdaysAsHoliday()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors">
                     <i class="fas fa-calendar-times mr-2"></i> Add All Saturdays as Holiday
                 </button>
@@ -46,19 +40,19 @@
                 <div class="flex flex-wrap gap-4">
                     <div class="flex items-center">
                         <div class="w-4 h-4 rounded mr-2" style="background-color: #3b82f6;"></div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Class</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">📚 Class</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-4 h-4 rounded mr-2" style="background-color: #ef4444;"></div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Holiday</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">🏖️ Holiday</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-4 h-4 rounded mr-2" style="background-color: #f59e0b;"></div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Exam</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">📝 Exam</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-4 h-4 rounded mr-2" style="background-color: #10b981;"></div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Event</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">🎉 Event</span>
                     </div>
                 </div>
             </div>
@@ -66,104 +60,256 @@
 
         <!-- Filters and Search -->
         <div class="card mb-6">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <label for="search" class="sr-only">Search</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+            <div class="p-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label for="search" class="sr-only">Search</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input id="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white" placeholder="Search sessions..." type="search">
                         </div>
-                        <input id="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white" placeholder="Search sessions..." type="search">
+                    </div>
+                    <div class="w-full md:w-48">
+                        <label for="statusFilter" class="sr-only">Status</label>
+                        <select id="statusFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                            <option value="">All Types</option>
+                            <option value="class">Class</option>
+                            <option value="holiday">Holiday</option>
+                            <option value="exam">Exam</option>
+                            <option value="event">Event</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-48">
+                        <label for="monthFilter" class="sr-only">Month Filter</label>
+                        <select id="monthFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                            <option value="">All Months</option>
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ date('n') == $i ? 'selected' : '' }}>
+                                    {{ date('F', mktime(0, 0, 0, $i, 1)) }}
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="w-full md:w-48">
+                        <label for="yearFilter" class="sr-only">Year Filter</label>
+                        <select id="yearFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                            <option value="">All Years</option>
+                            @for($year = date('Y') - 1; $year <= date('Y') + 2; $year++)
+                                <option value="{{ $year }}" {{ date('Y') == $year ? 'selected' : '' }}>
+                                    {{ $year }}
+                                </option>
+                            @endfor
+                        </select>
                     </div>
                 </div>
-                <div class="w-full md:w-48">
-                    <label for="statusFilter" class="sr-only">Status</label>
-                    <select id="statusFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        <option value="">All Types</option>
-                        <option value="class">Class</option>
-                        <option value="holiday">Holiday</option>
-                        <option value="exam">Exam</option>
-                        <option value="event">Event</option>
-                    </select>
+            </div>
+        </div>
+
+        <!-- Sessions Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <span class="text-white text-sm">📚</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Classes</dt>
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white" id="classCount">
+                                    {{ $sessions->where('status', 'class')->count() }}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-full md:w-48">
-                    <label for="date-range" class="sr-only">Date Range</label>
-                    <select id="date-range" class="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                        <option value="month">Month View</option>
-                        <option value="week">Week View</option>
-                        <option value="day">Day View</option>
-                        <option value="list">List View</option>
-                    </select>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                                <span class="text-white text-sm">🏖️</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Holidays</dt>
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white" id="holidayCount">
+                                    {{ $sessions->where('status', 'holiday')->count() }}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <span class="text-white text-sm">📝</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Exams</dt>
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white" id="examCount">
+                                    {{ $sessions->where('status', 'exam')->count() }}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <span class="text-white text-sm">🎉</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Events</dt>
+                                <dd class="text-lg font-medium text-gray-900 dark:text-white" id="eventCount">
+                                    {{ $sessions->where('status', 'event')->count() }}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Calendar View -->
-        <div class="card" id="calendarView">
-            <div class="p-4">
-                <div id="mainCalendar" class="bg-white dark:bg-gray-800 rounded-lg"></div>
+        <!-- Sessions Table -->
+        <div class="card">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">All Sessions</h3>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        Total: <span id="totalCount">{{ $sessions->count() }}</span> sessions
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Table View (Hidden by default) -->
-        <div class="card hidden" id="tableView">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <button onclick="sortTable('date')" class="flex items-center hover:text-gray-700 dark:hover:text-gray-100">
+                                Date & Time
+                                <i class="fas fa-sort ml-1"></i>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <button onclick="sortTable('status')" class="flex items-center hover:text-gray-700 dark:hover:text-gray-100">
+                                Status
+                                <i class="fas fa-sort ml-1"></i>
+                            </button>
+                        </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Notes</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($sessions as $session)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="sessionsTableBody">
+                    @forelse($sessions->sortBy('date') as $session)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors session-row"
+                            data-status="{{ $session->status ?? 'class' }}"
+                            data-date="{{ $session->date }}"
+                            data-month="{{ date('n', strtotime($session->date)) }}"
+                            data-year="{{ date('Y', strtotime($session->date)) }}"
+                            data-search="{{ strtolower(($session->notes ?? '') . ' ' . ($session->status ?? 'class')) }}">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ date('M d, Y', strtotime($session->date)) }}
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ date('h:i A', strtotime($session->start_time)) }} - {{ date('h:i A', strtotime($session->end_time)) }}
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ date('M d, Y', strtotime($session->date)) }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ date('l', strtotime($session->date)) }} •
+                                            {{ date('h:i A', strtotime($session->start_time)) }} - {{ date('h:i A', strtotime($session->end_time)) }}
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded mr-2" style="background-color: {{
+                                    <div class="w-3 h-3 rounded-full mr-3" style="background-color: {{
                                         $session->status === 'class' ? '#3b82f6' :
                                         ($session->status === 'holiday' ? '#ef4444' :
                                         ($session->status === 'exam' ? '#f59e0b' :
                                         ($session->status === 'event' ? '#10b981' : '#6b7280')))
                                     }};"></div>
-                                    <span class="text-sm text-gray-900 dark:text-white">
-                                        {{ ucfirst($session->status ?? 'class') }}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="
+                                        background-color: {{
+                                            $session->status === 'class' ? '#dbeafe' :
+                                            ($session->status === 'holiday' ? '#fee2e2' :
+                                            ($session->status === 'exam' ? '#fef3c7' :
+                                            ($session->status === 'event' ? '#d1fae5' : '#f3f4f6')))
+                                        }};
+                                        color: {{
+                                            $session->status === 'class' ? '#1e40af' :
+                                            ($session->status === 'holiday' ? '#dc2626' :
+                                            ($session->status === 'exam' ? '#d97706' :
+                                            ($session->status === 'event' ? '#059669' : '#374151')))
+                                        }};
+                                    ">
+                                        @switch($session->status ?? 'class')
+                                            @case('class') 📚 Class @break
+                                            @case('holiday') 🏖️ Holiday @break
+                                            @case('exam') 📝 Exam @break
+                                            @case('event') 🎉 Event @break
+                                            @default 📅 Session
+                                        @endswitch
                                     </span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900 dark:text-white truncate max-w-xs">
-                                    {{ $session->notes ?? 'No notes' }}
+                                <div class="text-sm text-gray-900 dark:text-white">
+                                    @if($session->notes)
+                                        <div class="max-w-xs truncate" title="{{ $session->notes }}">
+                                            {{ $session->notes }}
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 italic">No notes</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end space-x-2">
-                                    <button onclick="viewSession({{ $session->id }})" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300" title="View">
+                                    <button onclick="viewSession({{ $session->id }})" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button onclick="editSession({{ $session->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" title="Edit">
+                                    <button onclick="editSession({{ $session->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 p-1 rounded" title="Edit Session">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="confirmDeleteSession({{ $session->id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Delete">
+                                    <button onclick="confirmDeleteSession({{ $session->id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded" title="Delete Session">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
-                                No sessions found. <button onclick="showSessionModal()" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">Schedule one</button>
+                        <tr id="noSessionsRow">
+                            <td colspan="4" class="px-6 py-12 text-center">
+                                <div class="text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+                                    <p class="text-lg font-medium mb-2">No sessions found</p>
+                                    <p class="text-sm mb-4">Get started by scheduling your first session</p>
+                                    <button onclick="showSessionModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Schedule Session
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -175,7 +321,7 @@
 
     <!-- Schedule Session Modal -->
     <div id="sessionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="w-full max-w-6xl mx-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 space-y-6 max-h-[90vh] overflow-y-auto">
+        <div class="w-full max-w-4xl mx-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Schedule New Sessions</h2>
                 <button onclick="hideSessionModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -183,28 +329,63 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Calendar Section -->
-                <div class="lg:col-span-2">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Date Selection Section -->
+                <div>
                     <div class="mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Select Dates</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Click on dates to select multiple days for your sessions</p>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Select Date Range</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Choose start and end dates for your sessions</p>
                     </div>
-                    <div id="schedulingCalendar" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"></div>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                                <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            <div>
+                                <label for="endDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
+                                <input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Days of Week</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="1" class="dayCheckbox mr-2"> Mon
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="2" class="dayCheckbox mr-2"> Tue
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="3" class="dayCheckbox mr-2"> Wed
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="4" class="dayCheckbox mr-2"> Thu
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="5" class="dayCheckbox mr-2"> Fri
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="6" class="dayCheckbox mr-2"> Sat
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="0" class="dayCheckbox mr-2"> Sun
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="selectedDatesPreview" class="p-3 bg-gray-50 dark:bg-gray-800 rounded-md min-h-[60px]">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Select dates to see preview</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Session Details Section -->
                 <div class="space-y-6">
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Session Details</h3>
-
-                        <!-- Selected Dates Display -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Dates</label>
-                            <div id="selectedDates" class="min-h-[60px] p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">No dates selected</p>
-                            </div>
-                        </div>
 
                         <!-- Time Settings -->
                         <div class="grid grid-cols-2 gap-3 mb-4">
@@ -222,10 +403,10 @@
                         <div class="mb-4">
                             <label for="sessionStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                             <select id="sessionStatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md focus:ring-primary-500 focus:border-primary-500">
-                                <option value="class">Class</option>
-                                <option value="holiday">Holiday</option>
-                                <option value="exam">Exam</option>
-                                <option value="event">Event</option>
+                                <option value="class">📚 Class</option>
+                                <option value="holiday">🏖️ Holiday</option>
+                                <option value="exam">📝 Exam</option>
+                                <option value="event">🎉 Event</option>
                             </select>
                         </div>
 
@@ -237,11 +418,14 @@
 
                         <!-- Action Buttons -->
                         <div class="space-y-3">
+                            <button onclick="previewSessions()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <i class="fas fa-eye mr-2"></i>Preview Sessions
+                            </button>
                             <button onclick="saveSessions()" class="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed" id="saveButton" disabled>
                                 <i class="fas fa-save mr-2"></i>Save Sessions
                             </button>
-                            <button onclick="clearSelection()" class="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
-                                <i class="fas fa-eraser mr-2"></i>Clear Selection
+                            <button onclick="clearSessionForm()" class="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                                <i class="fas fa-eraser mr-2"></i>Clear Form
                             </button>
                         </div>
                     </div>
@@ -280,10 +464,10 @@
                 <div>
                     <label for="editStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                     <select id="editStatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md focus:ring-primary-500 focus:border-primary-500">
-                        <option value="class">Class</option>
-                        <option value="holiday">Holiday</option>
-                        <option value="exam">Exam</option>
-                        <option value="event">Event</option>
+                        <option value="class">📚 Class</option>
+                        <option value="holiday">🏖️ Holiday</option>
+                        <option value="exam">📝 Exam</option>
+                        <option value="event">🎉 Event</option>
                     </select>
                 </div>
 
@@ -359,8 +543,6 @@
         </div>
     </div>
 
-
-
     <!-- Add Saturdays as Holiday Modal -->
     <div id="saturdayHolidayModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="w-full max-w-lg mx-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -404,55 +586,33 @@
         </div>
     </div>
 
-
 @endsection
 
 @section('scripts')
-    <!-- Include FullCalendar JS -->
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-
     <script>
-        let mainCalendar;
-        let schedulingCalendar;
-        let selectedDates = [];
-        let currentView = 'calendar';
         let currentSessionId = null;
         let editingSessionId = null;
+        let selectedDates = [];
+        let sortDirection = 'asc';
+        let sortColumn = 'date';
 
-        // Sample session data - replace with your actual data from Laravel
+        // Sessions data from Laravel
         const sessionsData = [
                 @foreach($sessions as $session)
             {
-                id: '{{ $session->id }}',
-                title: '{{ ucfirst($session->status ?? "Session") }}',
-                start: '{{ \Carbon\Carbon::parse($session->date)->format("Y-m-d") }}T{{ $session->start_time }}',
-                end: '{{ \Carbon\Carbon::parse($session->date)->format("Y-m-d") }}T{{ $session->end_time }}',
-                backgroundColor: getEventColor('{{ $session->status ?? "class" }}'),
-                borderColor: getEventColor('{{ $session->status ?? "class" }}'),
-                extendedProps: {
-                    status: '{{ $session->status ?? "class" }}',
-                    notes: {!! json_encode($session->notes ?? "") !!}
-                }
+                id: {{ $session->id }},
+                date: '{{ $session->date }}',
+                start_time: '{{ $session->start_time }}',
+                end_time: '{{ $session->end_time }}',
+                status: '{{ $session->status ?? "class" }}',
+                notes: {!! json_encode($session->notes ?? '') !!}
             }@if(!$loop->last),@endif
             @endforeach
         ];
 
-        console.log(sessionsData);
-
-        function getEventColor(status) {
-            switch( (status.toLowerCase()) ) {
-                case 'class': return '#3b82f6';      // Blue
-                case 'holiday': return '#ef4444';    // Red
-                case 'exam': return '#f59e0b';       // Amber
-                case 'event': return '#10b981';      // Green
-                default: return '#6b7280';           // Gray
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
-            initializeMainCalendar();
-            initializeSchedulingCalendar();
             setDefaultDates();
+            initializeFilters();
         });
 
         function setDefaultDates() {
@@ -462,119 +622,259 @@
 
             document.getElementById('saturdayStartDate').value = startOfYear.toISOString().split('T')[0];
             document.getElementById('saturdayEndDate').value = endOfYear.toISOString().split('T')[0];
+            document.getElementById('startDate').value = today.toISOString().split('T')[0];
+            document.getElementById('endDate').value = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         }
 
-        function initializeMainCalendar() {
-            const calendarEl = document.getElementById('mainCalendar');
-
-            mainCalendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 'auto',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-                },
-                events: sessionsData,
-                eventClick: function(info) {
-                    showSessionDetails(info.event);
-                },
-                eventMouseEnter: function(info) {
-                    info.el.style.opacity = '0.8';
-                },
-                eventMouseLeave: function(info) {
-                    info.el.style.opacity = '1';
-                },
-                dayMaxEvents: 3,
-                moreLinkClick: 'popover',
-                eventDisplay: 'block'
+        function initializeFilters() {
+            // Search filter
+            document.getElementById('search').addEventListener('input', function(e) {
+                filterSessions();
             });
 
-            mainCalendar.render();
-            addCalendarStyles();
-        }
-
-        function initializeSchedulingCalendar() {
-            const calendarEl = document.getElementById('schedulingCalendar');
-
-            schedulingCalendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 'auto',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,listWeek'
-                },
-                selectable: true,
-                selectMirror: true,
-                dayMaxEvents: true,
-                weekends: true,
-
-                dateClick: function(info) {
-                    const dateStr = info.dateStr;
-
-                    if (selectedDates.includes(dateStr)) {
-                        selectedDates = selectedDates.filter(date => date !== dateStr);
-                        info.dayEl.classList.remove('selected-date');
-                    } else {
-                        selectedDates.push(dateStr);
-                        info.dayEl.classList.add('selected-date');
-                    }
-
-                    updateSelectedDatesDisplay();
-                    updateSaveButton();
-                }
+            // Status filter
+            document.getElementById('statusFilter').addEventListener('change', function(e) {
+                filterSessions();
             });
 
-            schedulingCalendar.render();
+            // Month filter
+            document.getElementById('monthFilter').addEventListener('change', function(e) {
+                filterSessions();
+            });
+
+            // Year filter
+            document.getElementById('yearFilter').addEventListener('change', function(e) {
+                filterSessions();
+            });
+
+            // Date range inputs for session creation
+            document.getElementById('startDate').addEventListener('change', previewSessions);
+            document.getElementById('endDate').addEventListener('change', previewSessions);
+            document.querySelectorAll('.dayCheckbox').forEach(checkbox => {
+                checkbox.addEventListener('change', previewSessions);
+            });
         }
 
-        function addCalendarStyles() {
-            const style = document.createElement('style');
-            style.textContent = `
-                .selected-date {
-                    background-color: #3b82f6 !important;
-                    color: white !important;
-                }
-                .fc-day-today {
-                    background-color: #fef3c7 !important;
+        function filterSessions() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+
+            const rows = document.querySelectorAll('.session-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                const date = row.dataset.date;
+                const month = row.dataset.month;
+                const year = row.dataset.year;
+                const searchText = row.dataset.search;
+
+                let show = true;
+
+                // Search filter
+                if (searchTerm && !searchText.includes(searchTerm)) {
+                    show = false;
                 }
 
-                .dark .fc-day-today {
-                    background-color: #451a03 !important;
+                // Status filter
+                if (statusFilter && status !== statusFilter) {
+                    show = false;
                 }
-                .fc-theme-standard td, .fc-theme-standard th {
-                    border-color: #e5e7eb;
+
+                // Month filter
+                if (monthFilter && month != monthFilter) {
+                    show = false;
                 }
-                .dark .fc-theme-standard td, .dark .fc-theme-standard th {
-                    border-color: #374151;
+
+                // Year filter
+                if (yearFilter && year != yearFilter) {
+                    show = false;
                 }
-                .dark .fc-daygrid-day-number {
-                    color: #d1d5db;
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            // Update total count
+            document.getElementById('totalCount').textContent = visibleCount;
+
+            // Show/hide no results message
+            const noSessionsRow = document.getElementById('noSessionsRow');
+            if (noSessionsRow) {
+                noSessionsRow.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        }
+
+        function sortTable(column) {
+            const tbody = document.getElementById('sessionsTableBody');
+            const rows = Array.from(tbody.querySelectorAll('.session-row'));
+
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                if (column === 'date') {
+                    aValue = new Date(a.dataset.date);
+                    bValue = new Date(b.dataset.date);
+                } else if (column === 'status') {
+                    aValue = a.dataset.status;
+                    bValue = b.dataset.status;
                 }
-                .dark .fc-col-header-cell-cushion {
-                    color: #d1d5db;
+
+                if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Clear tbody and append sorted rows
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Add no sessions row if needed
+            if (rows.length === 0) {
+                const noSessionsRow = document.createElement('tr');
+                noSessionsRow.id = 'noSessionsRow';
+                noSessionsRow.innerHTML = `
+                    <td colspan="4" class="px-6 py-12 text-center">
+                        <div class="text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+                            <p class="text-lg font-medium mb-2">No sessions found</p>
+                            <p class="text-sm mb-4">Get started by scheduling your first session</p>
+                            <button onclick="showSessionModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                <i class="fas fa-plus mr-2"></i>
+                                Schedule Session
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(noSessionsRow);
+            }
+        }
+
+        function previewSessions() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            const selectedDays = Array.from(document.querySelectorAll('.dayCheckbox:checked')).map(cb => parseInt(cb.value));
+
+            if (!startDate || !endDate || selectedDays.length === 0) {
+                document.getElementById('selectedDatesPreview').innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">Select dates and days to see preview</p>';
+                document.getElementById('saveButton').disabled = true;
+                return;
+            }
+
+            selectedDates = [];
+            const current = new Date(startDate);
+
+            while (current <= endDate) {
+                if (selectedDays.includes(current.getDay())) {
+                    selectedDates.push(current.toISOString().split('T')[0]);
                 }
-                .dark .fc-toolbar-title {
-                    color: #f9fafb;
-                }
-                .dark .fc-button {
-                    background-color: #374151;
-                    border-color: #4b5563;
-                    color: #f9fafb;
-                }
-                .dark .fc-button:hover {
-                    background-color: #4b5563;
-                }
-                .fc-event {
-                    cursor: pointer;
-                    transition: opacity 0.2s;
-                }
-                .fc-event:hover {
-                    opacity: 0.8 !important;
-                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            if (selectedDates.length === 0) {
+                document.getElementById('selectedDatesPreview').innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No dates match the selected criteria</p>';
+                document.getElementById('saveButton').disabled = true;
+                return;
+            }
+
+            const preview = selectedDates.slice(0, 10).map(date => {
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                return `<span class="inline-block bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 px-2 py-1 rounded text-xs mr-2 mb-2">${formattedDate}</span>`;
+            }).join('');
+
+            const moreText = selectedDates.length > 10 ? `<p class="text-xs text-gray-500 mt-2">...and ${selectedDates.length - 10} more dates</p>` : '';
+
+            document.getElementById('selectedDatesPreview').innerHTML = `
+                <div class="flex flex-wrap">${preview}</div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">${selectedDates.length} session(s) will be created</p>
+                ${moreText}
             `;
-            document.head.appendChild(style);
+
+            document.getElementById('saveButton').disabled = false;
+        }
+
+        function saveSessions() {
+            if (selectedDates.length === 0) {
+                alert('Please select at least one date.');
+                return;
+            }
+
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const status = document.getElementById('sessionStatus').value;
+            const notes = document.getElementById('sessionNotes').value;
+
+            if (startTime >= endTime) {
+                alert('End time must be after start time.');
+                return;
+            }
+
+            const sessionsData = {
+                dates: selectedDates,
+                start_time: startTime,
+                end_time: endTime,
+                status: status,
+                notes: notes,
+                _token: '{{ csrf_token() }}'
+            };
+
+            const saveBtn = document.getElementById('saveButton');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            saveBtn.disabled = true;
+
+            fetch('/admin/sessions/bulk-create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(sessionsData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Sessions created successfully!');
+                        hideSessionModal();
+                        location.reload();
+                    } else {
+                        alert('Error creating sessions: ' + (data.message || 'Unknown error'));
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving sessions.');
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                });
+        }
+
+        function clearSessionForm() {
+            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            document.getElementById('startTime').value = '09:00';
+            document.getElementById('endTime').value = '10:00';
+            document.getElementById('sessionStatus').value = 'class';
+            document.getElementById('sessionNotes').value = '';
+            document.querySelectorAll('.dayCheckbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectedDatesPreview').innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">Select dates to see preview</p>';
+            document.getElementById('saveButton').disabled = true;
+            selectedDates = [];
         }
 
         // Saturday Holiday Functions
@@ -601,7 +901,7 @@
             const current = new Date(startDate);
 
             while (current <= endDate) {
-                if (current.getDay() === 6) { // Saturday
+                if (current.getDay() === 6) {
                     saturdays.push(new Date(current));
                 }
                 current.setDate(current.getDate() + 1);
@@ -609,7 +909,10 @@
 
             const saturdayList = document.getElementById('saturdayList');
             saturdayList.innerHTML = saturdays.map(date =>
-                `<div class="mb-1">${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>`
+                `<div class="mb-1 flex items-center">
+                    <span class="text-red-500 mr-2">🏖️</span>
+                    ${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>`
             ).join('');
 
             document.getElementById('saturdayPreview').classList.remove('hidden');
@@ -640,7 +943,11 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            // API call to create Saturday holidays
+            const addBtn = document.getElementById('addSaturdaysBtn');
+            const originalText = addBtn.innerHTML;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding Holidays...';
+            addBtn.disabled = true;
+
             fetch('/admin/sessions/bulk-create', {
                 method: 'POST',
                 headers: {
@@ -656,44 +963,74 @@
                         hideSaturdayHolidayModal();
                         location.reload();
                     } else {
-                        alert('Error creating Saturday holidays: ' + data.message);
+                        alert('Error creating Saturday holidays: ' + (data.message || 'Unknown error'));
+                        addBtn.innerHTML = originalText;
+                        addBtn.disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred while creating Saturday holidays.');
+                    addBtn.innerHTML = originalText;
+                    addBtn.disabled = false;
                 });
         }
 
-        // Session Details Functions (View Only)
-        function showSessionDetails(event) {
-            currentSessionId = event.id;
-            const props = event.extendedProps;
+        // Session Management Functions
+        function viewSession(id) {
+            const session = sessionsData.find(s => s.id == id);
+            if (!session) {
+                alert('Session not found');
+                return;
+            }
+
+            currentSessionId = id;
+            const statusIcons = {
+                'class': '📚',
+                'holiday': '🏖️',
+                'exam': '📝',
+                'event': '🎉'
+            };
+
+            const statusColors = {
+                'class': '#3b82f6',
+                'holiday': '#ef4444',
+                'exam': '#f59e0b',
+                'event': '#10b981'
+            };
 
             const content = `
                 <div class="space-y-4">
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">${event.title}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">${event.start.toLocaleDateString()} at ${event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                            <span class="mr-2">${statusIcons[session.status] || '📅'}</span>
+                            ${session.status.charAt(0).toUpperCase() + session.status.slice(1)} Session
+                        </h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            ${new Date(session.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: ${event.backgroundColor}20; color: ${event.backgroundColor};">
-                                ${props.status.charAt(0).toUpperCase() + props.status.slice(1)}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  style="background-color: ${statusColors[session.status]}20; color: ${statusColors[session.status]};">
+                                ${statusIcons[session.status]} ${session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                             </span>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration</label>
-                            <p class="text-sm text-gray-900 dark:text-white">${event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+                            <p class="text-sm text-gray-900 dark:text-white">
+                                ${session.start_time} - ${session.end_time}
+                            </p>
                         </div>
                     </div>
 
-                    ${props.notes ? `
+                    ${session.notes ? `
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                        <p class="text-sm text-gray-900 dark:text-white">${props.notes}</p>
+                        <p class="text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 p-2 rounded">${session.notes}</p>
                     </div>
                     ` : ''}
                 </div>
@@ -714,22 +1051,21 @@
             }
         }
 
-        // Edit Session Functions
         function editSession(id) {
-            editingSessionId = id;
-            const event = mainCalendar.getEventById(id);
-
-            if (event) {
-                const props = event.extendedProps;
-
-                document.getElementById('editDate').value = event.start.toISOString().split('T')[0];
-                document.getElementById('editStatus').value = props.status;
-                document.getElementById('editStartTime').value = event.start.toTimeString().slice(0, 5);
-                document.getElementById('editEndTime').value = event.end.toTimeString().slice(0, 5);
-                document.getElementById('editNotes').value = props.notes || '';
-
-                document.getElementById('editSessionModal').classList.remove('hidden');
+            const session = sessionsData.find(s => s.id == id);
+            if (!session) {
+                alert('Session not found');
+                return;
             }
+
+            editingSessionId = id;
+            document.getElementById('editDate').value = session.date;
+            document.getElementById('editStatus').value = session.status;
+            document.getElementById('editStartTime').value = session.start_time;
+            document.getElementById('editEndTime').value = session.end_time;
+            document.getElementById('editNotes').value = session.notes || '';
+
+            document.getElementById('editSessionModal').classList.remove('hidden');
         }
 
         function hideEditSessionModal() {
@@ -750,7 +1086,6 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            // API call to update session
             fetch(`/admin/sessions/${editingSessionId}`, {
                 method: 'PUT',
                 headers: {
@@ -766,7 +1101,7 @@
                         hideEditSessionModal();
                         location.reload();
                     } else {
-                        alert('Error updating session: ' + data.message);
+                        alert('Error updating session: ' + (data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
@@ -775,47 +1110,59 @@
                 });
         });
 
-        // Delete Functions
         function confirmDeleteSession(id) {
+            const session = sessionsData.find(s => s.id == id);
+            if (!session) {
+                alert('Session not found');
+                return;
+            }
+
             currentSessionId = id;
-            const event = mainCalendar.getEventById(id);
+            const statusIcons = {
+                'class': '📚',
+                'holiday': '🏖️',
+                'exam': '📝',
+                'event': '🎉'
+            };
 
-            console.log("deleting"+id);
+            const statusColors = {
+                'class': '#3b82f6',
+                'holiday': '#ef4444',
+                'exam': '#f59e0b',
+                'event': '#10b981'
+            };
 
-            if (event) {
-                const props = event.extendedProps;
-                const details = `
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Date:</span>
-                            <span class="text-gray-900 dark:text-white">${event.start.toLocaleDateString()}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Time:</span>
-                            <span class="text-gray-900 dark:text-white">${event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Status:</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: ${event.backgroundColor}20; color: ${event.backgroundColor};">
-                                ${props.status.charAt(0).toUpperCase() + props.status.slice(1)}
-                            </span>
-                        </div>
-                        ${props.notes ? `
-                        <div class="flex justify-between">
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Notes:</span>
-                            <span class="text-gray-900 dark:text-white text-right max-w-xs truncate">${props.notes}</span>
-                        </div>
-                        ` : ''}
+            const details = `
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Date:</span>
+                        <span class="text-gray-900 dark:text-white">${new Date(session.date).toLocaleDateString()}</span>
                     </div>
-                `;
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Time:</span>
+                        <span class="text-gray-900 dark:text-white">${session.start_time} - ${session.end_time}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Status:</span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                              style="background-color: ${statusColors[session.status]}20; color: ${statusColors[session.status]};">
+                            ${statusIcons[session.status]} ${session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                        </span>
+                    </div>
+                    ${session.notes ? `
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Notes:</span>
+                        <span class="text-gray-900 dark:text-white text-right max-w-xs truncate">${session.notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
 
-                document.getElementById('deleteSessionDetails').innerHTML = details;
-                document.getElementById('deleteSessionModal').classList.remove('hidden');
+            document.getElementById('deleteSessionDetails').innerHTML = details;
+            document.getElementById('deleteSessionModal').classList.remove('hidden');
 
-                // Hide details modal if it's open
-                if (document.getElementById('sessionDetailsModal').classList.contains('hidden') === false) {
-                    hideSessionDetailsModal();
-                }
+            if (!document.getElementById('sessionDetailsModal').classList.contains('hidden')) {
+                hideSessionDetailsModal();
             }
         }
 
@@ -824,16 +1171,13 @@
         }
 
         function deleteSession() {
-            console.log("h", currentSessionId);
             if (!currentSessionId) return;
 
-            // Show loading state
             const deleteBtn = document.querySelector('#deleteSessionModal button[onclick="deleteSession()"]');
             const originalText = deleteBtn.innerHTML;
             deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
             deleteBtn.disabled = true;
 
-            // API call to delete session
             fetch(`/admin/sessions/${currentSessionId}`, {
                 method: 'DELETE',
                 headers: {
@@ -851,19 +1195,8 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === "success") {
-                        Swal.fire({
-                            toast: true,
-                            position: 'bottom-end',
-                            icon: 'success',
-                            title: 'Session deleted successfully!',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            background: '#f8f9fa',
-                            iconColor: '#28a745',
-                            color: '#343a40'
-                        });
+                    if (data.status === "success" || data.success) {
+                        alert('Session deleted successfully!');
                         hideDeleteSessionModal();
                         location.reload();
                     } else {
@@ -872,229 +1205,20 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    Swal.fire({
-                        toast: true,
-                        position: 'bottom-end',
-                        icon: 'error',
-                        title: 'Error deleting session',
-                        text: error.message,
-                        showConfirmButton: false,
-                        timer: 5000,
-                        timerProgressBar: true,
-                        background: '#f8f9fa',
-                        iconColor: '#dc3545',
-                        color: '#343a40'
-                    });
-
-                    // Reset button state if needed
-                    const deleteBtn = document.querySelector('#deleteSessionModal button[onclick="deleteSession()"]');
-                    if (deleteBtn) {
-                        deleteBtn.innerHTML = '<i class="fas fa-trash mr-2"></i>Delete Session';
-                        deleteBtn.disabled = false;
-                    }
-                });
-        }
-
-        // Toggle View Function
-        function toggleView() {
-            const calendarView = document.getElementById('calendarView');
-            const tableView = document.getElementById('tableView');
-            const toggleBtn = document.getElementById('viewToggleBtn');
-
-            if (currentView === 'calendar') {
-                calendarView.classList.add('hidden');
-                tableView.classList.remove('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-calendar mr-2"></i> Calendar View';
-                currentView = 'table';
-            } else {
-                calendarView.classList.remove('hidden');
-                tableView.classList.add('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-table mr-2"></i> Table View';
-                currentView = 'calendar';
-                setTimeout(() => mainCalendar.render(), 100);
-            }
-        }
-
-        // Selected Dates Functions
-        function updateSelectedDatesDisplay() {
-            const container = document.getElementById('selectedDates');
-
-            if (selectedDates.length === 0) {
-                container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No dates selected</p>';
-            } else {
-                const sortedDates = selectedDates.sort();
-                const dateElements = sortedDates.map(date => {
-                    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                    return `
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 mr-2 mb-2">
-                            ${formattedDate}
-                            <button onclick="removeDate('${date}')" class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-100">
-                                <i class="fas fa-times text-xs"></i>
-                            </button>
-                        </span>
-                    `;
-                }).join('');
-
-                container.innerHTML = `
-                    <div class="flex flex-wrap">
-                        ${dateElements}
-                    </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">${selectedDates.length} date(s) selected</p>
-                `;
-            }
-        }
-
-        function removeDate(dateStr) {
-            selectedDates = selectedDates.filter(date => date !== dateStr);
-
-            const dayEl = schedulingCalendar.el.querySelector(`[data-date="${dateStr}"]`);
-            if (dayEl) {
-                dayEl.classList.remove('selected-date');
-            }
-
-            updateSelectedDatesDisplay();
-            updateSaveButton();
-        }
-
-        function updateSaveButton() {
-            const saveButton = document.getElementById('saveButton');
-            saveButton.disabled = selectedDates.length === 0;
-        }
-
-        function clearSelection() {
-            selectedDates = [];
-
-            const selectedElements = schedulingCalendar.el.querySelectorAll('.selected-date');
-            selectedElements.forEach(el => el.classList.remove('selected-date'));
-
-            updateSelectedDatesDisplay();
-            updateSaveButton();
-        }
-
-        // Session Creation Function
-        function saveSessions() {
-            if (selectedDates.length === 0) {
-                alert('Please select at least one date.');
-                return;
-            }
-
-            const startTime = document.getElementById('startTime').value;
-            const endTime = document.getElementById('endTime').value;
-            const status = document.getElementById('sessionStatus').value;
-            const notes = document.getElementById('sessionNotes').value;
-
-            if (startTime >= endTime) {
-                alert('End time must be after start time.');
-                return;
-            }
-
-            const sessionsData = {
-                dates: selectedDates,
-                start_time: startTime,
-                end_time: endTime,
-                status: status,
-                notes: notes,
-                _token: '{{ csrf_token() }}'
-            };
-
-            fetch('/admin/sessions/bulk-create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(sessionsData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        alert('Sessions created successfully!');
-                        hideSessionModal();
-                        location.reload();
-                    } else {
-                        alert('Error creating sessions: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while saving sessions.');
+                    alert('Error deleting session: ' + error.message);
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
                 });
         }
 
         // Modal Control Functions
         function showSessionModal() {
             document.getElementById('sessionModal').classList.remove('hidden');
-            if (schedulingCalendar) {
-                setTimeout(() => schedulingCalendar.render(), 100);
-            }
         }
 
         function hideSessionModal() {
             document.getElementById('sessionModal').classList.add('hidden');
-            clearSelection();
-            document.getElementById('startTime').value = '09:00';
-            document.getElementById('endTime').value = '10:00';
-            document.getElementById('sessionStatus').value = 'class';
-            document.getElementById('sessionNotes').value = '';
+            clearSessionForm();
         }
-
-        function viewSession(id) {
-            const event = mainCalendar.getEventById(id);
-            if (event) {
-                showSessionDetails(event);
-            }
-        }
-
-        // Filter handling
-        document.getElementById('statusFilter').addEventListener('change', function(e) {
-            const filterValue = e.target.value;
-
-            if (filterValue === '') {
-                mainCalendar.removeAllEventSources();
-                mainCalendar.addEventSource(sessionsData);
-            } else {
-                const filteredEvents = sessionsData.filter(event => event.extendedProps.status === filterValue);
-                mainCalendar.removeAllEventSources();
-                mainCalendar.addEventSource(filteredEvents);
-            }
-        });
-
-        document.getElementById('date-range').addEventListener('change', function(e) {
-            const view = e.target.value;
-            switch(view) {
-                case 'month':
-                    mainCalendar.changeView('dayGridMonth');
-                    break;
-                case 'week':
-                    mainCalendar.changeView('timeGridWeek');
-                    break;
-                case 'day':
-                    mainCalendar.changeView('timeGridDay');
-                    break;
-                case 'list':
-                    mainCalendar.changeView('listWeek');
-                    break;
-            }
-        });
-
-        document.getElementById('search').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-
-            if (searchTerm === '') {
-                mainCalendar.removeAllEventSources();
-                mainCalendar.addEventSource(sessionsData);
-            } else {
-                const filteredEvents = sessionsData.filter(event =>
-                    event.title.toLowerCase().includes(searchTerm) ||
-                    event.extendedProps.notes.toLowerCase().includes(searchTerm)
-                );
-                mainCalendar.removeAllEventSources();
-                mainCalendar.addEventSource(filteredEvents);
-            }
-        });
     </script>
 @endsection

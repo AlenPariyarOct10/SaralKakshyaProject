@@ -98,7 +98,7 @@ class StudentPassPredictionController extends Controller
     }
 
     /**
-     * Make a prediction for a student
+     * Make a prediction for a student (Pass/Fail)
      */
     public function predict(Request $request)
     {

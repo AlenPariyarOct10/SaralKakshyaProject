@@ -4,6 +4,8 @@
     {{$user->fname}} {{$user->lname}}
 @endsection
 
+@section("title", "Dashboard")
+
 @section('fname')
     {{$user->fname}}
 @endsection

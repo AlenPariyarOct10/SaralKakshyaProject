@@ -26,21 +26,21 @@ class StudentFactory extends Factory
             'phone' => '98' . $this->faker->numerify('########'),
             'address' => $this->faker->address,
             'gender' => $this->faker->randomElement(['male', 'female',]),
-            'dob' => $this->faker->date(),
+            'dob' => $this->faker->dateTimeBetween('2000-01-01', '2004-12-31')->format('Y-m-d'),
             'guardian_name' => $this->faker->name,
             'guardian_phone' => '98' . $this->faker->numerify('########'),
-            'roll_number' => $this->faker->unique()->numerify('RN###'),
-            'batch' => $admissionDate->format('Y'),
-            'section' => $this->faker->randomElement(['A', 'B', 'C']),
-            'admission_date' => $admissionDate->format('Y-m-d'),
+            'roll_number' => $this->faker->unique()->numerify('##'),
+            'batch_id' => 1,
+            'section_id' => null,
+            'admission_date' => $this->faker->dateTimeBetween('2021-01-01', '2021-12-31')->format('Y-m-d'),
             'profile_picture' => null,
             'email_verified_at' => now(),
             'password' => Hash::make('password'), // or bcrypt('password')
-            'status' => $this->faker->randomElement([0,1]),
+            'status' => $this->faker->randomElement([1]),
             'remember_token' => \Illuminate\Support\Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
-            'institute_id' => $this->faker->randomElement([1, 2, 5]),
+            'institute_id' => $this->faker->randomElement([1]),
         ];
     }
 }

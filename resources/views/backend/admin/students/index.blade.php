@@ -12,6 +12,8 @@
     {{$user->lname}}
 @endsection
 
+@section("title", "Students")
+
 @section('profile_picture')
     {{$user->profile_picture}}
 @endsection
@@ -118,7 +120,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
+                <div class="hidden">
                     <select id="sectionFilter" class="form-input py-2">
                         <option value="">All Sections</option>
                         <option value="A">Section A</option>

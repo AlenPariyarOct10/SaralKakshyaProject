@@ -326,9 +326,11 @@
                 .then(data => {
                     // Check if data is an array (success case) or an object with message (error case)
                     if (Array.isArray(data)) {
-                        // Populate subject dropdown
+                        // Populate subject dropdown with "subject name - semester" format
                         data.forEach(subject => {
-                            subjectId.innerHTML += `<option value="${subject.id}">${subject.name} (${subject.code})</option>`;
+                            const semesterText = subject.semester ? ` - Semester ${subject.semester}` : '';
+                            const optionText = `${subject.name}${semesterText}`;
+                            subjectId.innerHTML += `<option value="${subject.id}">${optionText}</option>`;
                         });
 
                         // If in edit mode and we have a saved subject ID, set it after populating

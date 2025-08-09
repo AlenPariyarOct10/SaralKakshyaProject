@@ -106,9 +106,8 @@
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
                     <input type="text" id="searchBatches" placeholder="Search batches..." class="form-input pl-12 pr-4 py-2">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
-                        <i class="fas fa-search text-gray-400"></i>
-                    </div>
+
+
                 </div>
                 <div>
                     <select id="departmentFilter" class="form-input py-2">

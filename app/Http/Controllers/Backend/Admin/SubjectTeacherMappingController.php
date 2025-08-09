@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClassRoutine;
+use App\Models\Subject;
 use App\Models\SubjectTeacherMapping;
 use App\Models\TeacherAvailability;
 use Illuminate\Http\Request;
@@ -166,9 +167,24 @@ class SubjectTeacherMappingController extends Controller
             'teacher_id' => [
                 'required',
                 'exists:teachers,id',
-                Rule::unique('subject_teacher_mappings')->where(function ($query) use ($request) {
-                    return $query->where('subject_id', $request->subject_id);
-                })->ignore($request->id)
+                // Check if teacher is already assigned to another subject in the same semester
+                function ($attribute, $value, $fail) use ($request) {
+                    // Get the subject being assigned
+                    $subject = Subject::find($request->subject_id);
+
+                    // Check if teacher has any existing mappings in the same semester
+                    $existingMapping = SubjectTeacherMapping::where('teacher_id', $value)
+                        ->whereHas('subject', function($query) use ($subject) {
+                            $query->where('semester', $subject->semester)
+                                ->where('program_id', $subject->program_id);
+                        })
+                        ->where('institute_id', session('institute_id'))
+                        ->exists();
+
+                    if ($existingMapping) {
+                        $fail('This teacher is already assigned to a subject in semester ' . $subject->semester . '.');
+                    }
+                }
             ],
         ]);
 

@@ -49,11 +49,6 @@
             <!-- Password Input -->
             @component('components.login.password-input') @endcomponent
 
-            <!-- Remember Me & Forgot Password -->
-            <div class="flex items-center justify-between mb-6">
-                <a href="#" class="text-sm text-primary hover:text-secondary">Forgot password?</a>
-            </div>
-
             <!-- Login Button -->
             <button type="submit"
                     class="w-full bg-primary bg-blue-500 hover:bg-secondary text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">

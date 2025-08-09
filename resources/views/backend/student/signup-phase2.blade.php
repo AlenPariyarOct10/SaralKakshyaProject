@@ -7,7 +7,7 @@
             const departmentSelect = document.getElementById('department');
             const programSelect = document.getElementById('program');
             const batchSelect = document.getElementById('batch');
-            const sectionSelect = document.getElementById('section');
+
 
             // Department change handler
             departmentSelect.addEventListener('change', function() {
@@ -16,7 +16,7 @@
                 // Clear dependent fields
                 programSelect.innerHTML = '<option value="">Select Program</option>';
                 batchSelect.innerHTML = '<option value="">Select Batch</option>';
-                sectionSelect.innerHTML = '<option value="">Select Section</option>';
+
 
                 if (departmentId) {
                     // Fetch programs based on selected department
@@ -41,7 +41,7 @@
 
                 // Clear dependent fields
                 batchSelect.innerHTML = '<option value="">Select Batch</option>';
-                sectionSelect.innerHTML = '<option value="">Select Section</option>';
+
 
                 if (programId && departmentId) {
                     // Fetch batches based on selected program and department
@@ -57,18 +57,6 @@
                         })
                         .catch(error => console.error('Error fetching batches:', error));
 
-                    // Fetch sections based on selected program
-                    fetch(`/student/program/${programId}/sections`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.forEach(section => {
-                                const option = document.createElement('option');
-                                option.value = section.id;
-                                option.textContent = section.section_name;
-                                sectionSelect.appendChild(option);
-                            });
-                        })
-                        .catch(error => console.error('Error fetching sections:', error));
                 }
             });
             // Helper function to show errors
@@ -151,6 +139,16 @@
 @endsection
 
 @section('content')
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-3 rounded relative" role="alert">
+            <strong class="font-bold">Whoops!</strong>
+            <ul class="mt-2 list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="w-full max-w-md">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Complete Your Profile</h2>
@@ -246,13 +244,6 @@
                     </select>
                 </div>
 
-                <!-- Section -->
-                <div class="mb-4">
-                    <label for="section" class="block text-gray-700 text-sm font-medium mb-2">Section</label>
-                    <select id="section" name="section_id" class="w-full py-2 px-3 border rounded-md" required>
-                        <option value="">Select Section</option>
-                    </select>
-                </div>
 
                 <!-- Admission Date -->
                 <div class="mb-4">

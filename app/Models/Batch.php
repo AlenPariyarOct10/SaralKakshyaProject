@@ -19,4 +19,9 @@ class Batch extends Model
         return $this->hasMany(Subject::class, 'program_id', 'program_id')
             ->where('semester', $this->semester);
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

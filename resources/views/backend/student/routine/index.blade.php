@@ -4,7 +4,7 @@
 @extends('backend.layout.student-dashboard-layout')
 @php $user = Auth::user(); @endphp
 @section('username', $user->fname . ' ' . $user->lname)
-
+@section("title", "Routine")
 @section('styles')
     <style>
         @media print {

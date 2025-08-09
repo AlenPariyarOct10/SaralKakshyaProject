@@ -13,7 +13,7 @@
 @section('profile_picture')
     {{$user->profile_picture}}
 @endsection
-
+@section("title", "Profile")
 @section('content')
     <!-- Main Content Area -->
     <!-- Main Content Area - Made scrollable -->

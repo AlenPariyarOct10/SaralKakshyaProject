@@ -212,6 +212,7 @@ def chi_square_distance(hist1, hist2):
 
     return chi_sq
 
+# Euclidean distance
 def euclidean_distance(hist1, hist2):
     """Alternative distance metric"""
     if hist1 is None or hist2 is None:

@@ -15,7 +15,9 @@
 @section('profile_picture')
     {{$user->profile_picture}}
 @endsection
-
+@section("title")
+    Create Announcement
+@endsection
 @push("styles")
     <style type="text/tailwindcss">
         @layer utilities {

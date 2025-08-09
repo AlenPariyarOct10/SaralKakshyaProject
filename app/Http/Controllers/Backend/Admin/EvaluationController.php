@@ -23,11 +23,8 @@ class EvaluationController extends Controller
         return view('backend.admin.evaluation.index', compact('user'));
     }
 
-
     public function downloadResultsPdf(Request $request)
     {
-
-
         $program_id = $request->program_id;
         $semester = $request->semester;
         $institute_id = $request->institute_id;
@@ -56,7 +53,7 @@ class EvaluationController extends Controller
         return $pdf->download('evaluation-results-'.$batch->program->name.'-sem-'.$semester.'.pdf');
     }
 
-// Helper method to reuse evaluation logic
+    // Helper method to reuse evaluation logic
     private function getEvaluationResults($batch, $institute_id)
     {
         $holidayDates = InstituteSession::where('institute_id', $institute_id)
@@ -175,7 +172,6 @@ class EvaluationController extends Controller
 
             $passStatus = ($attendancePass && $assignmentPass && $preboardPass && $midtermPass) ? 'Pass' : 'Fail';
 
-
             return [
                 'student_name' => $student->fname . ' ' . $student->lname,
                 'exam_details' => collect($examDetails)->map(function ($item) {
@@ -204,7 +200,6 @@ class EvaluationController extends Controller
 
         return $result->sortByDesc('total_obtained')->values();
     }
-
 
     public function evaluation(Request $request)
     {
@@ -359,24 +354,31 @@ class EvaluationController extends Controller
                     'full_marks' => $totalFull,
                 ],
                 'status' => $passStatus,
-                'total_obtained' => $totalObtained, // used for sorting
+                'total_obtained' => $totalObtained, // Keep this for sorting
             ];
         });
 
         // Sort by total_obtained in descending order
         $sortedResults = $result->sortByDesc('total_obtained')->values();
 
-        // Add rank
-        $rankedResults = $sortedResults->map(function ($item, $index) use ($sortedResults) {
-            if ($index > 0 && $item['total_obtained'] === $sortedResults[$index - 1]['total_obtained']) {
-                $item['rank'] = $sortedResults[$index - 1]['rank'];
-            } else {
-                $item['rank'] = $index + 1;
+        // Add rank - FIXED VERSION
+        $rankedResults = [];
+        $currentRank = 1;
+        $previousScore = null;
+
+        foreach ($sortedResults as $index => $item) {
+            // If current score is different from previous, update currentRank
+            if ($previousScore !== null && $item['total_obtained'] < $previousScore) {
+                $currentRank = $index + 1;
             }
 
-            unset($item['total_obtained']); // cleanup
-            return $item;
-        });
+            $item['rank'] = $currentRank;
+            $previousScore = $item['total_obtained']; // Store current score for next iteration
+
+            // Remove total_obtained as it's only needed for sorting
+            unset($item['total_obtained']);
+            $rankedResults[] = $item;
+        }
 
         return response()->json([
             'batch_id' => $batch->id,

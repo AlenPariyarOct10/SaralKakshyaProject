@@ -87,7 +87,7 @@
         }
     </style>
 @endsection
-
+@section("title", "Setup Face")
 @section('content')
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-4xl mx-auto">

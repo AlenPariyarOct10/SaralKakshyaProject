@@ -109,10 +109,6 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
-                <button id="manageSectionBtn" class="bg-yellow-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-yellow-600">
-                    <i class="fas fa-plus mr-2"></i> Manage Sections
-                </button>
-
                 <a href="{{route('admin.batches.index')}}" class="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-600">
                     <i class="fas fa-plus mr-2"></i> Manage Batch
                 </a>

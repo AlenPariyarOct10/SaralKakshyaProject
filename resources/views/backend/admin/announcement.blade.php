@@ -1,6 +1,8 @@
 
 @extends("backend.layout.admin-dashboard-layout")
-
+@section("title")
+    Announcements
+@endsection
 
 @section('username')
     {{$user->fname}} {{$user->lname}}

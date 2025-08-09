@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{asset("js/sweetalert.js")}}"></script>
     @vite(['resources/js/app.js', 'resources/css/app.css'])
+    <link rel="shortcut icon" href="{{asset("assets/images/logo-square.png")}}" type="image/x-icon">
 
     <!-- Tailwind is already configured in tailwind.config.js -->
     <!-- These utility classes should be moved to app.css for better organization -->

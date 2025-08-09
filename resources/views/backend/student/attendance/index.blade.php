@@ -12,7 +12,7 @@
     $currentMonth = isset($startDate) ? $startDate->format('F Y') : \Carbon\Carbon::now()->format('F Y');
 @endphp
 @section('username', $user->fname . ' ' . $user->lname)
-
+@section("title", "Attendance")
 
 @section('content')
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">

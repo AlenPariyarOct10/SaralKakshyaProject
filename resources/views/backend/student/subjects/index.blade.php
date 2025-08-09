@@ -2,9 +2,8 @@
 @extends('backend.layout.student-dashboard-layout')
 @php $user = Auth::user(); @endphp
 @section('username', $user->fname . ' ' . $user->lname)
-
+@section('title', 'Subjects')
 @section('content')
-    program {{ session('program_id') }}
     <div class="scrollable-content p-6 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto">
             <!-- Page Title and Actions -->
@@ -67,6 +66,24 @@
 
 @section('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+
+                document.querySelectorAll('.card').forEach(card => {
+                    const subjectName = card.querySelector('h2').textContent.toLowerCase();
+
+                    // Show/hide based on name match
+                    if (subjectName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             // Filter functionality
             document.getElementById('searchInput').addEventListener('input', filterResources);

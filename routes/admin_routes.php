@@ -145,7 +145,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/teacher', [AdminTeacherController::class, "index"])->name('admin.teacher.index');
         Route::get('/teacher/{id}', [AdminTeacherController::class, "show"])->name('admin.teacher.show');
         Route::get('/teachers/getAll', [AdminTeacherController::class, "getAll"])->name('admin.teacher.getAll');
-        Route::get('/teacher/unapproved', [AdminTeacherController::class, "index_pending_teachers"])->name('admin.teacher.unapproved.index');
+        Route::get('/teacher/unapprovedd', [AdminTeacherController::class, "index_pending_teachers"])->name('admin.teacher.unapproved.index');
         Route::put('/teacher/approve/{id}', [AdminTeacherController::class, "approve_teacher"])->name('admin.teacher.approve');
         Route::put('/teacher/unapprove/{id}', [AdminTeacherController::class, "unapprove_teacher"])->name('admin.teacher.unapprove');
         Route::POST('/teacher/status/{id}', [AdminTeacherController::class, "toggle_status"])->name('admin.teacher.status');
@@ -203,6 +203,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Attendance routes
         Route::get('/attendance', [AdminAttendanceController::class, "index"])->name('admin.attendance.index');
+
+        Route::get('/attendance/location', [AdminAttendanceController::class, "showLocationSetup"])->name('admin.attendance.location.index');
+        Route::post('/attendance/location', [AdminAttendanceController::class, "updateLocation"])->name('admin.attendance.location.update');
+        Route::delete('/attendance/location', [AdminAttendanceController::class, "deleteLocation"])->name('admin.attendance.location.delete');
         Route::get('/attendance/create', [AdminAttendanceController::class, "create"])->name('admin.attendance.create');
         Route::post('/attendance', [AdminAttendanceController::class, "store"])->name('admin.attendance.store');
         Route::get('/attendance/{id}', [AdminAttendanceController::class, "show"])->name('admin.attendance.show');

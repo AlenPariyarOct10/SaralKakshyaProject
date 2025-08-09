@@ -4,6 +4,10 @@
     {{$user->fname}} {{$user->lname}}
 @endsection
 
+@section('title')
+    Teachers
+@endsection
+
 @section('fname')
     {{$user->fname}}
 @endsection
@@ -79,9 +83,6 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
-                    </div>
                     <input type="text" id="searchTeachers" placeholder="Search teachers..." class="form-input pl-10 pr-4 py-2">
                 </div>
             </div>
@@ -89,7 +90,7 @@
                 <a id="exportBtn" href="{{route('admin.teacher.download.excel')}}" class="btn-secondary flex items-center justify-center mr-2">
                     <i class="fas fa-download mr-2"></i> Export
                 </a>
-                <a href="{{route('admin.teacher.unapproved.index')}}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
+                <a href="{{route('admin.teacher.unapproved.index')}}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm hidden">
                     <i class="fa-solid fa-hourglass-end mr-2"></i> Pending Approval
                     <span class="ml-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                         {{$pendingCount}}

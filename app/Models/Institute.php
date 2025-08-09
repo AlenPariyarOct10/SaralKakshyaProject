@@ -10,7 +10,8 @@ class Institute extends Model
 {
     use SoftDeletes;
     protected $table = 'institutes';
-    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by'];
+    protected $fillable = ['name', 'address', 'email','description', 'logo', 'created_by',
+                            'latitude', 'longitude', 'threshold'];
 
     protected $casts = ['deleted_at' => 'datetime'];
 
@@ -69,6 +70,14 @@ class Institute extends Model
             'id',
             'id'
         )->where('attendances.attendee_type', 'student');
+    }
+
+    public function getLocation()
+    {
+        return [
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
     }
 
     public function getAttendanceStats()

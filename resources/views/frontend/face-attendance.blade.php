@@ -137,6 +137,10 @@
             background-color: rgba(239, 68, 68, 0.1);
             color: rgba(239, 68, 68, 1);
         }
+
+        .location-indicator {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -151,17 +155,32 @@
 
             <!-- Institute Selector -->
             <div class="relative w-64">
-                <select id="instituteSelector" class="dropdown-select appearance-none block w-full px-3 py-2 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition duration-200 pr-10 text-sm">
-                    <option value="" disabled selected>Select Institute</option>
-                    @foreach($institutes as $institute)
-                        <option value="{{ $institute->id }}">{{ $institute->name }}</option>
-                    @endforeach
+                <select id="instituteSelector" class="dropdown-select appearance-none block w-full px-3 py-2 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition duration-200 pr-10 text-sm" disabled>
+                    <option value="" disabled selected>Detecting location...</option>
                 </select>
+                <div id="locationLoader" class="absolute right-8 top-1/2 transform -translate-y-1/2">
+                    <div class="w-4 h-4 border-2 border-gray-300 border-t-emerald-500 rounded-full animate-spin"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Status -->
+        <div id="locationStatus" class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+            <div class="flex items-center gap-2 text-blue-800 text-sm">
+                <i class="fas fa-map-marker-alt location-indicator"></i>
+                <span id="locationText">Detecting your location...</span>
             </div>
         </div>
 
         <!-- Status Pills -->
         <div class="flex flex-wrap gap-2 mb-3">
+            <div id="locationStatusPill" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                <div class="relative">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div id="locationStatusBadge" class="badge bg-yellow-400"></div>
+                </div>
+                <span>Location</span>
+            </div>
             <div id="cameraStatus" class="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 <div class="relative">
                     <i class="fas fa-video"></i>
@@ -224,7 +243,7 @@
                 <!-- Camera Controls -->
                 <div class="p-3 border-t border-gray-100">
                     <div class="flex flex-wrap gap-2 justify-between">
-                        <button id="startBtn" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
+                        <button id="startBtn" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm" disabled>
                             <i class="fas fa-play"></i>
                             <span>Start Recognition</span>
                         </button>
@@ -237,6 +256,11 @@
                         <button id="switchCameraBtn" class="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
                             <i class="fas fa-sync-alt"></i>
                             <span>Switch Camera</span>
+                        </button>
+
+                        <button id="refreshLocationBtn" class="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 text-sm">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Refresh Location</span>
                         </button>
                     </div>
                 </div>
@@ -261,7 +285,7 @@
                 <div id="recognitionResult" class="flex-1 p-4 hidden">
                     <div class="text-center mb-4">
                         <div class="w-20 h-20 rounded-full bg-emerald-50 border-4 border-emerald-500 mx-auto mb-3 flex items-center justify-center overflow-hidden">
-                            <img id="personImage" src="/placeholder.svg" alt="Person" class="w-full h-full object-cover hidden">
+                            <img id="personImage" alt="Person" class="w-full h-full object-cover">
                             <i id="personIcon" class="fas fa-user-circle text-emerald-300 text-4xl"></i>
                         </div>
                         <h3 id="recognizedName" class="text-lg font-semibold text-gray-800"></h3>
@@ -330,7 +354,6 @@
                             <i class="fas fa-arrow-left"></i>
                             <span>Dashboard</span>
                         </a>
-
                     </div>
                 </div>
             </div>
@@ -356,6 +379,7 @@
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const switchCameraBtn = document.getElementById('switchCameraBtn');
+        const refreshLocationBtn = document.getElementById('refreshLocationBtn');
         const emptyState = document.getElementById('emptyState');
         const recognitionResult = document.getElementById('recognitionResult');
         const loadingState = document.getElementById('loadingState');
@@ -373,8 +397,14 @@
         const personImage = document.getElementById('personImage');
         const personIcon = document.getElementById('personIcon');
         const faceDetectionOverlay = document.getElementById('faceDetectionOverlay');
+        const instituteSelector = document.getElementById('instituteSelector');
+        const locationLoader = document.getElementById('locationLoader');
+        const locationStatus = document.getElementById('locationStatus');
+        const locationText = document.getElementById('locationText');
 
         // Status indicators
+        const locationStatusPill = document.getElementById('locationStatusPill');
+        const locationStatusBadge = document.getElementById('locationStatusBadge');
         const cameraStatus = document.getElementById('cameraStatus');
         const cameraStatusBadge = document.getElementById('cameraStatusBadge');
         const apiStatus = document.getElementById('apiStatus');
@@ -389,15 +419,213 @@
         let isRecognizing = false;
         let recognitionTimer = null;
         let faceDetectionTimer = null;
-        let facingMode = 'user'; // 'user' for front camera, 'environment' for back camera
+        let facingMode = 'user';
         let instituteId = '';
-        let hasFace = true;
-        let faceBox = true;
+        let hasFace = false;
+        let faceBox = false;
         let isAPIConnected = false;
+        let userLocation = null;
+        let nearbyInstitutes = [];
+        let isLocationDetected = false;
+        let isCameraReady = false;
 
+        // Location functions
+        function updateLocationStatus(status) {
+            if (status === 'detecting') {
+                locationStatusPill.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
+                locationStatusPill.classList.add('bg-yellow-100');
+                locationStatusBadge.classList.remove('bg-gray-400', 'bg-green-500', 'bg-red-500');
+                locationStatusBadge.classList.add('bg-yellow-400');
+            } else if (status === 'detected') {
+                locationStatusPill.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-red-100');
+                locationStatusPill.classList.add('bg-green-100');
+                locationStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-red-500');
+                locationStatusBadge.classList.add('bg-green-500');
+            } else if (status === 'error') {
+                locationStatusPill.classList.remove('bg-gray-100', 'bg-yellow-100', 'bg-green-100');
+                locationStatusPill.classList.add('bg-red-100');
+                locationStatusBadge.classList.remove('bg-gray-400', 'bg-yellow-400', 'bg-green-500');
+                locationStatusBadge.classList.add('bg-red-500');
+            }
+        }
+
+        function getCurrentLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation is not supported by this browser'));
+                    return;
+                }
+
+                updateLocationStatus('detecting');
+                locationStatus.classList.remove('hidden');
+                locationText.textContent = 'Detecting your location...';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const location = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+
+                        userLocation = location;
+                        isLocationDetected = true;
+                        updateLocationStatus('detected');
+                        locationText.textContent = `Location detected (±${Math.round(location.accuracy)}m accuracy)`;
+
+                        resolve(location);
+                    },
+                    (error) => {
+                        updateLocationStatus('error');
+                        locationText.textContent = 'Failed to detect location. Please enable location services.';
+
+                        let errorMessage = 'Location access denied';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location access denied by user';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Location information unavailable';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location request timed out';
+                                break;
+                        }
+
+                        reject(new Error(errorMessage));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            });
+        }
+
+        function loadNearbyInstitutes(location) {
+            locationLoader.classList.remove('hidden');
+
+            fetch('{{ route("attendance.nearby-institutes") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    locationLoader.classList.add('hidden');
+
+                    if (data.success) {
+                        nearbyInstitutes = data.institutes;
+                        updateInstituteSelector(data.institutes);
+
+                        if (data.institutes.length > 0) {
+                            locationText.textContent = `Found ${data.institutes.length} nearby institute(s)`;
+                            locationStatus.classList.remove('bg-blue-50', 'border-blue-200');
+                            locationStatus.classList.add('bg-green-50', 'border-green-200');
+                            locationText.classList.remove('text-blue-800');
+                            locationText.classList.add('text-green-800');
+                        } else {
+                            locationText.textContent = 'No institutes found in your area';
+                            locationStatus.classList.remove('bg-blue-50', 'border-blue-200');
+                            locationStatus.classList.add('bg-yellow-50', 'border-yellow-200');
+                            locationText.classList.remove('text-blue-800');
+                            locationText.classList.add('text-yellow-800');
+                        }
+                    } else {
+                        updateInstituteSelector([]);
+                        locationText.textContent = 'Failed to load nearby institutes';
+                        locationStatus.classList.remove('bg-blue-50', 'border-blue-200');
+                        locationStatus.classList.add('bg-red-50', 'border-red-200');
+                        locationText.classList.remove('text-blue-800');
+                        locationText.classList.add('text-red-800');
+                    }
+
+                    // Check if we can enable start button
+                    checkStartButtonState();
+                })
+                .catch(error => {
+                    console.error('Error loading nearby institutes:', error);
+                    locationLoader.classList.add('hidden');
+                    updateInstituteSelector([]);
+                    locationText.textContent = 'Error loading nearby institutes';
+                    locationStatus.classList.remove('bg-blue-50', 'border-blue-200');
+                    locationStatus.classList.add('bg-red-50', 'border-red-200');
+                    locationText.classList.remove('text-blue-800');
+                    locationText.classList.add('text-red-800');
+
+                    checkStartButtonState();
+                });
+        }
+
+        function updateInstituteSelector(institutes) {
+            instituteSelector.innerHTML = '';
+
+            if (institutes.length === 0) {
+                instituteSelector.innerHTML = '<option value="" disabled selected>No institutes in your area</option>';
+                instituteSelector.disabled = true;
+            } else {
+                instituteSelector.innerHTML = '<option value="" disabled selected>Select Institute</option>';
+
+                institutes.forEach(institute => {
+                    const option = document.createElement('option');
+                    option.value = institute.id;
+                    option.textContent = `${institute.name} (${institute.distance}m away)`;
+                    instituteSelector.appendChild(option);
+                });
+
+                instituteSelector.disabled = false;
+            }
+
+            // Add event listener for institute selection
+            instituteSelector.addEventListener('change', function() {
+                checkStartButtonState();
+            });
+        }
+
+        function checkStartButtonState() {
+            // Enable start button only if camera is ready, location is detected, institute is selected, and API is connected
+            const canStart = isCameraReady &&
+                isLocationDetected &&
+                instituteSelector.value &&
+                isAPIConnected;
+
+            startBtn.disabled = !canStart;
+        }
+
+        function initializeLocation() {
+            getCurrentLocation()
+                .then(location => {
+                    console.log('Location detected:', location);
+                    loadNearbyInstitutes(location);
+                })
+                .catch(error => {
+                    console.error('Location error:', error);
+                    // Fallback: show all institutes if location fails
+                    locationLoader.classList.add('hidden');
+
+                    const allInstitutes = {!! json_encode($institutes->map(function($institute) {
+                return [
+                    'id' => $institute->id,
+                    'name' => $institute->name,
+                    'distance' => 'Unknown',
+                    'threshold' => $institute->threshold ?? 100
+                ];
+            })) !!};
+
+                    updateInstituteSelector(allInstitutes);
+                    isLocationDetected = true; // Allow fallback to work
+                    checkStartButtonState();
+                });
+        }
         // Check API connection
         function checkAPIConnection() {
-            // Simple ping to API to verify connection
             fetch(`${FLASK_API_URL}/recognize-face`, {
                 method: 'OPTIONS',
                 mode: 'cors'
@@ -410,11 +638,13 @@
                         isAPIConnected = false;
                         updateAPIStatus('error');
                     }
+                    checkStartButtonState();
                 })
                 .catch(error => {
                     console.error('API connection error:', error);
                     isAPIConnected = false;
                     updateAPIStatus('error');
+                    checkStartButtonState();
                 });
         }
 
@@ -487,7 +717,6 @@
 
         // Update status indicators
         function updateCameraStatus(camera) {
-            // Camera status
             if (camera === 'connecting') {
                 cameraStatus.classList.remove('bg-gray-100', 'bg-green-100', 'bg-red-100');
                 cameraStatus.classList.add('bg-yellow-100');
@@ -512,12 +741,10 @@
                 updateCameraStatus('connecting');
                 showStatus('Initializing', 'Requesting camera access...');
 
-                // Stop any existing stream
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                 }
 
-                // Request camera access
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         width: { ideal: 1280 },
@@ -529,23 +756,25 @@
 
                 video.srcObject = stream;
 
-                // Wait for video to be ready
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     overlayCanvas.width = video.videoWidth;
                     overlayCanvas.height = video.videoHeight;
 
+                    isCameraReady = true;
                     updateCameraStatus('active');
                     showStatus('Camera Ready', 'Camera initialized successfully', 'fa-check-circle', true);
 
-                    // Start face detection timer
                     startFaceDetection();
+                    checkStartButtonState();
                 };
             } catch (error) {
                 console.error('Error accessing camera:', error);
+                isCameraReady = false;
                 updateCameraStatus('error');
                 showStatus('Camera Error', 'Failed to access camera', 'fa-exclamation-triangle');
+                checkStartButtonState();
             }
         }
 
@@ -555,31 +784,24 @@
                 return;
             }
 
-            // Draw the current video frame to the hidden canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Clear previous overlay
             overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-            // In a real implementation, you would use a proper face detection library here
+            // Simulate face detection - in real implementation, use proper face detection library
             hasFace = true;
             faceBox = true;
 
-            // Add face detection box when a face is detected
             if (hasFace && faceBox && isRecognizing) {
-                // Create a face detection box in the center of the frame (simulated)
                 const boxWidth = canvas.width * 0.4;
                 const boxHeight = canvas.height * 0.6;
                 const boxX = (canvas.width - boxWidth) / 2;
                 const boxY = (canvas.height - boxHeight) / 2;
 
-                // Draw face box on overlay canvas
                 overlayContext.strokeStyle = '#10B981';
                 overlayContext.lineWidth = 3;
                 overlayContext.setLineDash([]);
                 overlayContext.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
-                // Add pulsing effect
                 overlayContext.strokeStyle = 'rgba(16, 185, 129, 0.3)';
                 overlayContext.lineWidth = 5;
                 overlayContext.strokeRect(boxX - 3, boxY - 3, boxWidth + 6, boxHeight + 6);
@@ -590,12 +812,9 @@
 
         // Start face detection
         function startFaceDetection() {
-            // Clear any existing timer
             if (faceDetectionTimer) {
                 clearInterval(faceDetectionTimer);
             }
-
-            // Set up face detection timer
             faceDetectionTimer = setInterval(detectFace, 200);
         }
 
@@ -606,63 +825,50 @@
                 return;
             }
 
-            // Check if API is connected
             if (!isAPIConnected) {
                 showStatus('Error', 'API not connected', 'fa-exclamation-triangle', true);
                 return;
             }
 
-            // Check if institute is selected
-            if (!document.getElementById('instituteSelector').value) {
+            if (!instituteSelector.value) {
                 showStatus('Error', 'Please select an institute', 'fa-exclamation-triangle', true);
                 return;
             }
 
-            instituteId = document.getElementById('instituteSelector').value;
+            instituteId = instituteSelector.value;
             isRecognizing = true;
             startBtn.classList.add('hidden');
             stopBtn.classList.remove('hidden');
             recordingIndicator.classList.remove('hidden');
             cameraTitle.textContent = 'Recognition in Progress';
 
-            // Show scanning effect
             scanningEffect.classList.remove('opacity-0');
             scanningEffect.classList.add('opacity-100');
 
             showStatus('Recognition Active', 'Looking for faces...', 'fa-search');
 
-            // Hide empty state, show loading state
             emptyState.classList.add('hidden');
             loadingState.classList.remove('hidden');
             recognitionResult.classList.add('hidden');
             errorState.classList.add('hidden');
 
-            // Wait for a face to be detected, then recognize
             checkForFaceAndRecognize();
         }
 
         // Check for face and recognize when found
         function checkForFaceAndRecognize() {
-            // Clear existing timer if any
             if (recognitionTimer) {
                 clearInterval(recognitionTimer);
             }
 
             recognitionTimer = setInterval(() => {
                 if (hasFace && faceBox) {
-                    // Capture current frame
                     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    // Get image data for processing
                     const imageData = canvas.toDataURL('image/jpeg');
-
-                    // Call API for face recognition
                     recognizeFace(imageData);
-
-                    // Stop the interval after starting recognition
                     clearInterval(recognitionTimer);
                 } else {
-                    detectFace(); // Try to detect face
+                    detectFace();
                 }
             }, 500);
         }
@@ -679,7 +885,6 @@
             recordingIndicator.classList.add('hidden');
             cameraTitle.textContent = 'Camera Feed';
 
-            // Hide scanning effect
             scanningEffect.classList.remove('opacity-100');
             scanningEffect.classList.add('opacity-0');
 
@@ -690,7 +895,6 @@
         function recognizeFace(imageData) {
             showStatus('Processing', 'Analyzing facial features...', 'fa-cog fa-spin');
 
-            // Make API call to Flask backend
             fetch(`${FLASK_API_URL}/recognize-face`, {
                 method: 'POST',
                 headers: {
@@ -750,22 +954,18 @@
         function handleRecognitionSuccess(response) {
             showStatus('Success', 'Face recognized successfully!', 'fa-check-circle', true);
 
-            // Hide loading state, show recognition result
             loadingState.classList.add('hidden');
             recognitionResult.classList.remove('hidden');
             errorState.classList.add('hidden');
 
-            // Update recognition result
             recognizedName.textContent = response.person.fname+" "+response.person.lname;
             recognizedId.textContent = `Student • Roll : ${response.person.id} • ${response.person.institute.name}`;
 
-            // Update recognition status
             recognitionStatus.className = 'recognition-status success';
             recognitionStatus.innerHTML = '<i class="fas fa-check-circle mr-1"></i><span>Recognized</span>';
 
-            // Update profile image
-            if(response.person.profile_picture != null) {
-                personImage.src = "{{ asset('storage/profile_pictures') }}/" + response.person.profile_picture;
+            if(response.person.profile_picture != null && response.person.profile_picture.trim() !== '') {
+                personImage.src = "{{ asset('storage/') }}/" + response.person.profile_picture;
                 personImage.classList.remove("hidden");
                 personIcon.classList.add("hidden");
             } else {
@@ -773,7 +973,6 @@
                 personIcon.classList.remove("hidden");
             }
 
-            // Update attendance timestamp
             const now = new Date();
             attendanceTimestamp.textContent = now.toLocaleString('en-US', {
                 weekday: 'short',
@@ -783,37 +982,28 @@
                 minute: '2-digit'
             });
 
-            // Log attendance
             logAttendance(response.person.id);
-
-            // Stop recognition after successful match
             stopRecognition();
         }
 
         // Handle failed recognition
         function handleRecognitionFailure(reason) {
-            // Hide loading state, show error state
             loadingState.classList.add('hidden');
             recognitionResult.classList.add('hidden');
             errorState.classList.remove('hidden');
 
-            // Update error message
             errorMessage.textContent = reason;
-
-            // Stop recognition
             stopRecognition();
         }
 
         // API call for logging attendance
         function logAttendance(studentId) {
-            // Make API call to your Laravel backend to log attendance
             const attendanceData = {
                 student_id: studentId,
                 institute_id: instituteId,
                 timestamp: new Date().toISOString(),
             };
 
-            // Send to your Laravel backend
             fetch('{{ route("student.face.mark") }}', {
                 method: 'POST',
                 headers: {
@@ -825,7 +1015,6 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Attendance logged:', data);
-                    // Show a success notification
                     showAttendanceNotification(studentId);
                 })
                 .catch(error => {
@@ -835,7 +1024,6 @@
 
         // Show attendance notification
         function showAttendanceNotification(studentId) {
-            // Create notification element
             const notification = document.createElement('div');
             notification.className = 'fixed bottom-4 right-4 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 slide-in';
             notification.innerHTML = `
@@ -848,10 +1036,8 @@
                 </div>
             `;
 
-            // Add to document
             document.body.appendChild(notification);
 
-            // Remove after 5 seconds
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateY(20px)';
@@ -871,14 +1057,16 @@
         startBtn.addEventListener('click', startRecognition);
         stopBtn.addEventListener('click', stopRecognition);
         switchCameraBtn.addEventListener('click', switchCamera);
+        refreshLocationBtn.addEventListener('click', initializeLocation);
         retryBtn.addEventListener('click', startRecognition);
 
-        // Initialize
+        // Initialize everything
         initCamera();
         checkAPIConnection();
+        initializeLocation();
 
         // Periodically check API connection
-        setInterval(checkAPIConnection, 30000); // Check every 30 seconds
+        setInterval(checkAPIConnection, 30000);
     });
 </script>
 </body>
