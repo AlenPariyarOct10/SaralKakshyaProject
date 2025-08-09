@@ -11,9 +11,16 @@ SaralKakshya is a **smart classroom management system** designed to enhance the 
 ## 🚀 Features  
 
 ✅ **Automated Attendance Tracking** – Face Recognition using LBP  
+<img width="1917" height="1020" alt="image" src="https://github.com/user-attachments/assets/bcae08e0-c0db-4f75-bda6-83b2f3f4ec36" />
+
 ✅ **Assignment & Resource Management** – Upload, submit, and track assignments  
+<img width="903" height="473" alt="image" src="https://github.com/user-attachments/assets/0486d8ed-3b7e-4a2f-bf9b-fc2e4dca2959" />
+<img width="903" height="479" alt="image" src="https://github.com/user-attachments/assets/58960b6f-610f-47c1-b581-434e0adaa0e5" />
+
 ✅ **Real-Time Notifications & Communication** – Instant updates for students & teachers  
 ✅ **Pass/Fail Prediction** – AI-based academic performance analysis (Logistic Regression)  
+<img width="903" height="476" alt="image" src="https://github.com/user-attachments/assets/2440bba2-671c-47f0-b9c7-5e2e72c540a2" />
+
 ✅ **User Roles & Access Control** – Admin, Teacher, and Student dashboards  
 ✅ **Optimized Performance** – Caching, B-Tree Indexing, Secure Authentication  
 
