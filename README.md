@@ -92,5 +92,3 @@ Contributions are welcome! Feel free to fork this repository and submit pull req
 ```
 
 ---
-
-This README is **well-structured, informative, and beginner-friendly** while also highlighting that it’s a *BCA Project II submission*. 🚀 Let me know if you need any changes!
